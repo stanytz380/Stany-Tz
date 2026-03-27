@@ -1,1421 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    
-    <!-- Open Graph / Social Media Preview -->
-    <meta property="og:title" content="STANY MIN TV - Premium Entertainment">
-    <meta property="og:description" content="Watch Live TV, Movies, Sports & More. Premium streaming experience with thousands of channels and movies.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
-    <meta property="og:url" content="https://stanyappstore.web.app">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="STANY MIN TV">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="STANY MIN TV - Premium Entertainment">
-    <meta name="twitter:description" content="Watch Live TV, Movies, Sports & More. Premium streaming experience.">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
-    
-    <title>STANY MIN TV - Premium Entertainment</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Video.js Premium -->
-    <link href="https://unpkg.com/video.js@8.6.1/dist/video-js.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/@videojs/themes@1.0.1/dist/fantasy/index.css" rel="stylesheet">
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <!-- i18next for Multiple Languages -->
-    <script src="https://unpkg.com/i18next@23.5.0/i18next.min.js"></script>
-    
-    <style>
-        :root {
-            --ios-bg: #000000;
-            --ios-card: rgba(28, 28, 30, 0.65);
-            --ios-card-solid: #1c1c1e;
-            --ios-glass: rgba(255, 255, 255, 0.08);
-            --ios-border: rgba(255, 255, 255, 0.1);
-            --ios-blue: #0A84FF;
-            --ios-green: #30D158;
-            --ios-red: #FF453A;
-            --ios-orange: #FF9F0A;
-            --ios-gray: #8E8E93;
-            --ios-light-gray: #C7C7CC;
-            --ios-text: #FFFFFF;
-            --ios-text-secondary: #98989D;
-            --gradient-primary: linear-gradient(135deg, #FF2D55 0%, #5856D6 50%, #0A84FF 100%);
-            --gradient-secondary: linear-gradient(135deg, #FF375F 0%, #00C7BE 100%);
-            --glass-blur: blur(20px) saturate(180%);
-            --shadow-ios: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --shadow-glow: 0 0 40px rgba(10, 132, 255, 0.3);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            font-family: 'SF Pro Display', 'Inter', -apple-system, sans-serif;
-        }
-
-        body {
-            background: var(--ios-bg);
-            color: var(--ios-text);
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            overflow-x: hidden;
-            padding-bottom: 100px;
-        }
-
-        /* iOS Glassmorphism */
-        .ios-glass {
-            background: var(--ios-glass);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--ios-border);
-        }
-
-        .ios-card {
-            background: var(--ios-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--ios-border);
-            border-radius: 20px;
-        }
-
-        /* Premium Loader */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--ios-bg);
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .loader-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 28px;
-            object-fit: cover;
-            box-shadow: var(--shadow-glow);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .ios-spinner {
-            width: 44px;
-            height: 44px;
-            border: 3px solid var(--ios-glass);
-            border-top-color: var(--ios-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-        }
-
-        /* iOS Style Buttons */
-        .ios-button {
-            background: var(--gradient-primary);
-            border: none;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 4px 16px rgba(10, 132, 255, 0.3);
-        }
-
-        .ios-button:active {
-            transform: scale(0.96);
-            opacity: 0.9;
-        }
-
-        .ios-button-secondary {
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            box-shadow: none;
-        }
-
-        .ios-button-large {
-            padding: 18px 32px;
-            font-size: 18px;
-            border-radius: 16px;
-        }
-
-        /* Auth Screen */
-        .auth-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--ios-bg);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-        }
-
-        .auth-container {
-            width: 100%;
-            max-width: 420px;
-        }
-
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .auth-logo img {
-            width: 120px;
-            height: 120px;
-            border-radius: 32px;
-            object-fit: cover;
-            box-shadow: var(--shadow-glow);
-            margin-bottom: 16px;
-        }
-
-        .auth-title {
-            font-size: 34px;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .auth-subtitle {
-            color: var(--ios-text-secondary);
-            font-size: 17px;
-        }
-
-        .ios-input {
-            width: 100%;
-            padding: 18px 20px;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            border-radius: 14px;
-            color: var(--ios-text);
-            font-size: 17px;
-            margin-bottom: 16px;
-            outline: none;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .ios-input:focus {
-            border-color: var(--ios-blue);
-            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
-        }
-
-        .ios-input::placeholder {
-            color: var(--ios-gray);
-        }
-
-        /* Language Selector */
-        .language-selector {
-            margin-bottom: 24px;
-        }
-
-        .language-label {
-            color: var(--ios-text-secondary);
-            font-size: 13px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .language-options {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .language-option {
-            padding: 10px 20px;
-            background: var(--ios-glass);
-            border: 2px solid var(--ios-border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .language-option.active {
-            border-color: var(--ios-blue);
-            background: rgba(10, 132, 255, 0.2);
-            color: var(--ios-blue);
-        }
-
-        /* Header */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            padding: 16px 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--ios-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            object-fit: cover;
-        }
-
-        .header-title {
-            font-size: 22px;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 16px;
-        }
-
-        .header-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--ios-text);
-            font-size: 18px;
-        }
-
-        .header-icon:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Search Bar */
-        .search-bar {
-            margin: 16px 20px;
-            position: relative;
-        }
-
-        .search-input-wrapper {
-            position: relative;
-        }
-
-        .search-icon-left {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--ios-gray);
-            font-size: 16px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px 20px 14px 48px;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            border-radius: 14px;
-            color: var(--ios-text);
-            font-size: 16px;
-            outline: none;
-            backdrop-filter: blur(10px);
-        }
-
-        .search-input:focus {
-            border-color: var(--ios-blue);
-        }
-
-        /* iOS Style Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(20, 20, 20, 0.85);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border-top: 1px solid var(--ios-border);
-            padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-width: 64px;
-        }
-
-        .nav-item:active {
-            transform: scale(0.92);
-        }
-
-        .nav-item.active {
-            background: rgba(10, 132, 255, 0.15);
-        }
-
-        .nav-icon {
-            font-size: 24px;
-            color: var(--ios-text-secondary);
-            transition: all 0.3s;
-        }
-
-        .nav-item.active .nav-icon {
-            color: var(--ios-blue);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--ios-text-secondary);
-            transition: all 0.3s;
-        }
-
-        .nav-item.active .nav-label {
-            color: var(--ios-blue);
-            font-weight: 600;
-        }
-
-        /* Share Section */
-        .share-section {
-            margin: 20px;
-            padding: 24px;
-            border-radius: 24px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .share-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-primary);
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        .share-title {
-            font-size: 13px;
-            color: var(--ios-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .share-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .share-button {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            font-size: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .share-button:active {
-            transform: scale(0.9) rotate(-5deg);
-        }
-
-        .share-whatsapp { background: #25D366; }
-        .share-facebook { background: #1877F2; }
-        .share-twitter { background: #1DA1F2; }
-        .share-telegram { background: #0088cc; }
-        .share-copy { background: var(--ios-card-solid); }
-
-        /* Carousel */
-        .carousel-container {
-            margin: 20px;
-            height: 220px;
-            border-radius: 24px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: var(--shadow-ios);
-        }
-
-        .carousel-slide {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-        .carousel-slide.active {
-            opacity: 1;
-        }
-
-        .carousel-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .carousel-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 24px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-        }
-
-        .carousel-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .carousel-desc {
-            font-size: 14px;
-            color: var(--ios-light-gray);
-        }
-
-        /* Section Title */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 28px 20px 16px;
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .see-all {
-            color: var(--ios-blue);
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 0 20px;
-        }
-
-        @media (max-width: 480px) {
-            .content-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .content-card {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            aspect-ratio: 2/3;
-            background: var(--ios-card-solid);
-        }
-
-        .content-card:active {
-            transform: scale(0.95);
-        }
-
-        .content-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .content-card:hover img {
-            transform: scale(1.05);
-        }
-
-        .content-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-        }
-
-        .content-title {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .locked-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-        }
-
-        .lock-icon {
-            font-size: 32px;
-            color: white;
-        }
-
-        /* Category Tags */
-        .category-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 0 20px;
-            margin-bottom: 20px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .category-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-tag {
-            padding: 10px 20px;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .category-tag:active {
-            transform: scale(0.95);
-        }
-
-        .category-tag.active {
-            background: var(--gradient-primary);
-            border-color: transparent;
-            color: white;
-        }
-
-        /* Premium Video Player */
-        .video-js {
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-        }
-
-        .video-js .vjs-big-play-button {
-            background: rgba(10, 132, 255, 0.9) !important;
-            border: none !important;
-            border-radius: 50% !important;
-            width: 70px !important;
-            height: 70px !important;
-            line-height: 70px !important;
-            font-size: 32px !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 8px 32px rgba(10, 132, 255, 0.5);
-        }
-
-        .video-js .vjs-control-bar {
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-        }
-
-        .video-js .vjs-play-progress {
-            background: var(--ios-blue) !important;
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 20000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--ios-card-solid);
-            border-radius: 28px;
-            padding: 32px;
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid var(--ios-border);
-            box-shadow: var(--shadow-ios);
-            animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes modalSlide {
-            from {
-                opacity: 0;
-                transform: translateY(50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .modal-text {
-            color: var(--ios-text-secondary);
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 28px;
-            line-height: 1.5;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--ios-text);
-            font-size: 18px;
-            transition: all 0.3s;
-        }
-
-        .modal-close:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Toast Notification */
-        #toast {
-            position: fixed;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--ios-card-solid);
-            color: white;
-            padding: 16px 28px;
-            border-radius: 16px;
-            border: 1px solid var(--ios-border);
-            box-shadow: var(--shadow-ios);
-            z-index: 30000;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(20px);
-        }
-
-        #toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Pages */
-        .page {
-            display: none;
-            animation: pageFade 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes pageFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Profile Page */
-        .profile-header {
-            margin: 20px;
-            padding: 32px;
-            border-radius: 28px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 150px;
-            background: var(--gradient-primary);
-            opacity: 0.2;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .profile-name {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .profile-email {
-            color: var(--ios-text-secondary);
-            font-size: 15px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .profile-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            background: var(--gradient-primary);
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-
-        .menu-section {
-            margin: 0 20px 24px;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 20px;
-            background: var(--ios-glass);
-            border-bottom: 1px solid var(--ios-border);
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .menu-item:active {
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .menu-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .menu-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            background: var(--ios-glass);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ios-blue);
-            font-size: 16px;
-        }
-
-        .menu-text {
-            font-size: 17px;
-            font-weight: 500;
-        }
-
-        .menu-chevron {
-            color: var(--ios-gray);
-            font-size: 14px;
-        }
-
-        /* Chat */
-        .chat-container {
-            height: calc(100vh - 200px);
-            display: flex;
-            flex-direction: column;
-            margin: 20px;
-            border-radius: 24px;
-            overflow: hidden;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .chat-message {
-            max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 20px;
-            font-size: 15px;
-            line-height: 1.4;
-            animation: messageSlide 0.3s ease;
-        }
-
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-message.user {
-            align-self: flex-end;
-            background: var(--gradient-primary);
-            color: white;
-            border-bottom-right-radius: 6px;
-        }
-
-        .chat-message.admin {
-            align-self: flex-start;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            border-bottom-left-radius: 6px;
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 12px;
-            padding: 16px;
-            background: var(--ios-card-solid);
-            border-top: 1px solid var(--ios-border);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 14px 20px;
-            background: var(--ios-glass);
-            border: 1px solid var(--ios-border);
-            border-radius: 24px;
-            color: var(--ios-text);
-            font-size: 16px;
-            outline: none;
-        }
-
-        .chat-send {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-        }
-
-        .chat-send:active {
-            transform: scale(0.92);
-        }
-
-        /* Loading States */
-        .loading-skeleton {
-            background: linear-gradient(90deg, var(--ios-glass) 25%, var(--ios-border) 50%, var(--ios-glass) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 12px;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Responsive */
-        @media (max-width: 380px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            .nav-label {
-                font-size: 10px;
-            }
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--ios-gray);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--ios-light-gray);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>STANY MIN TV ADMIN - Ultimate Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #FF0000;
+        --secondary: #00bcd4;
+        --bg: #050505;
+        --card: #141414;
+        --text: #ffffff;
+        --border: #222;
+        --gray: #888;
+        --danger: #ff3b30;
+        --success: #34c759;
+        --warning: #ff9500;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+    .top-bar {
+        height: 65px; background: var(--card); border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;
+    }
+    .brand { font-size: 1.4em; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+    .back-btn { display: none; font-size: 1.2em; padding: 10px; cursor: pointer; color: white; margin-right: 10px; }
+    #homeView {
+        width: 100%; height: 100%; overflow-y: auto; padding: 20px;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; align-content: start;
+    }
+    .menu-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 25px; text-align: center;
+        cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .menu-card:hover { border-color: var(--primary); transform: translateY(-5px); background: #1a1a1a; }
+    .menu-icon { font-size: 2.5em; margin-bottom: 10px; color: var(--primary); }
+    .page-view {
+        display: none; width: 100%; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 100px;
+        background: var(--bg); animation: slideIn 0.3s;
+    }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .modal {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center;
+    }
+    .modal-box {
+        background: #181818; width: 90%; max-width: 500px; padding: 25px; border-radius: 15px;
+        border: 1px solid var(--primary); max-height: 90vh; overflow-y: auto;
+    }
+    .input-box {
+        width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white;
+        border-radius: 8px; margin-bottom: 10px;
+    }
+    .btn { padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-p { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+    .btn-d { background: var(--danger); color: white; }
+    .ep-row { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+    .chat-message-item {
+        background: #222; border-radius: 12px; padding: 12px; margin-bottom: 12px;
+    }
+    .chat-message-item small { color: #888; display: block; margin-top: 4px; }
+    #toast {
+        position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+        background: var(--primary); padding: 12px 30px; border-radius: 20px; z-index: 3000; display: none; font-weight: bold;
+    }
+</style>
 </head>
 <body>
 
-    <!-- Loader -->
-    <div id="loader">
-        <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV" class="loader-logo">
-        <div class="ios-spinner"></div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMessage">Notification</span>
-    </div>
-
-    <!-- Auth Screen -->
-    <div id="authPages" class="auth-screen">
-        <div class="auth-container">
-            <div id="loginPage">
-                <div class="auth-logo">
-                    <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV">
-                    <h1 class="auth-title" data-i18n="appTitle">STANY MIN TV</h1>
-                    <p class="auth-subtitle" data-i18n="welcomeBack">Welcome Back</p>
-                </div>
-                
-                <div class="language-selector">
-                    <div class="language-label" data-i18n="selectLanguage">Select Language</div>
-                    <div class="language-options">
-                        <div class="language-option active" onclick="changeLanguage('en')" data-lang="en">English</div>
-                        <div class="language-option" onclick="changeLanguage('sw')" data-lang="sw">Kiswahili</div>
-                        <div class="language-option" onclick="changeLanguage('fr')" data-lang="fr">Français</div>
-                    </div>
-                </div>
-
-                <input type="email" id="lemail" class="ios-input" data-i18n-placeholder="email" placeholder="Email">
-                <input type="password" id="lpass" class="ios-input" data-i18n-placeholder="password" placeholder="Password">
-                <button class="ios-button ios-button-large" onclick="login()" data-i18n="signIn">Sign In</button>
-                
-                <p style="text-align: center; margin-top: 24px; color: var(--ios-text-secondary);">
-                    <span data-i18n="noAccount">Don't have an account?</span>
-                    <span style="color: var(--ios-blue); cursor: pointer; margin-left: 8px;" onclick="showRegister()" data-i18n="signUp">Sign Up</span>
-                </p>
-            </div>
-
-            <div id="regPage" style="display:none;">
-                <div class="auth-logo">
-                    <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV">
-                    <h1 class="auth-title" data-i18n="createAccount">Create Account</h1>
-                    <p class="auth-subtitle" data-i18n="joinUs">Join Us Today</p>
-                </div>
-
-                <div class="language-selector">
-                    <div class="language-label" data-i18n="selectLanguage">Select Language</div>
-                    <div class="language-options">
-                        <div class="language-option active" onclick="changeLanguage('en')" data-lang="en">English</div>
-                        <div class="language-option" onclick="changeLanguage('sw')" data-lang="sw">Kiswahili</div>
-                        <div class="language-option" onclick="changeLanguage('fr')" data-lang="fr">Français</div>
-                    </div>
-                </div>
-
-                <input type="text" id="rname" class="ios-input" data-i18n-placeholder="fullName" placeholder="Full Name">
-                <input type="email" id="remail" class="ios-input" data-i18n-placeholder="email" placeholder="Email">
-                <input type="password" id="rpass" class="ios-input" data-i18n-placeholder="password" placeholder="Password">
-                <button class="ios-button ios-button-large" onclick="register()" data-i18n="createAccount">Create Account</button>
-                
-                <p style="text-align: center; margin-top: 24px; color: var(--ios-text-secondary);">
-                    <span data-i18n="haveAccount">Already have an account?</span>
-                    <span style="color: var(--ios-blue); cursor: pointer; margin-left: 8px;" onclick="showLogin()" data-i18n="signIn">Sign In</span>
-                </p>
-            </div>
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal" style="display:flex;">
+        <div class="modal-box" style="text-align:center;">
+            <h2 style="color:var(--primary); margin-bottom:20px;">ADMIN PORTAL</h2>
+            <input type="email" id="lemail" class="input-box" placeholder="Email">
+            <input type="password" id="lpass" class="input-box" placeholder="Password">
+            <button class="btn btn-p" onclick="login()">LOGIN</button>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="mainApp" style="display:none;">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-logo">
-                <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="Logo">
-                <div class="header-title">STANY MIN TV</div>
-            </div>
-            <div class="header-actions">
-                <div class="header-icon" onclick="toggleSearch()">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="header-icon" onclick="showNotifications()">
-                    <i class="fas fa-bell"></i>
-                </div>
-            </div>
+    <!-- Header -->
+    <div class="top-bar">
+        <div style="display:flex; align-items:center;">
+            <i class="fas fa-arrow-left back-btn" id="backBtn" onclick="goHome()"></i>
+            <div class="brand" id="pageTitle">STANY ADMIN PRO</div>
+        </div>
+        <i class="fas fa-sign-out-alt" onclick="auth.signOut()" style="cursor:pointer; color:var(--danger);"></i>
+    </div>
+
+    <div class="view-container">
+        <!-- Dashboard -->
+        <div id="homeView">
+            <div class="menu-card" onclick="openPage('users')"><i class="fas fa-users menu-icon"></i><div>User Control</div></div>
+            <div class="menu-card" onclick="openPage('channels')"><i class="fas fa-tv menu-icon"></i><div>Channels</div></div>
+            <div class="menu-card" onclick="openPage('movies')"><i class="fas fa-film menu-icon"></i><div>Movies</div></div>
+            <div class="menu-card" onclick="openPage('ads')"><i class="fas fa-ad menu-icon"></i><div>Ads Manager</div></div>
+            <div class="menu-card" onclick="openPage('tokens')"><i class="fas fa-key menu-icon"></i><div>Token Factory</div></div>
+            <div class="menu-card" onclick="openPage('library')"><i class="fas fa-book menu-icon"></i><div>Library</div></div>
+            <div class="menu-card" onclick="openPage('categories')"><i class="fas fa-tags menu-icon"></i><div>Categories</div></div>
+            <div class="menu-card" onclick="openPage('tips')"><i class="fas fa-futbol menu-icon"></i><div>Betting Tips</div></div>
+            <div class="menu-card" onclick="openPage('chat')"><i class="fas fa-comments menu-icon"></i><div>Chat Replies</div></div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-bar" id="searchBar" style="display:none;">
-            <div class="search-input-wrapper">
-                <i class="fas fa-search search-icon-left"></i>
-                <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="search" placeholder="Search..." onkeyup="globalSearch()">
-            </div>
+        <!-- 1. Users -->
+        <div id="users" class="page-view">
+            <h3>Manage Device Locks & Subscriptions</h3>
+            <div id="userList"></div>
         </div>
 
-        <!-- HOME PAGE -->
-        <div id="home" class="page active">
-            <!-- Share Section -->
-            <div class="share-section ios-card">
-                <div class="share-title">
-                    <i class="fas fa-share-alt"></i>
-                    <span data-i18n="shareApp">Share STANY MIN TV</span>
-                </div>
-                <div class="share-buttons">
-                    <button class="share-button share-whatsapp" onclick="shareApp('whatsapp')">
-                        <i class="fab fa-whatsapp"></i>
-                    </button>
-                    <button class="share-button share-facebook" onclick="shareApp('facebook')">
-                        <i class="fab fa-facebook-f"></i>
-                    </button>
-                    <button class="share-button share-twitter" onclick="shareApp('twitter')">
-                        <i class="fab fa-twitter"></i>
-                    </button>
-                    <button class="share-button share-telegram" onclick="shareApp('telegram')">
-                        <i class="fab fa-telegram-plane"></i>
-                    </button>
-                    <button class="share-button share-copy" onclick="copyLink()">
-                        <i class="fas fa-link"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Carousel -->
-            <div class="carousel-container ios-card" id="carousel">
-                <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--ios-text-secondary);">
-                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
-                    <span data-i18n="loading">Loading...</span>
-                </div>
-            </div>
-
-            <!-- Categories -->
-            <div class="category-scroll" id="categoryTags"></div>
-
-            <!-- Live Channels -->
-            <div class="section-header">
-                <h2 class="section-title" data-i18n="liveChannels">Live Channels</h2>
-                <span class="see-all" data-i18n="seeAll">See All</span>
-            </div>
-            <div class="content-grid" id="chanGrid">
-                <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--ios-text-secondary);">
-                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
-                    <span data-i18n="loading">Loading...</span>
-                </div>
-            </div>
-
-            <!-- Movies -->
-            <div class="section-header">
-                <h2 class="section-title" data-i18n="movies">Movies</h2>
-                <span class="see-all" data-i18n="seeAll">See All</span>
-            </div>
-            <div class="content-grid" id="movGrid">
-                <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--ios-text-secondary);">
-                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
-                    <span data-i18n="loading">Loading...</span>
-                </div>
-            </div>
+        <!-- 2. Channels -->
+        <div id="channels" class="page-view">
+            <button class="btn btn-p" style="margin-bottom:20px;" onclick="openChanModal()">+ Add Channel</button>
+            <div id="chanList"></div>
         </div>
 
-        <!-- CATEGORIES PAGE -->
-        <div id="cats" class="page">
-            <h2 class="section-title" style="margin:20px;" data-i18n="categories">Categories</h2>
-            <div id="catContent"></div>
+        <!-- 3. Movies -->
+        <div id="movies" class="page-view">
+            <button class="btn btn-p" style="margin-bottom:20px;" onclick="openMovieModal()">+ Add Movie</button>
+            <div id="movieList"></div>
         </div>
 
-        <!-- DOWNLOADS PAGE -->
-        <div id="downloads" class="page">
-            <h2 class="section-title" style="margin:20px;" data-i18n="downloads">Downloads</h2>
-            <div id="dlContent" style="padding:40px 20px; text-align:center; color:var(--ios-text-secondary);">
-                <i class="fas fa-download" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i>
-                <p data-i18n="noDownloads">No downloads yet</p>
+        <!-- 4. Ads Manager -->
+        <div id="ads" class="page-view">
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <h3>Create New Randomized Ad</h3>
+                <select id="adType" class="input-box" onchange="toggleAdFields()">
+                    <option value="image">Single Image Ad</option>
+                    <option value="video">Video Ad</option>
+                    <option value="slider">Slidable Image Slider</option>
+                </select>
+                <input id="adHeader" class="input-box" placeholder="Header Words">
+                <input id="adMedia" class="input-box" placeholder="Main URL (image/video)">
+                <textarea id="adSlider" class="input-box" placeholder="Slider URLs (comma separated)" style="display:none"></textarea>
+                <input id="adLink" class="input-box" placeholder="Sponsor Link">
+                <input id="adFooter" class="input-box" placeholder="Footer Words">
+                <input id="adDuration" type="number" class="input-box" placeholder="Duration (seconds)">
+                <button class="btn btn-p" onclick="saveAd()">Post Ad</button>
             </div>
+            <div id="adsList" style="margin-top:20px;"></div>
         </div>
 
-        <!-- TIPS PAGE -->
-        <div id="tips" class="page">
-            <h2 class="section-title" style="margin:20px;" data-i18n="bettingTips">Betting Tips</h2>
-            <div id="tipsContent" style="padding:0 20px;"></div>
+        <!-- 5. Token Factory -->
+        <div id="tokens" class="page-view">
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <h3>Premium Token Generator</h3>
+                <input id="tkCount" type="number" class="input-box" placeholder="Number of tokens">
+                <button class="btn btn-p" onclick="generateTokens()">Generate</button>
+            </div>
+            <div id="tkList" style="margin-top:20px;"></div>
         </div>
 
-        <!-- CHAT PAGE -->
-        <div id="bot" class="page">
-            <div class="chat-container ios-card">
-                <div class="chat-messages" id="chatBox">
-                    <div class="chat-message admin" data-i18n="welcomeChat">
-                        Welcome! How can we help you today?
+        <!-- 6. Library (Episodes) -->
+        <div id="library" class="page-view">
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <h3>Add New Book / Content</h3>
+                <select id="libCat" class="input-box">
+                    <option value="simulizi">Simulizi</option>
+                    <option value="tech">Tech Update</option>
+                </select>
+                <input id="libTitle" class="input-box" placeholder="Title">
+                <input id="libAuthor" class="input-box" placeholder="Author">
+                <textarea id="libDesc" class="input-box" placeholder="Summary"></textarea>
+                <div id="episodesArea">
+                    <h4>Episodes / Parts</h4>
+                    <div class="ep-row">
+                        <input class="ep-title input-box" placeholder="Part Title">
+                        <textarea class="ep-content input-box" rows="5" placeholder="Content"></textarea>
                     </div>
                 </div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="chatInput" data-i18n-placeholder="typeMessage" placeholder="Type a message...">
-                    <button class="chat-send" onclick="sendChat()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
+                <button class="btn" style="background:#333;" onclick="addEpField()">+ Add Episode</button>
+                <button class="btn btn-p" onclick="saveLib()">Save Book</button>
             </div>
         </div>
 
-        <!-- PROFILE PAGE -->
-        <div id="profile" class="page">
-            <div class="profile-header ios-card">
-                <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="Profile" class="profile-avatar">
-                <div class="profile-name" id="pName">User</div>
-                <div class="profile-email" id="pEmail">email@example.com</div>
-                <div class="profile-badge" id="pDays">7 days left</div>
-            </div>
-
-            <div class="menu-section ios-card">
-                <div class="menu-item" onclick="quickRefresh()">
-                    <div class="menu-left">
-                        <div class="menu-icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </div>
-                        <span class="menu-text" data-i18n="refresh">Refresh</span>
-                    </div>
-                    <i class="fas fa-chevron-right menu-chevron"></i>
+        <!-- 7. Categories Management -->
+        <div id="categories" class="page-view">
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <h3>Manage Categories (Genres)</h3>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input id="newCatName" class="input-box" placeholder="New category name">
+                    <button class="btn btn-p" onclick="addCategory()" style="width:auto;">Add</button>
                 </div>
-                <div class="menu-item" onclick="showLanguageSettings()">
-                    <div class="menu-left">
-                        <div class="menu-icon">
-                            <i class="fas fa-language"></i>
-                        </div>
-                        <span class="menu-text" data-i18n="language">Language</span>
-                    </div>
-                    <i class="fas fa-chevron-right menu-chevron"></i>
-                </div>
-            </div>
-
-            <div class="menu-section ios-card">
-                <div class="menu-item" onclick="showLogoutConfirm()">
-                    <div class="menu-left">
-                        <div class="menu-icon" style="color:var(--ios-red);">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </div>
-                        <span class="menu-text" style="color:var(--ios-red);" data-i18n="logout">Logout</span>
-                    </div>
-                    <i class="fas fa-chevron-right menu-chevron"></i>
-                </div>
+                <div id="catList"></div>
             </div>
         </div>
 
-        <!-- Bottom Navigation - iOS Style -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="nav('home', this)">
-                <i class="fas fa-home nav-icon"></i>
-                <span class="nav-label" data-i18n="navHome">Home</span>
+        <!-- 8. Betting Tips -->
+        <div id="tips" class="page-view">
+            <div style="background:var(--card); padding:20px; border-radius:15px;">
+                <h3>Manage Betting Tips</h3>
+                <input id="tipTitle" class="input-box" placeholder="Title (e.g. Manchester Utd vs Arsenal)">
+                <textarea id="tipContent" class="input-box" rows="4" placeholder="Tip details..."></textarea>
+                <button class="btn btn-p" onclick="addTip()">Add Tip</button>
             </div>
-            <div class="nav-item" onclick="nav('cats', this)">
-                <i class="fas fa-th-large nav-icon"></i>
-                <span class="nav-label" data-i18n="navCategories">Categories</span>
-            </div>
-            <div class="nav-item" onclick="nav('downloads', this)">
-                <i class="fas fa-download nav-icon"></i>
-                <span class="nav-label" data-i18n="navDownloads">Downloads</span>
-            </div>
-            <div class="nav-item" onclick="nav('tips', this)">
-                <i class="fas fa-futbol nav-icon"></i>
-                <span class="nav-label" data-i18n="navTips">Tips</span>
-            </div>
-            <div class="nav-item" onclick="nav('bot', this)">
-                <i class="fas fa-comments nav-icon"></i>
-                <span class="nav-label" data-i18n="navChat">Chat</span>
-            </div>
-            <div class="nav-item" onclick="nav('profile', this)">
-                <i class="fas fa-user nav-icon"></i>
-                <span class="nav-label" data-i18n="navProfile">Profile</span>
-            </div>
+            <div id="tipsList" style="margin-top:20px;"></div>
+        </div>
+
+        <!-- 9. Chat Replies -->
+        <div id="chat" class="page-view">
+            <h3>User Messages & Replies</h3>
+            <div id="chatMessagesList"></div>
         </div>
     </div>
 
     <!-- Modals -->
-    <div id="logoutModal" class="modal">
-        <div class="modal-content" style="position:relative;">
-            <div class="modal-close" onclick="cancelLogout()">
-                <i class="fas fa-times"></i>
-            </div>
-            <div style="text-align:center; margin-bottom:24px;">
-                <i class="fas fa-sign-out-alt" style="font-size:48px; color:var(--ios-red); margin-bottom:16px;"></i>
-            </div>
-            <h3 class="modal-title" data-i18n="logout">Logout</h3>
-            <p class="modal-text" data-i18n="confirmLogout">Are you sure you want to logout?</p>
-            <button class="ios-button" onclick="confirmLogout()" style="margin-bottom:12px; background:var(--ios-red);" data-i18n="yesLogout">Yes, Logout</button>
-            <button class="ios-button ios-button-secondary" onclick="cancelLogout()" data-i18n="cancel">Cancel</button>
+    <div id="chanModal" class="modal">
+        <div class="modal-box">
+            <h3>Channel</h3>
+            <input id="cName" class="input-box" placeholder="Name">
+            <input id="cLogo" class="input-box" placeholder="Logo URL">
+            <input id="cUrl" class="input-box" placeholder="Stream URL (m3u8)">
+            <input id="cGenre" class="input-box" placeholder="Genre (e.g. Sports, Movies)">
+            <select id="cAccess" class="input-box"><option value="FREE">FREE</option><option value="VIP">VIP</option></select>
+            <button class="btn btn-p" onclick="saveChan()">Save</button>
+            <button class="btn btn-d" onclick="closeModal('chanModal')">Cancel</button>
         </div>
     </div>
 
-    <div id="detailModal" class="modal">
-        <div class="modal-content" style="position:relative; max-width:500px;">
-            <div class="modal-close" onclick="closeDetailModal()">
-                <i class="fas fa-times"></i>
-            </div>
-            <img id="dImg" src="" style="width:100%; height:220px; object-fit:cover; border-radius:16px; margin-bottom:20px;">
-            <h3 class="modal-title" id="dTitle"></h3>
-            <p class="modal-text" id="dDesc" style="text-align:left;"></p>
-            
-            <!-- Share in modal -->
-            <div class="share-section ios-card" style="margin:20px 0;">
-                <div class="share-title">
-                    <i class="fas fa-share-alt"></i>
-                    <span data-i18n="shareThis">Share This</span>
-                </div>
-                <div class="share-buttons">
-                    <button class="share-button share-whatsapp" onclick="shareContent('whatsapp')">
-                        <i class="fab fa-whatsapp"></i>
-                    </button>
-                    <button class="share-button share-facebook" onclick="shareContent('facebook')">
-                        <i class="fab fa-facebook-f"></i>
-                    </button>
-                    <button class="share-button share-twitter" onclick="shareContent('twitter')">
-                        <i class="fab fa-twitter"></i>
-                    </button>
-                    <button class="share-button share-copy" onclick="copyContentLink()">
-                        <i class="fas fa-link"></i>
-                    </button>
-                </div>
-            </div>
-
-            <button class="ios-button ios-button-large" id="dBtn" data-i18n="watchNow">Watch Now</button>
+    <div id="movieModal" class="modal">
+        <div class="modal-box">
+            <h3>Movie</h3>
+            <input id="mTitle" class="input-box" placeholder="Title">
+            <input id="mPoster" class="input-box" placeholder="Poster URL">
+            <input id="mUrl" class="input-box" placeholder="Movie URL (mp4/m3u8)">
+            <input id="mGenre" class="input-box" placeholder="Genre">
+            <textarea id="mDesc" class="input-box" rows="3" placeholder="Description"></textarea>
+            <select id="mAccess" class="input-box"><option value="FREE">FREE</option><option value="VIP">VIP</option></select>
+            <button class="btn btn-p" onclick="saveMovie()">Save</button>
+            <button class="btn btn-d" onclick="closeModal('movieModal')">Cancel</button>
         </div>
     </div>
 
-    <div id="playerModal" class="modal" style="padding:0; background:#000;">
-        <div style="width:100%; height:100%; position:relative;">
-            <div class="modal-close" onclick="closePlayer()" style="top:20px; right:20px; z-index:100; background:rgba(0,0,0,0.6);">
-                <i class="fas fa-times"></i>
-            </div>
-            <video id="videoJS" class="video-js vjs-fluid vjs-big-play-centered" controls preload="auto" data-setup='{}'></video>
-        </div>
-    </div>
-
-    <!-- Video.js -->
-    <script src="https://unpkg.com/video.js@8.6.1/dist/video.min.js"></script>
-    <script src="https://unpkg.com/@videojs/http-streaming@3.1.0/dist/videojs-http-streaming.min.js"></script>
+    <div id="toast">Saved!</div>
 
     <script>
-        // Firebase Config
+        // Unified Firebase Config (from user app)
         const firebaseConfig = {
             apiKey: "AIzaSyAGQqAiYCnWR7X8XkxEXCGu19PU45qXDnc",
             authDomain: "stanyappstore.firebaseapp.com",
@@ -1425,510 +248,333 @@
             appId: "1:735017831251:web:9fa4184ef141349fb9afa6",
             measurementId: "G-EM3RTMBKTN"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.database();
+        const auth = firebase.auth();
 
-        // Translations
-        const translations = {
-            en: {
-                appTitle: 'STANY MIN TV',
-                welcomeBack: 'Welcome Back',
-                createAccount: 'Create Account',
-                joinUs: 'Join Us Today',
-                selectLanguage: 'Select Language',
-                email: 'Email',
-                password: 'Password',
-                fullName: 'Full Name',
-                signIn: 'Sign In',
-                signUp: 'Sign Up',
-                noAccount: "Don't have an account?",
-                haveAccount: 'Already have an account?',
-                shareApp: 'Share STANY MIN TV',
-                loading: 'Loading...',
-                liveChannels: 'Live Channels',
-                movies: 'Movies',
-                seeAll: 'See All',
-                categories: 'Categories',
-                downloads: 'Downloads',
-                bettingTips: 'Betting Tips',
-                welcomeChat: 'Welcome! How can we help you today?',
-                typeMessage: 'Type a message...',
-                refresh: 'Refresh',
-                language: 'Language',
-                logout: 'Logout',
-                confirmLogout: 'Are you sure you want to logout?',
-                yesLogout: 'Yes, Logout',
-                cancel: 'Cancel',
-                shareThis: 'Share This',
-                watchNow: 'Watch Now',
-                navHome: 'Home',
-                navCategories: 'Categories',
-                navDownloads: 'Downloads',
-                navTips: 'Tips',
-                navChat: 'Chat',
-                navProfile: 'Profile',
-                search: 'Search...',
-                noDownloads: 'No downloads yet'
-            },
-            sw: {
-                appTitle: 'STANY MIN TV',
-                welcomeBack: 'Karibu Tena',
-                createAccount: 'Unda Akaunti',
-                joinUs: 'Jiunge Nasi Leo',
-                selectLanguage: 'Chagua Lugha',
-                email: 'Barua Pepe',
-                password: 'Nenosiri',
-                fullName: 'Jina Kamili',
-                signIn: 'Ingia',
-                signUp: 'Jisajili',
-                noAccount: 'Huna akaunti?',
-                haveAccount: 'Tayari una akaunti?',
-                shareApp: 'Shiriki STANY MIN TV',
-                loading: 'Inapakia...',
-                liveChannels: 'Vitanzi Moja Kwa Moja',
-                movies: 'Filamu',
-                seeAll: 'Ona Zote',
-                categories: 'Aina',
-                downloads: 'Vilivyopakuliwa',
-                bettingTips: 'Vidokezo vya Kubeti',
-                welcomeChat: 'Karibu! Tunaweza kukusaidia vipi leo?',
-                typeMessage: 'Andika ujumbe...',
-                refresh: 'Onyesha Upya',
-                language: 'Lugha',
-                logout: 'Toka',
-                confirmLogout: 'Una uhakika unataka kutoka?',
-                yesLogout: 'Ndio, Toka',
-                cancel: 'Ghairi',
-                shareThis: 'Shiriki Hii',
-                watchNow: 'Tazama Sasa',
-                navHome: 'Nyumbani',
-                navCategories: 'Aina',
-                navDownloads: 'Pakua',
-                navTips: 'Vidokezo',
-                navChat: 'Msaada',
-                navProfile: 'Mimi',
-                search: 'Tafuta...',
-                noDownloads: 'Hakuna vilivyopakuliwa'
-            },
-            fr: {
-                appTitle: 'STANY MIN TV',
-                welcomeBack: 'Bon Retour',
-                createAccount: 'Créer un Compte',
-                joinUs: 'Rejoignez-nous',
-                selectLanguage: 'Choisir la Langue',
-                email: 'Email',
-                password: 'Mot de passe',
-                fullName: 'Nom Complet',
-                signIn: 'Se Connecter',
-                signUp: "S'inscrire",
-                noAccount: "Vous n'avez pas de compte?",
-                haveAccount: 'Vous avez déjà un compte?',
-                shareApp: 'Partager STANY MIN TV',
-                loading: 'Chargement...',
-                liveChannels: 'Chaînes en Direct',
-                movies: 'Films',
-                seeAll: 'Voir Tout',
-                categories: 'Catégories',
-                downloads: 'Téléchargements',
-                bettingTips: 'Conseils de Paris',
-                welcomeChat: 'Bienvenue! Comment pouvons-nous vous aider?',
-                typeMessage: 'Écrivez un message...',
-                refresh: 'Rafraîchir',
-                language: 'Langue',
-                logout: 'Déconnexion',
-                confirmLogout: 'Êtes-vous sûr de vouloir vous déconnecter?',
-                yesLogout: 'Oui, Déconnexion',
-                cancel: 'Annuler',
-                shareThis: 'Partager',
-                watchNow: 'Regarder',
-                navHome: 'Accueil',
-                navCategories: 'Catégories',
-                navDownloads: 'Télécharger',
-                navTips: 'Conseils',
-                navChat: 'Chat',
-                navProfile: 'Profil',
-                search: 'Rechercher...',
-                noDownloads: 'Aucun téléchargement'
-            }
-        };
-
-        let currentLang = localStorage.getItem('language') || 'en';
-
-        // Initialize i18n
-        function initI18n() {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    el.textContent = translations[currentLang][key];
-                }
-            });
-
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[currentLang][key]) {
-                    el.placeholder = translations[currentLang][key];
-                }
-            });
-
-            // Update language selector
-            document.querySelectorAll('.language-option').forEach(opt => {
-                opt.classList.toggle('active', opt.getAttribute('data-lang') === currentLang);
-            });
-        }
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('language', lang);
-            initI18n();
-        }
-
-        // Global Variables
-        let currentUser = null;
-        let userIsExpired = false;
-        let allData = { movies: [], channels: [] };
-        let player = null;
-        let deviceId = localStorage.getItem('did') || 'dev_' + Date.now();
-        localStorage.setItem('did', deviceId);
-
-        // Auth State
         auth.onAuthStateChanged(u => {
-            if (u) {
-                document.getElementById('authPages').style.display = 'none';
-                document.getElementById('loader').style.display = 'flex';
-                setTimeout(() => checkDevice(u.uid), 1000);
-            } else {
-                document.getElementById('authPages').style.display = 'flex';
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('loader').style.display = 'none';
-            }
+            if (u) { document.getElementById('authModal').style.display = 'none'; init(); }
+            else { document.getElementById('authModal').style.display = 'flex'; }
         });
-
-        function showRegister() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('regPage').style.display = 'block';
-        }
-
-        function showLogin() {
-            document.getElementById('regPage').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'block';
-        }
 
         function login() {
             const email = document.getElementById('lemail').value;
-            const password = document.getElementById('lpass').value;
-            if (!email || !password) {
-                showToast(currentLang === 'sw' ? 'Tafaza ingiza barua pepe na nenosiri' : 'Please enter email and password');
-                return;
-            }
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => showToast(currentLang === 'sw' ? 'Umeingia kwa mafanikio' : 'Signed in successfully'))
-                .catch(e => showToast(e.message));
+            const pass = document.getElementById('lpass').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
         }
 
-        function register() {
-            const name = document.getElementById('rname').value;
-            const email = document.getElementById('remail').value;
-            const password = document.getElementById('rpass').value;
-            if (!name || !email || !password) {
-                showToast(currentLang === 'sw' ? 'Tafaza jaza sehemu zote' : 'Please fill all fields');
-                return;
-            }
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(user => {
-                    return db.ref('users/' + user.user.uid).set({
-                        name: name,
-                        email: email,
-                        language: currentLang,
-                        activeDeviceId: deviceId,
-                        registeredAt: Date.now(),
-                        accessExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                    });
-                })
-                .then(() => showToast(currentLang === 'sw' ? 'Usajili umekamilika' : 'Registration successful'))
-                .catch(e => showToast(e.message));
+        function init() {
+            loadUsers();
+            loadChannels();
+            loadMovies();
+            loadAds();
+            loadTokens();
+            loadCategories();
+            loadTips();
+            loadChatMessages();
         }
 
-        function checkDevice(uid) {
-            db.ref('users/' + uid).once('value').then(snap => {
-                const u = snap.val();
-                if (!u || u.isBlocked) {
-                    auth.signOut();
-                    return;
-                }
-                if (!u.activeDeviceId || u.activeDeviceId === deviceId) {
-                    initializeApp(uid, u);
-                } else {
-                    showToast('Device not authorized');
-                    auth.signOut();
-                }
-            });
-        }
-
-        function initializeApp(uid, userData) {
-            currentUser = { uid: uid, ...userData };
-            userIsExpired = userData.accessExpiry && userData.accessExpiry < Date.now();
-            
-            // Update language from user preference
-            if (userData.language) {
-                currentLang = userData.language;
-                initI18n();
-            }
-
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('pName').textContent = userData.name || 'User';
-            document.getElementById('pEmail').textContent = userData.email;
-            
-            const days = userData.accessExpiry ? Math.ceil((userData.accessExpiry - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
-            document.getElementById('pDays').textContent = userIsExpired ? 
-                (currentLang === 'sw' ? 'Imeisha' : 'Expired') : 
-                (days + ' ' + (currentLang === 'sw' ? 'siku zimebaki' : 'days left'));
-            
-            loadEssentialData();
-            showToast(currentLang === 'sw' ? 'Karibu STANY MIN TV' : 'Welcome to STANY MIN TV');
-        }
-
-        function loadEssentialData() {
-            db.ref('channels').on('value', s => {
-                const channels = [];
-                s.forEach(c => channels.push({ id: c.key, ...c.val(), type: 'channel' }));
-                allData.channels = channels;
-                displayChannels(channels);
-            });
-
-            db.ref('movies').on('value', s => {
-                const movies = [];
-                s.forEach(c => movies.push({ id: c.key, ...c.val(), type: 'movie' }));
-                allData.movies = movies;
-                displayMovies(movies);
-            });
-
-            db.ref('genres').on('value', s => {
-                const tags = document.getElementById('categoryTags');
-                const allText = currentLang === 'sw' ? 'Zote' : (currentLang === 'fr' ? 'Toutes' : 'All');
-                tags.innerHTML = '<div class="category-tag active" onclick="filterHome(\'all\', this)">' + allText + '</div>';
-                s.forEach(g => {
-                    const name = g.val().name;
-                    tags.innerHTML += '<div class="category-tag" onclick="filterHome(\'' + name + '\', this)">' + name + '</div>';
+        // ---------- Users ----------
+        function loadUsers() {
+            db.ref('users').on('value', snap => {
+                const list = document.getElementById('userList');
+                list.innerHTML = '';
+                snap.forEach(u => {
+                    const user = u.val();
+                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px;">
+                        <div><b>${user.email}</b></div>
+                        <div><small>Expiry: ${user.accessExpiry ? new Date(user.accessExpiry).toLocaleDateString() : 'N/A'}</small></div>
+                        <div><small>Device ID: ${user.activeDeviceId || 'None'}</small></div>
+                        <button class="btn btn-d" style="padding:5px 10px; margin-top:8px;" onclick="resetUser('${u.key}')">Reset Device Lock</button>
+                        <button class="btn" style="background:#444; margin-left:8px;" onclick="extendUser('${u.key}')">+7 Days</button>
+                    </div>`;
                 });
             });
         }
-
-        function displayChannels(channels) {
-            const grid = document.getElementById('chanGrid');
-            grid.innerHTML = channels.map(ch => createCard(ch)).join('');
+        function resetUser(uid) { db.ref('users/'+uid).update({ activeDeviceId: null }); toast("Device reset"); }
+        function extendUser(uid) {
+            db.ref('users/'+uid).once('value', snap => {
+                let expiry = snap.val().accessExpiry || Date.now();
+                expiry += 7*24*60*60*1000;
+                db.ref('users/'+uid).update({ accessExpiry: expiry });
+                toast("Subscription extended");
+            });
         }
 
-        function displayMovies(movies) {
-            const grid = document.getElementById('movGrid');
-            grid.innerHTML = movies.map(m => createCard(m)).join('');
+        // ---------- Channels ----------
+        function loadChannels() {
+            db.ref('channels').on('value', snap => {
+                const list = document.getElementById('chanList');
+                list.innerHTML = '';
+                snap.forEach(c => {
+                    const ch = c.val();
+                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                        <span><b>${ch.name}</b> (${ch.genre || 'No genre'})</span>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('channels/${c.key}')"></i>
+                    </div>`;
+                });
+            });
         }
-
-        function createCard(item) {
-            const isLocked = userIsExpired && item.type === 'channel';
-            return '<div class="content-card" onclick="handleClick(\'' + item.type + '\',\'' + item.id + '\',' + isLocked + ')">' +
-                (isLocked ? '<div class="locked-overlay"><i class="fas fa-lock lock-icon"></i></div>' : '') +
-                '<img src="' + (item.posterURL || 'https://via.placeholder.com/300x450') + '" onerror="this.src=\'https://via.placeholder.com/300x450\'">' +
-                '<div class="content-overlay"><div class="content-title">' + (item.name || item.title || 'Untitled') + '</div></div>' +
-                '</div>';
-        }
-
-        function handleClick(type, id, locked) {
-            if (locked) {
-                showToast(currentLang === 'sw' ? 'Usajili wako umeisha' : 'Subscription expired');
-                return;
-            }
-            const item = type === 'channel' ? allData.channels.find(x => x.id === id) : allData.movies.find(x => x.id === id);
-            if (!item) return;
-            
-            document.getElementById('dImg').src = item.posterURL || 'https://via.placeholder.com/500x300';
-            document.getElementById('dTitle').textContent = item.name || item.title || 'Untitled';
-            document.getElementById('dDesc').textContent = item.description || (currentLang === 'sw' ? 'Hakuna maelezo' : 'No description');
-            document.getElementById('dBtn').onclick = () => {
-                closeDetailModal();
-                playContent(item);
+        function saveChan() {
+            const data = {
+                name: document.getElementById('cName').value,
+                logo: document.getElementById('cLogo').value,
+                m3u8Link: document.getElementById('cUrl').value,
+                genre: document.getElementById('cGenre').value,
+                access: document.getElementById('cAccess').value
             };
-            document.getElementById('detailModal').style.display = 'flex';
-        }
-
-        function playContent(item) {
-            const url = item.m3u8Link || item.movieURL;
-            if (!url) {
-                showToast(currentLang === 'sw' ? 'Hakuna link ya kutazama' : 'No stream URL available');
-                return;
-            }
-            document.getElementById('playerModal').style.display = 'flex';
-            
-            if (!player) {
-                player = videojs('videoJS', {
-                    fluid: true,
-                    autoplay: true,
-                    preload: 'auto',
-                    controls: true,
-                    responsive: true,
-                    controlBar: {
-                        volumePanel: {
-                            inline: false
-                        }
-                    }
-                });
-            }
-            
-            player.src({
-                src: url,
-                type: url.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4'
+            db.ref('channels').push(data).then(() => {
+                toast(); closeModal('chanModal');
+                document.getElementById('cName').value = '';
+                document.getElementById('cLogo').value = '';
+                document.getElementById('cUrl').value = '';
+                document.getElementById('cGenre').value = '';
             });
-            player.play();
         }
 
-        function filterHome(category, el) {
-            document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-
-            const mg = document.getElementById('movGrid');
-            const cg = document.getElementById('chanGrid');
-
-            if (category === 'all') {
-                mg.innerHTML = allData.movies.map(m => createCard(m)).join('');
-                cg.innerHTML = allData.channels.map(c => createCard(c)).join('');
-            } else {
-                mg.innerHTML = allData.movies.filter(m => m.genre && m.genre.includes(category)).map(m => createCard(m)).join('');
-                cg.innerHTML = allData.channels.filter(c => c.categories && c.categories.includes(category)).map(c => createCard(c)).join('');
-            }
+        // ---------- Movies ----------
+        function loadMovies() {
+            db.ref('movies').on('value', snap => {
+                const list = document.getElementById('movieList');
+                list.innerHTML = '';
+                snap.forEach(m => {
+                    const mov = m.val();
+                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                        <span><b>${mov.title}</b> (${mov.genre || 'No genre'})</span>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('movies/${m.key}')"></i>
+                    </div>`;
+                });
+            });
+        }
+        function saveMovie() {
+            const data = {
+                title: document.getElementById('mTitle').value,
+                posterURL: document.getElementById('mPoster').value,
+                movieURL: document.getElementById('mUrl').value,
+                genre: document.getElementById('mGenre').value,
+                description: document.getElementById('mDesc').value,
+                access: document.getElementById('mAccess').value
+            };
+            db.ref('movies').push(data).then(() => {
+                toast(); closeModal('movieModal');
+                document.getElementById('mTitle').value = '';
+                document.getElementById('mPoster').value = '';
+                document.getElementById('mUrl').value = '';
+                document.getElementById('mGenre').value = '';
+                document.getElementById('mDesc').value = '';
+            });
         }
 
-        function shareApp(platform) {
-            const url = encodeURIComponent(window.location.href);
-            const title = encodeURIComponent('STANY MIN TV - Premium Entertainment');
-            const text = encodeURIComponent(currentLang === 'sw' ? 
-                'Tazama STANY MIN TV - Vitanzi, Filamu na zaidi!' : 
-                'Watch STANY MIN TV - Live TV, Movies and more!');
-            
-            let shareUrl = '';
-            if (platform === 'whatsapp') shareUrl = 'https://wa.me/?text=' + text + '%20' + url;
-            else if (platform === 'facebook') shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
-            else if (platform === 'twitter') shareUrl = 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url;
-            else if (platform === 'telegram') shareUrl = 'https://t.me/share/url?url=' + url + '&text=' + text;
-            
-            window.open(shareUrl, '_blank', 'width=600,height=400');
+        // ---------- Ads ----------
+        function toggleAdFields() {
+            const type = document.getElementById('adType').value;
+            document.getElementById('adSlider').style.display = type === 'slider' ? 'block' : 'none';
+            document.getElementById('adMedia').style.display = type === 'slider' ? 'none' : 'block';
         }
-
-        function shareContent(platform) {
-            shareApp(platform);
-        }
-
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href);
-            showToast(currentLang === 'sw' ? 'Link imenakiliwa' : 'Link copied');
-        }
-
-        function copyContentLink() {
-            copyLink();
-        }
-
-        function toggleSearch() {
-            const bar = document.getElementById('searchBar');
-            bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
-            if (bar.style.display === 'block') {
-                document.getElementById('searchInput').focus();
-            }
-        }
-
-        function globalSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            if (!query) {
-                loadEssentialData();
-                return;
-            }
-
-            const mg = document.getElementById('movGrid');
-            const cg = document.getElementById('chanGrid');
-            
-            mg.innerHTML = allData.movies.filter(m => m.title && m.title.toLowerCase().includes(query)).map(m => createCard(m)).join('');
-            cg.innerHTML = allData.channels.filter(c => c.name && c.name.toLowerCase().includes(query)).map(c => createCard(c)).join('');
-        }
-
-        function sendChat() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !currentUser) return;
-
-            db.ref('stanyBotMessages/' + currentUser.uid).push({
-                text: text,
-                sender: 'user',
+        function saveAd() {
+            const data = {
+                type: document.getElementById('adType').value,
+                header: document.getElementById('adHeader').value,
+                link: document.getElementById('adLink').value,
+                footer: document.getElementById('adFooter').value,
+                duration: parseInt(document.getElementById('adDuration').value) || 5,
                 timestamp: Date.now()
-            });
-            input.value = '';
-
-            setTimeout(() => {
-                db.ref('stanyBotMessages/' + currentUser.uid).push({
-                    text: currentLang === 'sw' ? 
-                        'Tumepokea ujumbe wako. Tutakujibu hivi karibuni.' : 
-                        'We received your message. We will reply soon.',
-                    sender: 'admin',
-                    timestamp: Date.now()
-                });
-            }, 1000);
-        }
-
-        function nav(page, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function showLogoutConfirm() {
-            document.getElementById('logoutModal').style.display = 'flex';
-        }
-
-        function cancelLogout() {
-            document.getElementById('logoutModal').style.display = 'none';
-        }
-
-        function confirmLogout() {
-            auth.signOut();
-            document.getElementById('logoutModal').style.display = 'none';
-            showToast(currentLang === 'sw' ? 'Umetoka kwa mafanikio' : 'Logged out successfully');
-        }
-
-        function closeDetailModal() {
-            document.getElementById('detailModal').style.display = 'none';
-        }
-
-        function closePlayer() {
-            document.getElementById('playerModal').style.display = 'none';
-            if (player) {
-                player.pause();
+            };
+            if (data.type === 'slider') {
+                data.images = document.getElementById('adSlider').value.split(',').map(s=>s.trim());
+            } else {
+                data.url = document.getElementById('adMedia').value;
             }
+            db.ref('ads').push(data).then(() => {
+                toast(); loadAds();
+                document.getElementById('adHeader').value = '';
+                document.getElementById('adLink').value = '';
+                document.getElementById('adFooter').value = '';
+                document.getElementById('adDuration').value = '';
+                document.getElementById('adMedia').value = '';
+                document.getElementById('adSlider').value = '';
+            });
+        }
+        function loadAds() {
+            db.ref('ads').on('value', snap => {
+                const list = document.getElementById('adsList');
+                list.innerHTML = '';
+                snap.forEach(ad => {
+                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                        <span><b>${ad.val().header}</b> (${ad.val().type})</span>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('ads/${ad.key}')"></i>
+                    </div>`;
+                });
+            });
         }
 
-        function quickRefresh() {
-            showToast(currentLang === 'sw' ? 'Imeoneshwa upya' : 'Refreshed');
+        // ---------- Tokens ----------
+        function generateTokens() {
+            const count = parseInt(document.getElementById('tkCount').value) || 1;
+            for (let i = 0; i < count; i++) {
+                const token = 'STANY-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                db.ref('tokens/' + token).set({ status: 'unused', generated: Date.now() });
+            }
+            toast(count + " tokens generated");
+        }
+        function loadTokens() {
+            db.ref('tokens').limitToLast(20).on('value', snap => {
+                const list = document.getElementById('tkList');
+                list.innerHTML = '<h4>Latest Tokens</h4>';
+                snap.forEach(t => {
+                    list.innerHTML += `<div style="padding:8px; border-bottom:1px solid #333;">${t.key} - ${t.val().status}</div>`;
+                });
+            });
         }
 
-        function showNotifications() {
-            showToast(currentLang === 'sw' ? 'Hakuna arifa mpya' : 'No new notifications');
+        // ---------- Library ----------
+        function addEpField() {
+            const div = document.createElement('div');
+            div.className = 'ep-row';
+            div.innerHTML = `<input class="ep-title input-box" placeholder="Episode Title"><textarea class="ep-content input-box" rows="5" placeholder="Episode content..."></textarea>`;
+            document.getElementById('episodesArea').appendChild(div);
+        }
+        function saveLib() {
+            const eps = [];
+            document.querySelectorAll('#episodesArea .ep-row').forEach(row => {
+                const title = row.querySelector('.ep-title').value;
+                const content = row.querySelector('.ep-content').value;
+                if (title.trim() || content.trim()) eps.push({ title, content });
+            });
+            const data = {
+                category: document.getElementById('libCat').value,
+                title: document.getElementById('libTitle').value,
+                author: document.getElementById('libAuthor').value,
+                description: document.getElementById('libDesc').value,
+                episodes: eps,
+                timestamp: Date.now()
+            };
+            db.ref('library').push(data).then(() => {
+                toast("Book saved");
+                document.getElementById('libTitle').value = '';
+                document.getElementById('libAuthor').value = '';
+                document.getElementById('libDesc').value = '';
+                document.getElementById('episodesArea').innerHTML = `<div class="ep-row"><input class="ep-title input-box" placeholder="Part Title"><textarea class="ep-content input-box" rows="5" placeholder="Content"></textarea></div>`;
+            });
         }
 
-        function showLanguageSettings() {
-            document.querySelector('.language-selector').scrollIntoView({ behavior: 'smooth' });
+        // ---------- Categories ----------
+        function loadCategories() {
+            db.ref('genres').on('value', snap => {
+                const list = document.getElementById('catList');
+                list.innerHTML = '';
+                snap.forEach(genre => {
+                    list.innerHTML += `<div style="background:var(--card); padding:12px; margin-bottom:8px; display:flex; justify-content:space-between;">
+                        <span>${genre.val().name}</span>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('genres/${genre.key}')"></i>
+                    </div>`;
+                });
+            });
+        }
+        function addCategory() {
+            const name = document.getElementById('newCatName').value.trim();
+            if (!name) return;
+            db.ref('genres').push({ name: name }).then(() => {
+                toast("Category added");
+                document.getElementById('newCatName').value = '';
+            });
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        // ---------- Betting Tips ----------
+        function loadTips() {
+            db.ref('tips').on('value', snap => {
+                const list = document.getElementById('tipsList');
+                list.innerHTML = '';
+                snap.forEach(tip => {
+                    const t = tip.val();
+                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px;">
+                        <div><b>${t.title}</b></div>
+                        <div>${t.content.substring(0,100)}...</div>
+                        <div style="margin-top:8px;">
+                            <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('tips/${tip.key}')"></i>
+                        </div>
+                    </div>`;
+                });
+            });
+        }
+        function addTip() {
+            const title = document.getElementById('tipTitle').value.trim();
+            const content = document.getElementById('tipContent').value.trim();
+            if (!title || !content) return;
+            db.ref('tips').push({ title, content, timestamp: Date.now() }).then(() => {
+                toast("Tip added");
+                document.getElementById('tipTitle').value = '';
+                document.getElementById('tipContent').value = '';
+            });
         }
 
-        // Initialize
-        window.onload = () => {
-            initI18n();
-        };
+        // ---------- Chat Replies ----------
+        function loadChatMessages() {
+            db.ref('stanyBotMessages').on('value', async snap => {
+                const container = document.getElementById('chatMessagesList');
+                container.innerHTML = '';
+                const users = {};
+                snap.forEach(userSnap => {
+                    users[userSnap.key] = userSnap.val();
+                });
+                for (const [uid, msgs] of Object.entries(users)) {
+                    // get user email
+                    let email = uid;
+                    try {
+                        const userSnap = await db.ref('users/'+uid).once('value');
+                        if (userSnap.exists()) email = userSnap.val().email;
+                    } catch(e) {}
+                    const msgsArray = Object.values(msgs);
+                    const lastMsg = msgsArray[msgsArray.length-1];
+                    container.innerHTML += `
+                        <div style="background:var(--card); padding:15px; margin-bottom:15px; border-radius:12px;">
+                            <div><b>${email}</b> <small>${new Date(lastMsg.timestamp).toLocaleString()}</small></div>
+                            <div style="margin:10px 0;">${lastMsg.text}</div>
+                            <textarea id="reply-${uid}" class="input-box" placeholder="Type reply..."></textarea>
+                            <button class="btn btn-p" style="width:auto; padding:8px 16px;" onclick="sendReply('${uid}')">Send Reply</button>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function sendReply(uid) {
+            const replyText = document.getElementById(`reply-${uid}`).value.trim();
+            if (!replyText) return;
+            db.ref(`stanyBotMessages/${uid}`).push({
+                text: replyText,
+                sender: 'admin',
+                timestamp: Date.now()
+            }).then(() => {
+                toast("Reply sent");
+                document.getElementById(`reply-${uid}`).value = '';
+            });
+        }
+
+        // ---------- Utilities ----------
+        function openPage(id) {
+            document.getElementById('homeView').style.display = 'none';
+            document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('pageTitle').innerText = id.toUpperCase();
+        }
+        function goHome() {
+            document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
+            document.getElementById('homeView').style.display = 'grid';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('pageTitle').innerText = 'STANY ADMIN PRO';
+        }
+        function openChanModal() { document.getElementById('chanModal').style.display = 'flex'; }
+        function openMovieModal() { document.getElementById('movieModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function del(path) { if (confirm("Delete?")) db.ref(path).remove(); }
+        function toast(msg = "Done!") {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
     </script>
 </body>
 </html>
-
