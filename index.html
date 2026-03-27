@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STANY MIN TV ADMIN - Ultimate Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STANY MIN TV ADMIN - FULL CONTROL</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
     :root {
-        --primary: #FF0000;
+        --primary: #00e676;
         --secondary: #00bcd4;
         --bg: #050505;
         --card: #141414;
@@ -21,560 +22,3194 @@
         --danger: #ff3b30;
         --success: #34c759;
         --warning: #ff9500;
+        --premium: #ffd700;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-    .top-bar {
-        height: 65px; background: var(--card); border-bottom: 1px solid var(--border);
-        display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0;
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    body { background: var(--bg); color: var(--text); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* 1. TOP BAR (FIXED) */
+    .top-bar { 
+        height: 65px; background: var(--card); border-bottom: 1px solid var(--border); 
+        display: flex; align-items: center; justify-content: space-between; padding: 0 20px; 
+        flex-shrink: 0; z-index: 100;
     }
     .brand { font-size: 1.4em; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
-    .back-btn { display: none; font-size: 1.2em; padding: 10px; cursor: pointer; color: white; margin-right: 10px; }
-    #homeView {
-        width: 100%; height: 100%; overflow-y: auto; padding: 20px;
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; align-content: start;
+    .back-btn { 
+        display: none;
+        font-size: 1.2em; padding: 10px; cursor: pointer; color: white; margin-right: 10px; 
     }
-    .menu-card {
-        background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 25px; text-align: center;
-        cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    .back-btn:hover { color: var(--primary); }
+
+    /* 2. VIEWS CONTAINER */
+    .view-container { flex: 1; position: relative; overflow: hidden; }
+
+    /* A. HOME MENU (DASHBOARD GRID) */
+    #homeView { 
+        width: 100%; height: 100%; overflow-y: auto; padding: 20px; 
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+        gap: 20px; align-content: start; 
+    }
+    
+    .menu-card { 
+        background: var(--card); border: 1px solid var(--border); 
+        border-radius: 15px; padding: 25px; text-align: center; 
+        cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; 
+        align-items: center; justify-content: center; min-height: 140px;
+        position: relative;
     }
     .menu-card:hover { border-color: var(--primary); transform: translateY(-5px); background: #1a1a1a; }
-    .menu-icon { font-size: 2.5em; margin-bottom: 10px; color: var(--primary); }
-    .page-view {
-        display: none; width: 100%; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 100px;
-        background: var(--bg); animation: slideIn 0.3s;
+    .menu-icon { font-size: 2.5em; margin-bottom: 10px; }
+    .menu-title { font-size: 1.1em; font-weight: 600; }
+    .menu-count { font-size: 0.9em; color: var(--gray); margin-top: 5px; }
+    .badge { background: var(--danger); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-left: 5px; }
+    
+    /* Premium Styling */
+    .premium-card { border: 2px solid var(--premium); position: relative; overflow: hidden; }
+    .premium-card::before {
+        content: "PREMIUM";
+        position: absolute;
+        top: 8px;
+        right: -25px;
+        background: var(--premium);
+        color: black;
+        padding: 2px 25px;
+        font-size: 0.7em;
+        font-weight: bold;
+        transform: rotate(45deg);
+    }
+    .premium-icon { color: var(--premium); }
+
+    /* B. INNER PAGES (FULL SCREEN) */
+    .page-view { 
+        display: none; width: 100%; height: 100%; 
+        overflow-y: auto; padding: 20px; padding-bottom: 100px; 
+        background: var(--bg); animation: slideIn 0.3s; 
     }
     @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .modal {
-        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center;
+
+    /* NEW: App Settings Section */
+    .app-settings-section {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border);
     }
-    .modal-box {
-        background: #181818; width: 90%; max-width: 500px; padding: 25px; border-radius: 15px;
-        border: 1px solid var(--primary); max-height: 90vh; overflow-y: auto;
+    
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
     }
-    .input-box {
-        width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white;
-        border-radius: 8px; margin-bottom: 10px;
+    
+    .setting-group {
+        margin-bottom: 15px;
     }
-    .btn { padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-    .btn-p { background: var(--primary); color: white; width: 100%; margin-top: 10px; }
+    
+    .setting-group label {
+        display: block;
+        color: var(--gray);
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+
+    /* MODERN SELECT STYLES */
+    .select-modern {
+        width: 100%;
+        padding: 12px;
+        background: #000;
+        border: 1px solid #333;
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23ffffff' d='M2 0L0 2h4zm0 5L0 3h4z'></path></svg>");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+    }
+    
+    .select-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
+    }
+
+    /* NEW: Carousel Management */
+    .carousel-management {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border);
+    }
+    
+    .carousel-preview {
+        width: 100%;
+        height: 150px;
+        background: #000;
+        border-radius: 8px;
+        margin: 10px 0;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .carousel-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ITEM GRID */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .item-card { background: var(--card); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; transition: transform 0.2s; }
+    .item-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+    .item-img { width: 100%; height: 110px; object-fit: cover; background: #111; }
+    .item-body { padding: 10px; }
+    .item-title { font-weight: 600; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px; }
+    .item-actions { display: flex; gap: 5px; }
+
+    /* USER LIST ROW */
+    .user-row { 
+        display: flex; justify-content: space-between; align-items: center; 
+        background: var(--card); padding: 15px; border-radius: 10px; 
+        margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer;
+        transition: all 0.2s;
+    }
+    .user-row:hover { border-color: var(--primary); transform: translateX(5px); }
+    
+    /* USER STATUS BADGES */
+    .user-status { 
+        padding: 4px 8px; border-radius: 6px; font-size: 0.8em; font-weight: bold;
+    }
+    .status-blocked { background: var(--danger); color: white; }
+    .status-premium { background: var(--premium); color: black; }
+    .status-active { background: var(--success); color: white; }
+    .status-trial { background: var(--warning); color: black; }
+    .status-expired { background: var(--gray); color: white; }
+    .status-new { background: var(--secondary); color: white; }
+
+    /* CHAT */
+    .chat-layout { display: flex; height: 100%; flex-direction: column; }
+    .chat-list-view { flex: 1; overflow-y: auto; }
+    .chat-room-view { display: none; flex: 1; flex-direction: column; height: 100%; }
+    
+    .chat-user { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .chat-user:hover { background: #1f1f1f; }
+    .chat-user-info { flex: 1; }
+    .chat-user-name { font-weight: bold; font-size: 1em; }
+    .chat-user-email { font-size: 0.8em; color: var(--gray); }
+    .chat-user-msg { font-size: 0.9em; margin-top: 5px; color: #ccc; }
+    
+    .chat-msgs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { padding: 10px 15px; border-radius: 10px; max-width: 80%; font-size: 0.95em; }
+    .msg-in { background: #222; align-self: flex-start; color: #ccc; }
+    .msg-out { background: var(--primary); color: black; align-self: flex-end; }
+    .msg-info { font-size: 0.8em; color: var(--gray); margin-bottom: 5px; }
+    .chat-input-area { padding: 15px; background: var(--card); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+
+    /* FAB (Floating Button) */
+    .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 5px 20px rgba(0,230,118,0.4); cursor: pointer; color: black; z-index: 500; }
+
+    /* FORM MODAL */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-box { background: #181818; width: 90%; max-width: 500px; padding: 25px; border-radius: 15px; border: 1px solid var(--primary); position: relative; }
+    .input-box { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; margin-bottom: 10px; }
+    .input-box:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0,230,118,0.2); }
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    .btn-p { background: var(--primary); color: black; }
     .btn-d { background: var(--danger); color: white; }
-    .ep-row { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
-    .chat-message-item {
-        background: #222; border-radius: 12px; padding: 12px; margin-bottom: 12px;
+    .btn-premium { background: var(--premium); color: black; }
+    .btn-sm { width: auto; padding: 6px 12px; font-size: 0.85em; }
+
+    /* Device Request Cards */
+    .device-card { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); transition: all 0.2s; }
+    .device-card:hover { border-color: var(--primary); }
+    .device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .device-actions { display: flex; gap: 10px; margin-top: 10px; }
+
+    /* DOWNLOADS SECTION */
+    .downloads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+    .download-item { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .download-item img { width: 100%; height: 150px; object-fit: cover; }
+    .download-info { padding: 15px; }
+    .download-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; }
+    .download-desc { color: var(--gray); font-size: 0.9em; margin-bottom: 10px; }
+
+    /* CATEGORY MANAGEMENT - IMPROVED */
+    .category-manager { background: var(--card); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .sortable-list { margin-top: 15px; }
+    .sortable-item { 
+        background: #222; padding: 12px; margin-bottom: 8px; border-radius: 8px; 
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: move;
+        transition: all 0.2s;
     }
-    .chat-message-item small { color: #888; display: block; margin-top: 4px; }
-    #toast {
-        position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-        background: var(--primary); padding: 12px 30px; border-radius: 20px; z-index: 3000; display: none; font-weight: bold;
+    .sortable-item:hover { background: #2a2a2a; }
+    .sortable-item.dragging { opacity: 0.5; background: #333; }
+
+    /* STATS CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: var(--card); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+    .stat-number { font-size: 2em; font-weight: bold; margin-bottom: 5px; }
+    .stat-label { color: var(--gray); font-size: 0.9em; }
+
+    /* TIPS SECTION */
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+    .tip-card { background: var(--card); border-radius: 10px; padding: 15px; border: 1px solid var(--border); }
+    .tip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .tip-title { font-weight: bold; font-size: 1.1em; }
+    .tip-category { background: var(--primary); color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
+    .tip-content { color: var(--gray); margin-bottom: 10px; }
+
+    /* BETTING TIPS STYLES */
+    .betting-tip-card { 
+        background: var(--card); 
+        border-radius: 10px; 
+        padding: 15px; 
+        margin-bottom: 15px; 
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+    .betting-tip-card:hover { border-color: var(--primary); }
+    .betting-tip-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 10px; 
+    }
+    .betting-tip-teams { 
+        font-weight: bold; 
+        font-size: 1.1em; 
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+    .betting-tip-title { 
+        font-weight: bold; 
+        font-size: 1em; 
+        margin-bottom: 8px;
+    }
+    .betting-tip-prediction { 
+        background: #333; 
+        padding: 5px 10px; 
+        border-radius: 5px; 
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+    .betting-tip-odds { 
+        color: var(--premium); 
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .booking-code-item {
+        background: #222;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .status-upcoming { background: var(--warning); color: black; }
+    .status-completed { background: var(--gray); color: white; }
+    .status-successful { background: var(--success); color: white; }
+    .status-failed { background: var(--danger); color: white; }
+
+    #toast { 
+        position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
+        background: #222; padding: 12px 30px; border-radius: 20px; 
+        border: 1px solid var(--primary); z-index: 3000; display: none; 
+        font-weight: bold;
+    }
+
+    /* Form Grid Layout */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        color: var(--gray);
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+    .booking-codes-section {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    .booking-code-input {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+    }
+
+    /* Category Assignment Styles */
+    .category-assignment {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    .assignment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #222;
+        margin-bottom: 8px;
+        border-radius: 5px;
+    }
+    
+    /* NEW: Channel Lock Management */
+    .channel-lock-management {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border);
+    }
+    
+    .lock-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+    }
+    
+    .channel-list-container {
+        max-height: 300px;
+        overflow-y: auto;
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    
+    .channel-lock-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 5px;
+        background: #222;
+        border-radius: 5px;
+    }
+
+    /* NEW: Trial Settings */
+    .trial-settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .trial-unit-selector {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    /* NEW: Multi-select styles */
+    .multi-select-container {
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 10px;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    
+    .multi-select-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        margin-bottom: 5px;
+        background: #222;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .multi-select-item:hover {
+        background: #333;
+    }
+    
+    .multi-select-item input {
+        margin-right: 10px;
+    }
+    
+    /* NEW: Date filter styles */
+    .date-filter {
+        background: var(--card);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .date-filter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
     }
 </style>
 </head>
 <body>
 
-    <!-- Auth Modal -->
+    <!-- LOGIN -->
     <div id="authModal" class="modal" style="display:flex;">
         <div class="modal-box" style="text-align:center;">
-            <h2 style="color:var(--primary); margin-bottom:20px;">ADMIN PORTAL</h2>
-            <input type="email" id="lemail" class="input-box" placeholder="Email">
+            <h2 style="color:var(--primary); margin-bottom:20px;">ADMIN ACCESS</h2>
+            <input type="email" id="lemail" class="input-box" placeholder="Admin Email">
             <input type="password" id="lpass" class="input-box" placeholder="Password">
             <button class="btn btn-p" onclick="login()">LOGIN</button>
         </div>
     </div>
 
-    <!-- Header -->
+    <!-- APP HEADER -->
     <div class="top-bar">
         <div style="display:flex; align-items:center;">
             <i class="fas fa-arrow-left back-btn" id="backBtn" onclick="goHome()"></i>
-            <div class="brand" id="pageTitle">STANY ADMIN PRO</div>
+            <div class="brand" id="pageTitle">STANY MIN TV ADMIN</div>
         </div>
-        <i class="fas fa-sign-out-alt" onclick="auth.signOut()" style="cursor:pointer; color:var(--danger);"></i>
+        <div style="display:flex; gap:15px;">
+            <i class="fas fa-bell" onclick="openPage('notif')" style="font-size:1.2em; cursor:pointer;"></i>
+            <i class="fas fa-sign-out-alt" onclick="auth.signOut()" style="font-size:1.2em; cursor:pointer; color:var(--danger);"></i>
+        </div>
     </div>
 
+    <!-- APP CONTENT -->
     <div class="view-container">
-        <!-- Dashboard -->
+        
+        <!-- 1. HOME DASHBOARD (GRID MENU) -->
         <div id="homeView">
-            <div class="menu-card" onclick="openPage('users')"><i class="fas fa-users menu-icon"></i><div>User Control</div></div>
-            <div class="menu-card" onclick="openPage('channels')"><i class="fas fa-tv menu-icon"></i><div>Channels</div></div>
-            <div class="menu-card" onclick="openPage('movies')"><i class="fas fa-film menu-icon"></i><div>Movies</div></div>
-            <div class="menu-card" onclick="openPage('ads')"><i class="fas fa-ad menu-icon"></i><div>Ads Manager</div></div>
-            <div class="menu-card" onclick="openPage('tokens')"><i class="fas fa-key menu-icon"></i><div>Token Factory</div></div>
-            <div class="menu-card" onclick="openPage('library')"><i class="fas fa-book menu-icon"></i><div>Library</div></div>
-            <div class="menu-card" onclick="openPage('categories')"><i class="fas fa-tags menu-icon"></i><div>Categories</div></div>
-            <div class="menu-card" onclick="openPage('tips')"><i class="fas fa-futbol menu-icon"></i><div>Betting Tips</div></div>
-            <div class="menu-card" onclick="openPage('chat')"><i class="fas fa-comments menu-icon"></i><div>Chat Replies</div></div>
+            <!-- STATS OVERVIEW -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statPremiumUsers">0</div>
+                    <div class="stat-label">Premium Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTrialUsers">0</div>
+                    <div class="stat-label">Free Trial</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statNewUsers">0</div>
+                    <div class="stat-label">New Users (Today)</div>
+                </div>
+            </div>
+
+            <div class="menu-card" onclick="openPage('users')">
+                <i class="fas fa-users menu-icon"></i>
+                <div class="menu-title">Users Management</div>
+                <div class="menu-count" id="cntUsers">0 Registered</div>
+            </div>
+            <div class="menu-card" onclick="openPage('channels')">
+                <i class="fas fa-tv menu-icon"></i>
+                <div class="menu-title">Live Channels</div>
+                <div class="menu-count" id="cntChan">0 Live</div>
+            </div>
+            <div class="menu-card" onclick="openPage('movies')">
+                <i class="fas fa-film menu-icon"></i>
+                <div class="menu-title">Movies</div>
+                <div class="menu-count" id="cntMov">0 Added</div>
+            </div>
+            <div class="menu-card premium-card" onclick="openPage('premium')">
+                <i class="fas fa-crown menu-icon premium-icon"></i>
+                <div class="menu-title">Premium Content</div>
+                <div class="menu-count">Exclusive</div>
+            </div>
+            <div class="menu-card" onclick="openPage('downloads')">
+                <i class="fas fa-download menu-icon"></i>
+                <div class="menu-title">Downloads</div>
+                <div class="menu-count" id="cntDownloads">0 Files</div>
+            </div>
+            <div class="menu-card" onclick="openPage('chat')">
+                <i class="fas fa-comments menu-icon"></i>
+                <div class="menu-title">Chat Bot</div>
+                <div class="menu-count"><span id="cntChat">0</span> New</div>
+            </div>
+            <div class="menu-card" onclick="openPage('devices')">
+                <i class="fas fa-mobile-alt menu-icon" style="color:var(--danger)"></i>
+                <div class="menu-title">Device Requests</div>
+                <div class="menu-count" id="cntDev">0 Pending</div>
+            </div>
+            <div class="menu-card" onclick="openPage('settings')">
+                <i class="fas fa-cog menu-icon" style="color:white"></i>
+                <div class="menu-title">Settings</div>
+                <div class="menu-count">App Config</div>
+            </div>
+            <div class="menu-card" onclick="openPage('categories')">
+                <i class="fas fa-layer-group menu-icon"></i>
+                <div class="menu-title">Categories</div>
+                <div class="menu-count">Arrange Content</div>
+            </div>
+            <div class="menu-card" onclick="openPage('tips')">
+                <i class="fas fa-lightbulb menu-icon" style="color:#ffd700"></i>
+                <div class="menu-title">Tips & Guides</div>
+                <div class="menu-count">User Education</div>
+            </div>
+            <div class="menu-card" onclick="openPage('bettingTips')">
+                <i class="fas fa-chart-line menu-icon" style="color:#ff6b6b"></i>
+                <div class="menu-title">Betting Tips</div>
+                <div class="menu-count" id="cntBettingTips">0 Tips</div>
+            </div>
+            <!-- NEW: App Settings Menu Card -->
+            <div class="menu-card" onclick="openPage('appSettings')">
+                <i class="fas fa-sliders-h menu-icon" style="color:var(--secondary)"></i>
+                <div class="menu-title">App Settings</div>
+                <div class="menu-count">UI & Features</div>
+            </div>
+            <!-- NEW: New Users Menu Card -->
+            <div class="menu-card" onclick="openPage('newUsers')">
+                <i class="fas fa-user-plus menu-icon" style="color:var(--secondary)"></i>
+                <div class="menu-title">New Users</div>
+                <div class="menu-count" id="cntNewUsers">0 Today</div>
+            </div>
         </div>
 
-        <!-- 1. Users -->
+        <!-- 2. USERS PAGE -->
         <div id="users" class="page-view">
-            <h3>Manage Device Locks & Subscriptions</h3>
+            <div style="display:flex; gap:10px; margin-bottom:15px; position:sticky; top:0; background:var(--bg); z-index:10; padding:10px 0; flex-wrap: wrap;">
+                <button class="btn btn-sm btn-p" onclick="filterUsers('all')">All Users</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('premium')">Premium</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('trial')">Free Trial</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('active')">Active</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('blocked')">Blocked</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('expired')">Expired</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterUsers('new')">New Users</button>
+                <input id="searchUser" class="input-box" style="margin:0; min-width:200px;" placeholder="Search users..." onkeyup="searchUI()">
+            </div>
             <div id="userList"></div>
         </div>
 
-        <!-- 2. Channels -->
+        <!-- 3. CHANNELS PAGE -->
         <div id="channels" class="page-view">
-            <button class="btn btn-p" style="margin-bottom:20px;" onclick="openChanModal()">+ Add Channel</button>
-            <div id="chanList"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>Live Channels</h3>
+                <button class="btn btn-p btn-sm" onclick="openChanModal()"><i class="fas fa-plus"></i> Add Channel</button>
+            </div>
+            <div class="grid" id="chanGrid"></div>
+            <div class="fab" onclick="openChanModal()"><i class="fas fa-plus"></i></div>
         </div>
 
-        <!-- 3. Movies -->
+        <!-- 4. MOVIES PAGE -->
         <div id="movies" class="page-view">
-            <button class="btn btn-p" style="margin-bottom:20px;" onclick="openMovieModal()">+ Add Movie</button>
-            <div id="movieList"></div>
-        </div>
-
-        <!-- 4. Ads Manager -->
-        <div id="ads" class="page-view">
-            <div style="background:var(--card); padding:20px; border-radius:15px;">
-                <h3>Create New Randomized Ad</h3>
-                <select id="adType" class="input-box" onchange="toggleAdFields()">
-                    <option value="image">Single Image Ad</option>
-                    <option value="video">Video Ad</option>
-                    <option value="slider">Slidable Image Slider</option>
-                </select>
-                <input id="adHeader" class="input-box" placeholder="Header Words">
-                <input id="adMedia" class="input-box" placeholder="Main URL (image/video)">
-                <textarea id="adSlider" class="input-box" placeholder="Slider URLs (comma separated)" style="display:none"></textarea>
-                <input id="adLink" class="input-box" placeholder="Sponsor Link">
-                <input id="adFooter" class="input-box" placeholder="Footer Words">
-                <input id="adDuration" type="number" class="input-box" placeholder="Duration (seconds)">
-                <button class="btn btn-p" onclick="saveAd()">Post Ad</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>Movies</h3>
+                <button class="btn btn-p btn-sm" onclick="openMovModal()"><i class="fas fa-plus"></i> Add Movie</button>
             </div>
-            <div id="adsList" style="margin-top:20px;"></div>
+            <div class="grid" id="movGrid"></div>
+            <div class="fab" onclick="openMovModal()"><i class="fas fa-plus"></i></div>
         </div>
 
-        <!-- 5. Token Factory -->
-        <div id="tokens" class="page-view">
-            <div style="background:var(--card); padding:20px; border-radius:15px;">
-                <h3>Premium Token Generator</h3>
-                <input id="tkCount" type="number" class="input-box" placeholder="Number of tokens">
-                <button class="btn btn-p" onclick="generateTokens()">Generate</button>
-            </div>
-            <div id="tkList" style="margin-top:20px;"></div>
-        </div>
-
-        <!-- 6. Library (Episodes) -->
-        <div id="library" class="page-view">
-            <div style="background:var(--card); padding:20px; border-radius:15px;">
-                <h3>Add New Book / Content</h3>
-                <select id="libCat" class="input-box">
-                    <option value="simulizi">Simulizi</option>
-                    <option value="tech">Tech Update</option>
-                </select>
-                <input id="libTitle" class="input-box" placeholder="Title">
-                <input id="libAuthor" class="input-box" placeholder="Author">
-                <textarea id="libDesc" class="input-box" placeholder="Summary"></textarea>
-                <div id="episodesArea">
-                    <h4>Episodes / Parts</h4>
-                    <div class="ep-row">
-                        <input class="ep-title input-box" placeholder="Part Title">
-                        <textarea class="ep-content input-box" rows="5" placeholder="Content"></textarea>
+        <!-- 5. PREMIUM CONTENT PAGE -->
+        <div id="premium" class="page-view">
+            <div class="category-manager">
+                <h3 style="color:var(--premium); margin-bottom:15px;"><i class="fas fa-crown"></i> Premium Content Management</h3>
+                
+                <div class="trial-settings-grid">
+                    <div>
+                        <h4>Free Trial Settings</h4>
+                        <div class="form-group">
+                            <label for="trialDuration">Trial Duration</label>
+                            <input type="number" id="trialDuration" class="input-box" placeholder="7" min="1" max="365000">
+                        </div>
+                        
+                        <label style="color:var(--gray); display:block; margin-bottom:5px;">Trial Unit</label>
+                        <div class="trial-unit-selector">
+                            <button type="button" class="btn btn-sm" style="background:#333; color:white;" onclick="setTrialUnit('seconds')">Seconds</button>
+                            <button type="button" class="btn btn-sm" style="background:#333; color:white;" onclick="setTrialUnit('minutes')">Minutes</button>
+                            <button type="button" class="btn btn-sm btn-p" onclick="setTrialUnit('hours')">Hours</button>
+                            <button type="button" class="btn btn-sm" style="background:#333; color:white;" onclick="setTrialUnit('days')">Days</button>
+                        </div>
+                        
+                        <button class="btn btn-premium" onclick="saveTrialSettings()" style="margin-top:10px;">Save Trial Settings</button>
+                    </div>
+                    
+                    <div>
+                        <h4>Auto Trial Assignment</h4>
+                        <div class="form-group">
+                            <label for="autoTrialDate">Auto Assign Trial for Users Joining On:</label>
+                            <input type="date" id="autoTrialDate" class="input-box">
+                        </div>
+                        <button class="btn btn-sm btn-p" onclick="assignTrialToDateUsers()" style="margin-bottom:5px;">Assign Trial to Date Users</button>
+                        <button class="btn btn-sm" style="background:var(--danger); width:100%;" onclick="massBlockExpired()">Block All Expired Users</button>
                     </div>
                 </div>
-                <button class="btn" style="background:#333;" onclick="addEpField()">+ Add Episode</button>
-                <button class="btn btn-p" onclick="saveLib()">Save Book</button>
             </div>
-        </div>
 
-        <!-- 7. Categories Management -->
-        <div id="categories" class="page-view">
-            <div style="background:var(--card); padding:20px; border-radius:15px;">
-                <h3>Manage Categories (Genres)</h3>
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <input id="newCatName" class="input-box" placeholder="New category name">
-                    <button class="btn btn-p" onclick="addCategory()" style="width:auto;">Add</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
+                <div class="category-manager">
+                    <h4><i class="fas fa-fire" style="color:var(--danger);"></i> Popular Movies</h4>
+                    <div id="popularMovies" class="grid" style="min-height:100px;"></div>
+                    <button class="btn btn-sm btn-p" onclick="openMovModalWithSection('popular')" style="margin-top:10px;"><i class="fas fa-plus"></i> Add Popular Movie</button>
                 </div>
-                <div id="catList"></div>
+                
+                <div class="category-manager">
+                    <h4><i class="fas fa-star" style="color:var(--premium);"></i> Latest Movies</h4>
+                    <div id="latestMovies" class="grid" style="min-height:100px;"></div>
+                    <button class="btn btn-sm btn-p" onclick="openMovModalWithSection('latest')" style="margin-top:10px;"><i class="fas fa-plus"></i> Add Latest Movie</button>
+                </div>
             </div>
         </div>
 
-        <!-- 8. Betting Tips -->
+        <!-- 6. DOWNLOADS PAGE -->
+        <div id="downloads" class="page-view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>Downloadable Content</h3>
+                <button class="btn btn-p btn-sm" onclick="openDownloadModal()"><i class="fas fa-plus"></i> Add Download</button>
+            </div>
+            <div class="downloads-grid" id="downloadsGrid"></div>
+            <div class="fab" onclick="openDownloadModal()"><i class="fas fa-plus"></i></div>
+        </div>
+
+        <!-- 7. CHAT PAGE -->
+        <div id="chat" class="page-view" style="padding:0; overflow:hidden;">
+            <div id="chatListContainer" class="chat-layout">
+                <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:bold;">Inbox</div>
+                <div id="chatList" class="chat-list-view"></div>
+            </div>
+            <div id="chatRoom" class="chat-room-view">
+                <div style="padding:10px 15px; background:var(--card); border-bottom:1px solid var(--border); display:flex; align-items:center;">
+                    <i class="fas fa-arrow-left" onclick="closeChatRoom()" style="padding:10px; cursor:pointer;"></i>
+                    <div style="margin-left:10px;">
+                        <b id="chatHeaderName" style="display:block;">User</b>
+                        <small id="chatHeaderEmail" style="color:var(--gray);">email</small>
+                    </div>
+                </div>
+                <div id="chatMsgs" class="chat-msgs"></div>
+                <div class="chat-input-area">
+                    <input id="chatInput" class="input-box" style="margin:0;" placeholder="Reply..." onkeypress="if(event.key==='Enter') sendReply()">
+                    <button class="btn btn-p btn-sm" style="margin:0;" onclick="sendReply()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. DEVICES PAGE -->
+        <div id="devices" class="page-view">
+            <h3 style="margin-bottom:15px;">Pending Device Approvals</h3>
+            <div id="devList"></div>
+        </div>
+
+        <!-- 9. SETTINGS PAGE -->
+        <div id="settings" class="page-view">
+            <div class="category-manager">
+                <h3 style="color:var(--primary); margin-bottom:15px;">App Configuration</h3>
+                <label style="color:var(--gray); display:block; margin-bottom:5px;">App Name</label>
+                <input id="setAppName" class="input-box" placeholder="STANY MIN TV">
+                <label style="color:var(--gray); display:block; margin-bottom:5px; margin-top:15px;">Theme Color</label>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="color" id="setColor" style="height:45px; width:50px;">
+                    <input id="setColorText" class="input-box" style="margin:0;" placeholder="#00e676">
+                </div>
+                <label style="color:var(--gray); display:block; margin-bottom:5px;">WhatsApp Number</label>
+                <input id="setContact" class="input-box" placeholder="255xxxxxxxxx">
+                <button class="btn btn-p" onclick="saveSettings()" style="margin-top:20px;">Save Configuration</button>
+            </div>
+
+            <div class="category-manager" style="margin-top:20px;">
+                <h3 style="color:var(--primary); margin-bottom:15px;">System Controls</h3>
+                <button class="btn" style="background:#333; margin-bottom:10px;" onclick="clearAllDeviceRequests()">Clear All Device Requests</button>
+                <button class="btn" style="background:var(--danger);" onclick="resetAllUsers()">Reset All Users (Danger)</button>
+            </div>
+        </div>
+
+        <!-- 10. CATEGORIES PAGE - IMPROVED -->
+        <div id="categories" class="page-view">
+            <div class="category-manager">
+                <h3 style="color:var(--primary); margin-bottom:15px;">Category Management</h3>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <h4>Add New Category</h4>
+                        <input type="text" id="newCategoryName" class="input-box" placeholder="Category Name">
+                        <button class="btn btn-p" onclick="addCategory()" style="margin-top:10px;">Add Category</button>
+                    </div>
+                    
+                    <div>
+                        <h4>Existing Categories</h4>
+                        <div id="categoryList" class="sortable-list" style="max-height:300px; overflow-y:auto;"></div>
+                        <button class="btn btn-sm btn-p" onclick="saveCategoryOrder()" style="margin-top:10px;">Save Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-manager" style="margin-top:20px;">
+                <h4>Category Assignment</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:15px;">
+                    <div>
+                        <h5>Assign Categories to Channels</h5>
+                        <select id="assignChannelSelect" class="select-modern">
+                            <option value="">Select Channel</option>
+                        </select>
+                        <div class="multi-select-container" id="assignChannelCategory">
+                            <!-- Categories will be loaded here as checkboxes -->
+                        </div>
+                        <button class="btn btn-p btn-sm" onclick="assignChannelCategories()" style="margin-top:10px;">Assign to Channel</button>
+                    </div>
+                    
+                    <div>
+                        <h5>Assign Categories to Movies</h5>
+                        <select id="assignMovieSelect" class="select-modern">
+                            <option value="">Select Movie</option>
+                        </select>
+                        <div class="multi-select-container" id="assignMovieCategory">
+                            <!-- Categories will be loaded here as checkboxes -->
+                        </div>
+                        <button class="btn btn-p btn-sm" onclick="assignMovieCategories()" style="margin-top:10px;">Assign to Movie</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-manager" style="margin-top:20px;">
+                <h4>Quick Category Overview</h4>
+                <div id="categoryStats" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px; margin-top:10px;"></div>
+            </div>
+        </div>
+
+        <!-- 11. TIPS PAGE -->
         <div id="tips" class="page-view">
-            <div style="background:var(--card); padding:20px; border-radius:15px;">
-                <h3>Manage Betting Tips</h3>
-                <input id="tipTitle" class="input-box" placeholder="Title (e.g. Manchester Utd vs Arsenal)">
-                <textarea id="tipContent" class="input-box" rows="4" placeholder="Tip details..."></textarea>
-                <button class="btn btn-p" onclick="addTip()">Add Tip</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>Tips & Guides Management</h3>
+                <button class="btn btn-p btn-sm" onclick="openTipModal()"><i class="fas fa-plus"></i> Add Tip</button>
             </div>
-            <div id="tipsList" style="margin-top:20px;"></div>
+            <div class="tips-grid" id="tipsGrid"></div>
+            <div class="fab" onclick="openTipModal()"><i class="fas fa-plus"></i></div>
         </div>
 
-        <!-- 9. Chat Replies -->
-        <div id="chat" class="page-view">
-            <h3>User Messages & Replies</h3>
-            <div id="chatMessagesList"></div>
+        <!-- 12. BETTING TIPS PAGE -->
+        <div id="bettingTips" class="page-view">
+            <div class="category-manager">
+                <h3 style="color:var(--primary); margin-bottom:15px;">Betting Tips Management</h3>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <h4>Add New Betting Tip</h4>
+                        <form id="addBettingTipForm">
+                            <div class="form-group">
+                                <label for="tipTitle">Tip Title</label>
+                                <input type="text" id="tipTitle" class="input-box" placeholder="e.g., Premier League Match" required>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="team1">Team 1</label>
+                                    <input type="text" id="team1" class="input-box" placeholder="e.g., Manchester United" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="team2">Team 2</label>
+                                    <input type="text" id="team2" class="input-box" placeholder="e.g., Liverpool" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction">Prediction</label>
+                                <input type="text" id="prediction" class="input-box" placeholder="e.g., Team 1 Win, Draw, Over 2.5 Goals" required>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="odds">Odds</label>
+                                    <input type="text" id="odds" class="input-box" placeholder="e.g., 1.75" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="stake">Stake (Optional)</label>
+                                    <input type="text" id="stake" class="input-box" placeholder="e.g., 2% of bankroll">
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="tipStatus">Status</label>
+                                    <select id="tipStatus" class="select-modern">
+                                        <option value="upcoming">Upcoming</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="successful">Successful</option>
+                                        <option value="failed">Failed</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tipResult">Result (Optional)</label>
+                                    <input type="text" id="tipResult" class="input-box" placeholder="e.g., Won 2-1">
+                                </div>
+                            </div>
+
+                            <div class="booking-codes-section">
+                                <h4>Booking Codes</h4>
+                                <div class="booking-code-input">
+                                    <div class="form-group">
+                                        <label for="bookingCodePlatform">Platform</label>
+                                        <input type="text" id="bookingCodePlatform" class="input-box" placeholder="e.g., SportyBet">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bookingCodeValue">Code</label>
+                                        <input type="text" id="bookingCodeValue" class="input-box" placeholder="e.g., 278AADA">
+                                    </div>
+                                    <button type="button" class="btn btn-sm" style="background:var(--warning); color:black; margin-bottom:5px;" id="addBookingCodeBtn">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                                <div class="booking-codes-list" id="bookingCodesList"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bookmakerLink">Bookmaker Link</label>
+                                <input type="url" id="bookmakerLink" class="input-box" placeholder="Enter bookmaker URL" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tipDescription">Description (Optional)</label>
+                                <textarea id="tipDescription" class="input-box" placeholder="Add additional details about the tip" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-p"><i class="fas fa-plus-circle"></i> Add Betting Tip</button>
+                        </form>
+                    </div>
+                    
+                    <div>
+                        <h4>Existing Betting Tips</h4>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <input type="text" id="bettingTipsSearch" class="input-box" style="margin:0;" placeholder="Search by teams or prediction">
+                            <button class="btn btn-sm" style="background:#333; color:white;" onclick="sortBettingTips('date')">Sort by Date</button>
+                            <button class="btn btn-sm" style="background:#333; color:white;" onclick="sortBettingTips('status')">Sort by Status</button>
+                        </div>
+                        <div id="bettingTipsList" style="max-height:500px; overflow-y:auto;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- 13. NOTIF PAGE -->
+        <div id="notif" class="page-view">
+            <div class="category-manager">
+                <h3 style="color:var(--primary); margin-bottom:15px;">Broadcast Message</h3>
+                <input id="nTitle" class="input-box" placeholder="Notification Title">
+                <textarea id="nMsg" class="input-box" rows="5" placeholder="Message content..."></textarea>
+                <select id="nTarget" class="select-modern">
+                    <option value="all">All Users</option>
+                    <option value="premium">Premium Users Only</option>
+                    <option value="trial">Free Trial Users Only</option>
+                    <option value="active">Active Users Only</option>
+                    <option value="new">New Users Only</option>
+                </select>
+                <button class="btn btn-p" onclick="sendNotif()">Send Notification</button>
+            </div>
+        </div>
+
+        <!-- NEW: APP SETTINGS PAGE -->
+        <div id="appSettings" class="page-view">
+            <div class="app-settings-section">
+                <h3 style="color:var(--primary); margin-bottom:15px;"><i class="fas fa-sliders-h"></i> User App Settings</h3>
+                
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <label for="cardSizeSetting">Card Size</label>
+                        <select id="cardSizeSetting" class="select-modern">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label for="fontSizeSetting">Font Size</label>
+                        <select id="fontSizeSetting" class="select-modern">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label for="carouselInterval">Carousel Slide Interval (ms)</label>
+                        <input type="number" id="carouselInterval" class="input-box" value="5000" min="1000" max="30000">
+                    </div>
+                </div>
+                
+                <button class="btn btn-p" onclick="saveAppSettings()" style="margin-top:15px;">
+                    <i class="fas fa-save"></i> Save App Settings
+                </button>
+            </div>
+
+            <!-- Channel Lock Management -->
+            <div class="channel-lock-management">
+                <h3 style="color:var(--primary); margin-bottom:15px;"><i class="fas fa-lock"></i> Channel Lock Management</h3>
+                
+                <div class="lock-controls">
+                    <div>
+                        <h4>Lock Channels</h4>
+                        <div class="channel-list-container" id="lockChannelsList">
+                            <!-- Channels will be loaded here -->
+                        </div>
+                        <button class="btn btn-d btn-sm" onclick="lockSelectedChannels()" style="margin-top:10px;">
+                            <i class="fas fa-lock"></i> Lock Selected
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h4>Unlock Channels</h4>
+                        <div class="channel-list-container" id="unlockChannelsList">
+                            <!-- Locked channels will be loaded here -->
+                        </div>
+                        <button class="btn btn-p btn-sm" onclick="unlockSelectedChannels()" style="margin-top:10px;">
+                            <i class="fas fa-unlock"></i> Unlock Selected
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-top:20px;">
+                    <h4>Make Channels Free for All Users</h4>
+                    <div class="channel-list-container" id="freeChannelsList">
+                        <!-- Channels will be loaded here -->
+                    </div>
+                    <button class="btn btn-premium btn-sm" onclick="makeChannelsFree()" style="margin-top:10px;">
+                        <i class="fas fa-gift"></i> Make Selected Free
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carousel Management -->
+            <div class="carousel-management">
+                <h3 style="color:var(--primary); margin-bottom:15px;"><i class="fas fa-images"></i> Carousel Management</h3>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <h4>Add New Slide</h4>
+                        <div class="form-group">
+                            <label for="carouselTitle">Slide Title</label>
+                            <input type="text" id="carouselTitle" class="input-box" placeholder="Enter title">
+                        </div>
+                        <div class="form-group">
+                            <label for="carouselDescription">Description</label>
+                            <input type="text" id="carouselDescription" class="input-box" placeholder="Enter description">
+                        </div>
+                        <div class="form-group">
+                            <label for="carouselImage">Image URL</label>
+                            <input type="text" id="carouselImage" class="input-box" placeholder="Enter image URL">
+                        </div>
+                        <button class="btn btn-p" onclick="addCarouselSlide()">
+                            <i class="fas fa-plus"></i> Add Slide
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h4>Current Slides</h4>
+                        <div id="carouselSlidesList" style="max-height:300px; overflow-y:auto;">
+                            <!-- Carousel slides will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Script Management -->
+            <div class="app-settings-section">
+                <h3 style="color:var(--primary); margin-bottom:15px;"><i class="fas fa-code"></i> Channel Script Management</h3>
+                
+                <div class="form-group">
+                    <label for="scriptChannelSelect">Select Channel</label>
+                    <select id="scriptChannelSelect" class="select-modern">
+                        <option value="">Select a channel</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="channelScriptCode">JavaScript Code</label>
+                    <textarea id="channelScriptCode" class="input-box" rows="6" placeholder="Enter JavaScript code that will execute when this channel is played"></textarea>
+                </div>
+                
+                <button class="btn btn-p" onclick="saveChannelScript()">
+                    <i class="fas fa-save"></i> Save Channel Script
+                </button>
+                
+                <button class="btn btn-d" onclick="clearChannelScript()" style="margin-top:10px;">
+                    <i class="fas fa-trash"></i> Clear Script
+                </button>
+            </div>
+        </div>
+
+        <!-- NEW: NEW USERS PAGE -->
+        <div id="newUsers" class="page-view">
+            <div class="date-filter">
+                <h4 style="margin-bottom:10px;">Filter New Users by Date</h4>
+                <div class="date-filter-grid">
+                    <div class="form-group">
+                        <label for="newUsersStartDate">Start Date</label>
+                        <input type="date" id="newUsersStartDate" class="input-box">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUsersEndDate">End Date</label>
+                        <input type="date" id="newUsersEndDate" class="input-box">
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="filterNewUsersByDate()" style="margin-bottom:10px;">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn btn-sm btn-p" onclick="filterNewUsers('today')">Today</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterNewUsers('yesterday')">Yesterday</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterNewUsers('week')">This Week</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterNewUsers('month')">This Month</button>
+                <button class="btn btn-sm" style="background:#333; color:white;" onclick="filterNewUsers('all')">All Time</button>
+            </div>
+
+            <div id="newUsersList"></div>
+        </div>
+
     </div>
 
-    <!-- Modals -->
+    <!-- --- MODALS --- -->
+
+    <!-- CHANNEL FORM -->
     <div id="chanModal" class="modal">
         <div class="modal-box">
-            <h3>Channel</h3>
-            <input id="cName" class="input-box" placeholder="Name">
-            <input id="cLogo" class="input-box" placeholder="Logo URL">
-            <input id="cUrl" class="input-box" placeholder="Stream URL (m3u8)">
-            <input id="cGenre" class="input-box" placeholder="Genre (e.g. Sports, Movies)">
-            <select id="cAccess" class="input-box"><option value="FREE">FREE</option><option value="VIP">VIP</option></select>
-            <button class="btn btn-p" onclick="saveChan()">Save</button>
-            <button class="btn btn-d" onclick="closeModal('chanModal')">Cancel</button>
+            <h3 id="cTitle" style="color:var(--primary); margin-bottom:15px;">Channel</h3>
+            <input type="hidden" id="cId">
+            <input id="cName" class="input-box" placeholder="Channel Name">
+            
+            <!-- IMPROVED: Category Selection for Channels with Checkboxes -->
+            <div class="form-group">
+                <label for="cCategory">Categories (Select Multiple)</label>
+                <div class="multi-select-container" id="cCategory">
+                    <!-- Categories will be loaded here as checkboxes -->
+                </div>
+            </div>
+            
+            <input id="cLink" class="input-box" placeholder="Stream URL">
+            <input id="cImg" class="input-box" placeholder="Poster URL">
+            <select id="cType" class="select-modern">
+                <option value="internal">Internal Player</option>
+                <option value="external_browser">External Browser</option>
+                <option value="external_section">App Section</option>
+            </select>
+            <input id="cExt" class="input-box" placeholder="External Code (for App Section)">
+            <textarea id="cDesc" class="input-box" placeholder="Description"></textarea>
+            
+            <!-- NEW: Channel Order Field -->
+            <div class="form-group">
+                <label for="cOrder">Display Order</label>
+                <input type="number" id="cOrder" class="input-box" placeholder="Lower numbers show first" value="999">
+                <small style="color:var(--gray);">Channels with lower order numbers appear first</small>
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-p" onclick="saveChan()">Save</button>
+                <button class="btn btn-d" onclick="document.getElementById('chanModal').style.display='none'">Cancel</button>
+            </div>
         </div>
     </div>
 
-    <div id="movieModal" class="modal">
+    <!-- MOVIE FORM -->
+    <div id="movModal" class="modal">
         <div class="modal-box">
-            <h3>Movie</h3>
-            <input id="mTitle" class="input-box" placeholder="Title">
-            <input id="mPoster" class="input-box" placeholder="Poster URL">
-            <input id="mUrl" class="input-box" placeholder="Movie URL (mp4/m3u8)">
-            <input id="mGenre" class="input-box" placeholder="Genre">
-            <textarea id="mDesc" class="input-box" rows="3" placeholder="Description"></textarea>
-            <select id="mAccess" class="input-box"><option value="FREE">FREE</option><option value="VIP">VIP</option></select>
-            <button class="btn btn-p" onclick="saveMovie()">Save</button>
-            <button class="btn btn-d" onclick="closeModal('movieModal')">Cancel</button>
+            <h3 id="mTitle" style="color:var(--primary); margin-bottom:15px;">Movie</h3>
+            <input type="hidden" id="mId">
+            <input id="mName" class="input-box" placeholder="Movie Title">
+            
+            <!-- IMPROVED: Category Selection for Movies with Checkboxes -->
+            <div class="form-group">
+                <label for="mCategory">Categories (Select Multiple)</label>
+                <div class="multi-select-container" id="mCategory">
+                    <!-- Categories will be loaded here as checkboxes -->
+                </div>
+            </div>
+            
+            <input id="mLink" class="input-box" placeholder="Movie URL">
+            <input id="mImg" class="input-box" placeholder="Poster URL">
+            <select id="mType" class="select-modern">
+                <option value="internal">Internal Player</option>
+                <option value="external_browser">External Browser</option>
+                <option value="external_section">App Section</option>
+            </select>
+            <input id="mExt" class="input-box" placeholder="External Code (for App Section)">
+            <textarea id="mDesc" class="input-box" placeholder="Description"></textarea>
+            <select id="mSection" class="select-modern">
+                <option value="regular">Regular</option>
+                <option value="popular">Popular</option>
+                <option value="latest">Latest</option>
+                <option value="premium">Premium</option>
+            </select>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-p" onclick="saveMov()">Save</button>
+                <button class="btn btn-d" onclick="document.getElementById('movModal').style.display='none'">Cancel</button>
+            </div>
         </div>
     </div>
 
-    <div id="toast">Saved!</div>
+    <!-- DOWNLOAD FORM -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--primary); margin-bottom:15px;">Add Download</h3>
+            <input type="hidden" id="dlId">
+            <input id="dlTitle" class="input-box" placeholder="Title">
+            <input id="dlUrl" class="input-box" placeholder="Download URL">
+            <input id="dlImg" class="input-box" placeholder="Poster URL">
+            <textarea id="dlDesc" class="input-box" placeholder="Description" rows="3"></textarea>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-p" onclick="saveDownload()">Save</button>
+                <button class="btn btn-d" onclick="document.getElementById('downloadModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIP FORM -->
+    <div id="tipModal" class="modal">
+        <div class="modal-box">
+            <h3 id="tipTitle" style="color:var(--primary); margin-bottom:15px;">Add Tip</h3>
+            <input type="hidden" id="tipId">
+            <input id="tipName" class="input-box" placeholder="Tip Title">
+            <select id="tipCategory" class="select-modern">
+                <option value="general">General</option>
+                <option value="premium">Premium</option>
+                <option value="troubleshooting">Troubleshooting</option>
+                <option value="features">Features</option>
+            </select>
+            <textarea id="tipContent" class="input-box" placeholder="Tip Content" rows="5"></textarea>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-p" onclick="saveTip()">Save</button>
+                <button class="btn btn-d" onclick="document.getElementById('tipModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT BETTING TIP MODAL -->
+    <div id="editBettingTipModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--primary); margin-bottom:15px;">Edit Betting Tip</h3>
+            <form id="editBettingTipForm">
+                <input type="hidden" id="editBettingTipId">
+                <div class="form-group">
+                    <label for="editTipTitle">Tip Title</label>
+                    <input type="text" id="editTipTitle" class="input-box" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editTeam1">Team 1</label>
+                        <input type="text" id="editTeam1" class="input-box" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTeam2">Team 2</label>
+                        <input type="text" id="editTeam2" class="input-box" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editPrediction">Prediction</label>
+                    <input type="text" id="editPrediction" class="input-box" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editOdds">Odds</label>
+                        <input type="text" id="editOdds" class="input-box" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStake">Stake</label>
+                        <input type="text" id="editStake" class="input-box">
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editTipStatus">Status</label>
+                        <select id="editTipStatus" class="select-modern">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="completed">Completed</option>
+                            <option value="successful">Successful</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTipResult">Result</label>
+                        <input type="text" id="editTipResult" class="input-box">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editBookmakerLink">Bookmaker Link</label>
+                    <input type="url" id="editBookmakerLink" class="input-box" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTipDescription">Description</label>
+                    <textarea id="editTipDescription" class="input-box" rows="3"></textarea>
+                </div>
+
+                <div class="booking-codes-section">
+                    <h4>Booking Codes</h4>
+                    <div class="booking-code-input">
+                        <div class="form-group">
+                            <label for="editBookingCodePlatform">Platform</label>
+                            <input type="text" id="editBookingCodePlatform" class="input-box" placeholder="e.g., SportyBet">
+                        </div>
+                        <div class="form-group">
+                            <label for="editBookingCodeValue">Code</label>
+                            <input type="text" id="editBookingCodeValue" class="input-box" placeholder="e.g., 278AADA">
+                        </div>
+                        <button type="button" class="btn btn-sm" style="background:var(--warning); color:black; margin-bottom:5px;" id="editAddBookingCodeBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="booking-codes-list" id="editBookingCodesList"></div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" class="btn btn-p"><i class="fas fa-save"></i> Save Changes</button>
+                    <button type="button" class="btn btn-d" onclick="document.getElementById('editBettingTipModal').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- USER FORM -->
+    <div id="userModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--primary);">Manage User</h3>
+            <input type="hidden" id="umId">
+            <h4 id="umName" style="margin:10px 0;">User</h4>
+            <p id="umEmail" style="color:var(--gray); margin-bottom:15px;">email</p>
+            
+            <label style="color:var(--gray);">Subscription Type</label>
+            <select id="umSubType" class="select-modern" onchange="toggleSubscriptionFields()">
+                <option value="trial">Free Trial</option>
+                <option value="premium">Premium</option>
+                <option value="none">No Subscription</option>
+            </select>
+
+            <div id="subFields">
+                <label style="color:var(--gray);">Subscription Expiry</label>
+                <input type="date" id="umDate" class="input-box">
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                     <button class="btn btn-sm" style="background:#333; color:white;" onclick="addTime(1)">+1 Day</button>
+                     <button class="btn btn-sm" style="background:#333; color:white;" onclick="addTime(7)">+1 Week</button>
+                     <button class="btn btn-sm" style="background:#333; color:white;" onclick="addTime(30)">+1 Month</button>
+                     <button class="btn btn-sm" style="background:#333; color:white;" onclick="addTime(365)">+1 Year</button>
+                </div>
+            </div>
+
+            <label style="color:var(--gray);">Current Device ID</label>
+            <input id="umDevice" class="input-box" readonly>
+            
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn btn-p" onclick="saveUserSub()">Update Subscription</button>
+                <button id="umBlockBtn" class="btn btn-d" onclick="toggleBlock()">Block User</button>
+            </div>
+
+            <div style="margin-top:15px;">
+                <button class="btn btn-sm" style="background:#333; width:100%;" onclick="viewPass()">View Channel Passwords</button>
+                <button class="btn btn-sm" style="background:var(--danger); width:100%; margin-top:5px;" onclick="forceLogout()">Force Logout User</button>
+            </div>
+
+            <button class="btn btn-sm" style="background:#333; margin-top:15px; width:100%;" onclick="document.getElementById('userModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <!-- USER PASSWORDS MODAL -->
+    <div id="passModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:var(--primary);">User Channel Passwords</h3>
+            <div id="passList" style="margin:15px 0; max-height:300px; overflow-y:auto;"></div>
+            <button class="btn btn-d" onclick="document.getElementById('passModal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <div id="toast">Saved</div>
 
     <script>
-        // Unified Firebase Config (from user app)
         const firebaseConfig = {
-            apiKey: "AIzaSyAGQqAiYCnWR7X8XkxEXCGu19PU45qXDnc",
-            authDomain: "stanyappstore.firebaseapp.com",
-            projectId: "stanyappstore",
-            storageBucket: "stanyappstore.firebasestorage.app",
-            messagingSenderId: "735017831251",
-            appId: "1:735017831251:web:9fa4184ef141349fb9afa6",
-            measurementId: "G-EM3RTMBKTN"
+            apiKey: "AIzaSyABEnVaSOR5b1FL1V3-C13KoR9O7MqAoHg",
+            authDomain: "studio-3650831122-2eea3.firebaseapp.com",
+            databaseURL: "https://studio-3650831122-2eea3-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "studio-3650831122-2eea3",
+            storageBucket: "studio-3650831122-2eea3.firebasestorage.app",
+            messagingSenderId: "893787872699",
+            appId: "1:893787872699:web:91268a1b8fb18b7bc4f89e"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
         const auth = firebase.auth();
+        const db = firebase.database();
 
+        let allUsers=[], channels={}, movies={}, downloads={}, tips={}, bettingTips={}, chatUid=null, currentChatUser=null;
+        let trialSettings = { duration: 7, unit: 'hours' };
+        let categories = [];
+        let appSettings = {
+            cardSize: 'medium',
+            fontSize: 'medium',
+            carouselInterval: 5000,
+            lockedChannels: [],
+            freeChannels: [],
+            channelScripts: {}
+        };
+
+        // Betting Tips Variables
+        let currentBookingCodes = [];
+        let currentEditBookingCodes = [];
+
+        // AUTH
         auth.onAuthStateChanged(u => {
-            if (u) { document.getElementById('authModal').style.display = 'none'; init(); }
-            else { document.getElementById('authModal').style.display = 'flex'; }
+            if(u) { 
+                document.getElementById('authModal').style.display='none'; 
+                init(); 
+            }
+            else { 
+                document.getElementById('authModal').style.display='flex'; 
+            }
         });
 
-        function login() {
+        function login(){
             const email = document.getElementById('lemail').value;
-            const pass = document.getElementById('lpass').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
+            const password = document.getElementById('lpass').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(e => {
+                    alert('Login Error: ' + e.message);
+                });
+        }
+
+        // --- NAVIGATION ENGINE ---
+        function openPage(id) {
+            document.getElementById('homeView').style.display='none';
+            document.querySelectorAll('.page-view').forEach(p=>p.style.display='none');
+            document.getElementById(id).style.display='block';
+            document.getElementById(id).scrollTop = 0;
+            document.getElementById('backBtn').style.display='block';
+            
+            const pageTitles = {
+                'users': 'Users Management',
+                'channels': 'Live Channels', 
+                'movies': 'Movies',
+                'premium': 'Premium Content',
+                'downloads': 'Downloads',
+                'chat': 'Chat Bot',
+                'devices': 'Device Requests',
+                'settings': 'Settings',
+                'categories': 'Categories',
+                'tips': 'Tips & Guides',
+                'bettingTips': 'Betting Tips',
+                'notif': 'Notifications',
+                'appSettings': 'App Settings',
+                'newUsers': 'New Users'
+            };
+            
+            document.getElementById('pageTitle').innerText = pageTitles[id] || id.toUpperCase();
+            
+            // Refresh data when opening specific pages
+            if(id === 'devices') loadDeviceRequests();
+            if(id === 'users') filterUsers('all');
+            if(id === 'downloads') loadDownloads();
+            if(id === 'categories') loadCategories();
+            if(id === 'premium') loadPremiumContent();
+            if(id === 'tips') loadTips();
+            if(id === 'bettingTips') initBettingTips();
+            if(id === 'appSettings') loadAppSettingsPage();
+            if(id === 'newUsers') filterNewUsers('today');
+        }
+
+        function goHome() {
+            document.querySelectorAll('.page-view').forEach(p=>p.style.display='none');
+            document.getElementById('homeView').style.display='grid';
+            document.getElementById('backBtn').style.display='none';
+            document.getElementById('pageTitle').innerText = 'STANY MIN TV ADMIN';
         }
 
         function init() {
-            loadUsers();
-            loadChannels();
-            loadMovies();
-            loadAds();
-            loadTokens();
+            loadData(); 
+            loadChatList(); 
+            loadSettings();
+            loadTrialSettings();
             loadCategories();
-            loadTips();
-            loadChatMessages();
-        }
-
-        // ---------- Users ----------
-        function loadUsers() {
-            db.ref('users').on('value', snap => {
-                const list = document.getElementById('userList');
-                list.innerHTML = '';
-                snap.forEach(u => {
-                    const user = u.val();
-                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px;">
-                        <div><b>${user.email}</b></div>
-                        <div><small>Expiry: ${user.accessExpiry ? new Date(user.accessExpiry).toLocaleDateString() : 'N/A'}</small></div>
-                        <div><small>Device ID: ${user.activeDeviceId || 'None'}</small></div>
-                        <button class="btn btn-d" style="padding:5px 10px; margin-top:8px;" onclick="resetUser('${u.key}')">Reset Device Lock</button>
-                        <button class="btn" style="background:#444; margin-left:8px;" onclick="extendUser('${u.key}')">+7 Days</button>
-                    </div>`;
-                });
-            });
-        }
-        function resetUser(uid) { db.ref('users/'+uid).update({ activeDeviceId: null }); toast("Device reset"); }
-        function extendUser(uid) {
-            db.ref('users/'+uid).once('value', snap => {
-                let expiry = snap.val().accessExpiry || Date.now();
-                expiry += 7*24*60*60*1000;
-                db.ref('users/'+uid).update({ accessExpiry: expiry });
-                toast("Subscription extended");
+            loadAppSettings();
+            initBettingTips();
+            
+            // Color picker sync
+            const p=document.getElementById('setColor'), t=document.getElementById('setColorText');
+            p.addEventListener('input',e=>t.value=e.target.value); 
+            t.addEventListener('input',e=>{
+                if(e.target.value.length===7) p.value=e.target.value
             });
         }
 
-        // ---------- Channels ----------
-        function loadChannels() {
-            db.ref('channels').on('value', snap => {
-                const list = document.getElementById('chanList');
-                list.innerHTML = '';
-                snap.forEach(c => {
-                    const ch = c.val();
-                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
-                        <span><b>${ch.name}</b> (${ch.genre || 'No genre'})</span>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('channels/${c.key}')"></i>
-                    </div>`;
-                });
-            });
-        }
-        function saveChan() {
-            const data = {
-                name: document.getElementById('cName').value,
-                logo: document.getElementById('cLogo').value,
-                m3u8Link: document.getElementById('cUrl').value,
-                genre: document.getElementById('cGenre').value,
-                access: document.getElementById('cAccess').value
-            };
-            db.ref('channels').push(data).then(() => {
-                toast(); closeModal('chanModal');
-                document.getElementById('cName').value = '';
-                document.getElementById('cLogo').value = '';
-                document.getElementById('cUrl').value = '';
-                document.getElementById('cGenre').value = '';
-            });
-        }
-
-        // ---------- Movies ----------
-        function loadMovies() {
-            db.ref('movies').on('value', snap => {
-                const list = document.getElementById('movieList');
-                list.innerHTML = '';
-                snap.forEach(m => {
-                    const mov = m.val();
-                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
-                        <span><b>${mov.title}</b> (${mov.genre || 'No genre'})</span>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('movies/${m.key}')"></i>
-                    </div>`;
-                });
-            });
-        }
-        function saveMovie() {
-            const data = {
-                title: document.getElementById('mTitle').value,
-                posterURL: document.getElementById('mPoster').value,
-                movieURL: document.getElementById('mUrl').value,
-                genre: document.getElementById('mGenre').value,
-                description: document.getElementById('mDesc').value,
-                access: document.getElementById('mAccess').value
-            };
-            db.ref('movies').push(data).then(() => {
-                toast(); closeModal('movieModal');
-                document.getElementById('mTitle').value = '';
-                document.getElementById('mPoster').value = '';
-                document.getElementById('mUrl').value = '';
-                document.getElementById('mGenre').value = '';
-                document.getElementById('mDesc').value = '';
-            });
-        }
-
-        // ---------- Ads ----------
-        function toggleAdFields() {
-            const type = document.getElementById('adType').value;
-            document.getElementById('adSlider').style.display = type === 'slider' ? 'block' : 'none';
-            document.getElementById('adMedia').style.display = type === 'slider' ? 'none' : 'block';
-        }
-        function saveAd() {
-            const data = {
-                type: document.getElementById('adType').value,
-                header: document.getElementById('adHeader').value,
-                link: document.getElementById('adLink').value,
-                footer: document.getElementById('adFooter').value,
-                duration: parseInt(document.getElementById('adDuration').value) || 5,
-                timestamp: Date.now()
-            };
-            if (data.type === 'slider') {
-                data.images = document.getElementById('adSlider').value.split(',').map(s=>s.trim());
-            } else {
-                data.url = document.getElementById('adMedia').value;
-            }
-            db.ref('ads').push(data).then(() => {
-                toast(); loadAds();
-                document.getElementById('adHeader').value = '';
-                document.getElementById('adLink').value = '';
-                document.getElementById('adFooter').value = '';
-                document.getElementById('adDuration').value = '';
-                document.getElementById('adMedia').value = '';
-                document.getElementById('adSlider').value = '';
-            });
-        }
-        function loadAds() {
-            db.ref('ads').on('value', snap => {
-                const list = document.getElementById('adsList');
-                list.innerHTML = '';
-                snap.forEach(ad => {
-                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px; display:flex; justify-content:space-between;">
-                        <span><b>${ad.val().header}</b> (${ad.val().type})</span>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('ads/${ad.key}')"></i>
-                    </div>`;
-                });
-            });
-        }
-
-        // ---------- Tokens ----------
-        function generateTokens() {
-            const count = parseInt(document.getElementById('tkCount').value) || 1;
-            for (let i = 0; i < count; i++) {
-                const token = 'STANY-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-                db.ref('tokens/' + token).set({ status: 'unused', generated: Date.now() });
-            }
-            toast(count + " tokens generated");
-        }
-        function loadTokens() {
-            db.ref('tokens').limitToLast(20).on('value', snap => {
-                const list = document.getElementById('tkList');
-                list.innerHTML = '<h4>Latest Tokens</h4>';
-                snap.forEach(t => {
-                    list.innerHTML += `<div style="padding:8px; border-bottom:1px solid #333;">${t.key} - ${t.val().status}</div>`;
-                });
-            });
-        }
-
-        // ---------- Library ----------
-        function addEpField() {
-            const div = document.createElement('div');
-            div.className = 'ep-row';
-            div.innerHTML = `<input class="ep-title input-box" placeholder="Episode Title"><textarea class="ep-content input-box" rows="5" placeholder="Episode content..."></textarea>`;
-            document.getElementById('episodesArea').appendChild(div);
-        }
-        function saveLib() {
-            const eps = [];
-            document.querySelectorAll('#episodesArea .ep-row').forEach(row => {
-                const title = row.querySelector('.ep-title').value;
-                const content = row.querySelector('.ep-content').value;
-                if (title.trim() || content.trim()) eps.push({ title, content });
-            });
-            const data = {
-                category: document.getElementById('libCat').value,
-                title: document.getElementById('libTitle').value,
-                author: document.getElementById('libAuthor').value,
-                description: document.getElementById('libDesc').value,
-                episodes: eps,
-                timestamp: Date.now()
-            };
-            db.ref('library').push(data).then(() => {
-                toast("Book saved");
-                document.getElementById('libTitle').value = '';
-                document.getElementById('libAuthor').value = '';
-                document.getElementById('libDesc').value = '';
-                document.getElementById('episodesArea').innerHTML = `<div class="ep-row"><input class="ep-title input-box" placeholder="Part Title"><textarea class="ep-content input-box" rows="5" placeholder="Content"></textarea></div>`;
-            });
-        }
-
-        // ---------- Categories ----------
-        function loadCategories() {
-            db.ref('genres').on('value', snap => {
-                const list = document.getElementById('catList');
-                list.innerHTML = '';
-                snap.forEach(genre => {
-                    list.innerHTML += `<div style="background:var(--card); padding:12px; margin-bottom:8px; display:flex; justify-content:space-between;">
-                        <span>${genre.val().name}</span>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('genres/${genre.key}')"></i>
-                    </div>`;
-                });
-            });
-        }
-        function addCategory() {
-            const name = document.getElementById('newCatName').value.trim();
-            if (!name) return;
-            db.ref('genres').push({ name: name }).then(() => {
-                toast("Category added");
-                document.getElementById('newCatName').value = '';
-            });
-        }
-
-        // ---------- Betting Tips ----------
-        function loadTips() {
-            db.ref('tips').on('value', snap => {
-                const list = document.getElementById('tipsList');
-                list.innerHTML = '';
-                snap.forEach(tip => {
-                    const t = tip.val();
-                    list.innerHTML += `<div style="background:var(--card); padding:15px; margin-bottom:10px;">
-                        <div><b>${t.title}</b></div>
-                        <div>${t.content.substring(0,100)}...</div>
-                        <div style="margin-top:8px;">
-                            <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="del('tips/${tip.key}')"></i>
-                        </div>
-                    </div>`;
-                });
-            });
-        }
-        function addTip() {
-            const title = document.getElementById('tipTitle').value.trim();
-            const content = document.getElementById('tipContent').value.trim();
-            if (!title || !content) return;
-            db.ref('tips').push({ title, content, timestamp: Date.now() }).then(() => {
-                toast("Tip added");
-                document.getElementById('tipTitle').value = '';
-                document.getElementById('tipContent').value = '';
-            });
-        }
-
-        // ---------- Chat Replies ----------
-        function loadChatMessages() {
-            db.ref('stanyBotMessages').on('value', async snap => {
-                const container = document.getElementById('chatMessagesList');
-                container.innerHTML = '';
-                const users = {};
-                snap.forEach(userSnap => {
-                    users[userSnap.key] = userSnap.val();
-                });
-                for (const [uid, msgs] of Object.entries(users)) {
-                    // get user email
-                    let email = uid;
-                    try {
-                        const userSnap = await db.ref('users/'+uid).once('value');
-                        if (userSnap.exists()) email = userSnap.val().email;
-                    } catch(e) {}
-                    const msgsArray = Object.values(msgs);
-                    const lastMsg = msgsArray[msgsArray.length-1];
-                    container.innerHTML += `
-                        <div style="background:var(--card); padding:15px; margin-bottom:15px; border-radius:12px;">
-                            <div><b>${email}</b> <small>${new Date(lastMsg.timestamp).toLocaleString()}</small></div>
-                            <div style="margin:10px 0;">${lastMsg.text}</div>
-                            <textarea id="reply-${uid}" class="input-box" placeholder="Type reply..."></textarea>
-                            <button class="btn btn-p" style="width:auto; padding:8px 16px;" onclick="sendReply('${uid}')">Send Reply</button>
-                        </div>
-                    `;
+        // --- NEW: APP SETTINGS MANAGEMENT ---
+        function loadAppSettings() {
+            db.ref('appSettings').on('value', s => {
+                if(s.exists()) {
+                    appSettings = { ...appSettings, ...s.val() };
+                    console.log("App settings loaded:", appSettings);
                 }
             });
         }
 
-        function sendReply(uid) {
-            const replyText = document.getElementById(`reply-${uid}`).value.trim();
-            if (!replyText) return;
-            db.ref(`stanyBotMessages/${uid}`).push({
-                text: replyText,
-                sender: 'admin',
-                timestamp: Date.now()
-            }).then(() => {
-                toast("Reply sent");
-                document.getElementById(`reply-${uid}`).value = '';
+        function loadAppSettingsPage() {
+            // Load current app settings into the form
+            document.getElementById('cardSizeSetting').value = appSettings.cardSize || 'medium';
+            document.getElementById('fontSizeSetting').value = appSettings.fontSize || 'medium';
+            document.getElementById('carouselInterval').value = appSettings.carouselInterval || 5000;
+            
+            // Load channel lists for locking management
+            loadChannelLockLists();
+            
+            // Load carousel slides
+            loadCarouselSlides();
+            
+            // Load channel scripts dropdown
+            loadChannelScriptsDropdown();
+        }
+
+        function saveAppSettings() {
+            const newSettings = {
+                cardSize: document.getElementById('cardSizeSetting').value,
+                fontSize: document.getElementById('fontSizeSetting').value,
+                carouselInterval: parseInt(document.getElementById('carouselInterval').value) || 5000,
+                lockedChannels: appSettings.lockedChannels || [],
+                freeChannels: appSettings.freeChannels || [],
+                channelScripts: appSettings.channelScripts || {},
+                updatedAt: Date.now()
+            };
+            
+            db.ref('appSettings').set(newSettings)
+                .then(() => {
+                    toast("App settings saved successfully!");
+                    appSettings = newSettings;
+                })
+                .catch(error => {
+                    toast("Error saving app settings: " + error.message);
+                });
+        }
+
+        function loadChannelLockLists() {
+            const lockList = document.getElementById('lockChannelsList');
+            const unlockList = document.getElementById('unlockChannelsList');
+            const freeList = document.getElementById('freeChannelsList');
+            
+            lockList.innerHTML = '';
+            unlockList.innerHTML = '';
+            freeList.innerHTML = '';
+            
+            Object.values(channels).forEach(channel => {
+                const isLocked = appSettings.lockedChannels && appSettings.lockedChannels.includes(channel.id);
+                const isFree = appSettings.freeChannels && appSettings.freeChannels.includes(channel.id);
+                
+                const channelItem = `
+                    <div class="channel-lock-item">
+                        <span>${channel.name}</span>
+                        <input type="checkbox" value="${channel.id}" ${isLocked ? 'checked' : ''}>
+                    </div>
+                `;
+                
+                if (!isLocked) {
+                    lockList.innerHTML += channelItem;
+                } else {
+                    unlockList.innerHTML += channelItem;
+                }
+                
+                const freeItem = `
+                    <div class="channel-lock-item">
+                        <span>${channel.name}</span>
+                        <input type="checkbox" value="${channel.id}" ${isFree ? 'checked' : ''}>
+                    </div>
+                `;
+                freeList.innerHTML += freeItem;
             });
         }
 
-        // ---------- Utilities ----------
-        function openPage(id) {
-            document.getElementById('homeView').style.display = 'none';
-            document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-            document.getElementById('backBtn').style.display = 'block';
-            document.getElementById('pageTitle').innerText = id.toUpperCase();
+        function lockSelectedChannels() {
+            const checkboxes = document.querySelectorAll('#lockChannelsList input[type="checkbox"]:checked');
+            const channelsToLock = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (channelsToLock.length === 0) {
+                toast("Please select channels to lock");
+                return;
+            }
+            
+            const updatedLockedChannels = [...(appSettings.lockedChannels || []), ...channelsToLock];
+            appSettings.lockedChannels = [...new Set(updatedLockedChannels)]; // Remove duplicates
+            
+            db.ref('appSettings/lockedChannels').set(appSettings.lockedChannels)
+                .then(() => {
+                    toast(`Locked ${channelsToLock.length} channels`);
+                    loadChannelLockLists();
+                });
         }
-        function goHome() {
-            document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
-            document.getElementById('homeView').style.display = 'grid';
-            document.getElementById('backBtn').style.display = 'none';
-            document.getElementById('pageTitle').innerText = 'STANY ADMIN PRO';
+
+        function unlockSelectedChannels() {
+            const checkboxes = document.querySelectorAll('#unlockChannelsList input[type="checkbox"]:checked');
+            const channelsToUnlock = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (channelsToUnlock.length === 0) {
+                toast("Please select channels to unlock");
+                return;
+            }
+            
+            appSettings.lockedChannels = (appSettings.lockedChannels || []).filter(id => !channelsToUnlock.includes(id));
+            
+            db.ref('appSettings/lockedChannels').set(appSettings.lockedChannels)
+                .then(() => {
+                    toast(`Unlocked ${channelsToUnlock.length} channels`);
+                    loadChannelLockLists();
+                });
         }
-        function openChanModal() { document.getElementById('chanModal').style.display = 'flex'; }
-        function openMovieModal() { document.getElementById('movieModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function del(path) { if (confirm("Delete?")) db.ref(path).remove(); }
-        function toast(msg = "Done!") {
+
+        function makeChannelsFree() {
+            const checkboxes = document.querySelectorAll('#freeChannelsList input[type="checkbox"]:checked');
+            const channelsToMakeFree = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (channelsToMakeFree.length === 0) {
+                toast("Please select channels to make free");
+                return;
+            }
+            
+            appSettings.freeChannels = [...new Set([...(appSettings.freeChannels || []), ...channelsToMakeFree])];
+            
+            db.ref('appSettings/freeChannels').set(appSettings.freeChannels)
+                .then(() => {
+                    toast(`Made ${channelsToMakeFree.length} channels free for all users`);
+                    loadChannelLockLists();
+                });
+        }
+
+        // --- CAROUSEL MANAGEMENT ---
+        function loadCarouselSlides() {
+            db.ref('carousel').on('value', s => {
+                const slidesList = document.getElementById('carouselSlidesList');
+                slidesList.innerHTML = '';
+                
+                if (!s.exists()) {
+                    slidesList.innerHTML = '<div style="text-align:center; color:var(--gray); padding:20px;">No carousel slides yet</div>';
+                    return;
+                }
+                
+                s.forEach(slide => {
+                    const slideData = slide.val();
+                    slidesList.innerHTML += `
+                        <div class="channel-lock-item">
+                            <div>
+                                <strong>${slideData.title || 'No Title'}</strong>
+                                <div style="font-size:0.8em; color:var(--gray);">${slideData.description || 'No description'}</div>
+                            </div>
+                            <div>
+                                <button class="btn btn-p btn-sm" onclick="editCarouselSlide('${slide.key}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-d btn-sm" onclick="deleteCarouselSlide('${slide.key}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function addCarouselSlide() {
+            const title = document.getElementById('carouselTitle').value;
+            const description = document.getElementById('carouselDescription').value;
+            const imageURL = document.getElementById('carouselImage').value;
+            
+            if (!title || !imageURL) {
+                toast("Please enter title and image URL");
+                return;
+            }
+            
+            const slideData = {
+                title: title,
+                description: description,
+                imageURL: imageURL,
+                createdAt: Date.now()
+            };
+            
+            db.ref('carousel').push(slideData)
+                .then(() => {
+                    toast("Carousel slide added successfully!");
+                    document.getElementById('carouselTitle').value = '';
+                    document.getElementById('carouselDescription').value = '';
+                    document.getElementById('carouselImage').value = '';
+                })
+                .catch(error => {
+                    toast("Error adding slide: " + error.message);
+                });
+        }
+
+        function editCarouselSlide(slideId) {
+            db.ref('carousel/' + slideId).once('value').then(s => {
+                const slideData = s.val();
+                document.getElementById('carouselTitle').value = slideData.title || '';
+                document.getElementById('carouselDescription').value = slideData.description || '';
+                document.getElementById('carouselImage').value = slideData.imageURL || '';
+                
+                // Remove old slide and add updated one
+                db.ref('carousel/' + slideId).remove().then(() => {
+                    toast("Slide loaded for editing");
+                });
+            });
+        }
+
+        function deleteCarouselSlide(slideId) {
+            if (confirm("Delete this carousel slide?")) {
+                db.ref('carousel/' + slideId).remove()
+                    .then(() => toast("Slide deleted"))
+                    .catch(error => toast("Error deleting slide: " + error.message));
+            }
+        }
+
+        // --- CHANNEL SCRIPTS MANAGEMENT ---
+        function loadChannelScriptsDropdown() {
+            const dropdown = document.getElementById('scriptChannelSelect');
+            dropdown.innerHTML = '<option value="">Select a channel</option>';
+            
+            Object.values(channels).forEach(channel => {
+                dropdown.innerHTML += `<option value="${channel.id}">${channel.name}</option>`;
+            });
+            
+            // Load existing script when channel is selected
+            dropdown.addEventListener('change', function() {
+                const channelId = this.value;
+                if (channelId && appSettings.channelScripts && appSettings.channelScripts[channelId]) {
+                    document.getElementById('channelScriptCode').value = appSettings.channelScripts[channelId];
+                } else {
+                    document.getElementById('channelScriptCode').value = '';
+                }
+            });
+        }
+
+        function saveChannelScript() {
+            const channelId = document.getElementById('scriptChannelSelect').value;
+            const scriptCode = document.getElementById('channelScriptCode').value;
+            
+            if (!channelId) {
+                toast("Please select a channel");
+                return;
+            }
+            
+            if (!appSettings.channelScripts) {
+                appSettings.channelScripts = {};
+            }
+            
+            appSettings.channelScripts[channelId] = scriptCode;
+            
+            db.ref('appSettings/channelScripts').set(appSettings.channelScripts)
+                .then(() => {
+                    toast("Channel script saved successfully!");
+                })
+                .catch(error => {
+                    toast("Error saving script: " + error.message);
+                });
+        }
+
+        function clearChannelScript() {
+            const channelId = document.getElementById('scriptChannelSelect').value;
+            
+            if (!channelId) {
+                toast("Please select a channel");
+                return;
+            }
+            
+            if (appSettings.channelScripts && appSettings.channelScripts[channelId]) {
+                delete appSettings.channelScripts[channelId];
+                
+                db.ref('appSettings/channelScripts').set(appSettings.channelScripts)
+                    .then(() => {
+                        document.getElementById('channelScriptCode').value = '';
+                        toast("Channel script cleared!");
+                    })
+                    .catch(error => {
+                        toast("Error clearing script: " + error.message);
+                    });
+            }
+        }
+
+        // --- DATA LOADERS ---
+        function loadData() {
+            // Users
+            db.ref('users').on('value', s => {
+                allUsers=[]; 
+                let total=0, premium=0, trial=0, blocked=0, active=0, newUsers=0;
+                const today = new Date().toDateString();
+                
+                s.forEach(c => { 
+                    let u={key:c.key,...c.val()}; 
+                    u.isExpired = u.accessExpiry && u.accessExpiry < Date.now();
+                    u.isTrial = u.subscriptionType === 'trial';
+                    u.isPremium = u.subscriptionType === 'premium';
+                    
+                    // Check if user is new (joined today)
+                    const joinDate = u.joinDate ? new Date(u.joinDate).toDateString() : new Date(u.createdAt || c.key).toDateString();
+                    u.isNew = joinDate === today;
+                    
+                    total++;
+                    if(u.isBlocked) blocked++;
+                    else if(u.isPremium && !u.isExpired) premium++;
+                    else if(u.isTrial && !u.isExpired) trial++;
+                    else if(!u.isExpired && u.accessExpiry) active++;
+                    if(u.isNew) newUsers++;
+                    
+                    allUsers.push(u); 
+                });
+                
+                document.getElementById('cntUsers').innerText = total + ' Registered';
+                document.getElementById('statTotalUsers').innerText = total;
+                document.getElementById('statPremiumUsers').innerText = premium;
+                document.getElementById('statTrialUsers').innerText = trial;
+                document.getElementById('statNewUsers').innerText = newUsers;
+                document.getElementById('cntNewUsers').innerText = newUsers + ' Today';
+                
+                filterUsers('all');
+            });
+
+            // Channels
+            db.ref('channels').on('value', s => {
+                channels={}; 
+                const g=document.getElementById('chanGrid'); 
+                g.innerHTML='';
+                let channelList = [];
+                
+                s.forEach(c => { 
+                    const channel = {id:c.key,...c.val()};
+                    channels[c.key] = channel;
+                    channelList.push(channel);
+                });
+                
+                // Sort channels by order field
+                channelList.sort((a, b) => (a.order || 999) - (b.order || 999));
+                
+                channelList.forEach(channel => {
+                    g.innerHTML+=`
+                        <div class="item-card">
+                            <img src="${channel.posterURL || 'https://via.placeholder.com/150x100?text=No+Image'}" class="item-img" onerror="this.src='https://via.placeholder.com/150x100?text=No+Image'">
+                            <div class="item-body">
+                                <div class="item-title">${channel.name || 'Unnamed'}</div>
+                                <div style="font-size:0.8em; color:var(--gray); margin-bottom:8px;">Order: ${channel.order || 999}</div>
+                                <div class="item-actions">
+                                    <button class="btn btn-p btn-sm" onclick="openChanModal('${channel.id}')">Edit</button>
+                                    <button class="btn btn-d btn-sm" onclick="del('channels','${channel.id}')">Del</button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                document.getElementById('cntChan').innerText = s.numChildren() + ' Live';
+                
+                // Update assignment dropdowns
+                updateAssignmentDropdowns();
+            });
+
+            // Movies
+            db.ref('movies').on('value', s => {
+                movies={}; 
+                const g=document.getElementById('movGrid'); 
+                g.innerHTML='';
+                s.forEach(c => { 
+                    movies[c.key]={id:c.key,...c.val()};
+                    g.innerHTML+=`
+                        <div class="item-card">
+                            <img src="${c.val().posterURL || 'https://via.placeholder.com/150x100?text=No+Image'}" class="item-img" onerror="this.src='https://via.placeholder.com/150x100?text=No+Image'">
+                            <div class="item-body">
+                                <div class="item-title">${c.val().title || 'Untitled'}</div>
+                                <div class="item-actions">
+                                    <button class="btn btn-p btn-sm" onclick="openMovModal('${c.key}')">Edit</button>
+                                    <button class="btn btn-d btn-sm" onclick="del('movies','${c.key}')">Del</button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                document.getElementById('cntMov').innerText = s.numChildren() + ' Added';
+                
+                // Update assignment dropdowns
+                updateAssignmentDropdowns();
+            });
+
+            // Downloads
+            loadDownloads();
+
+            // Tips
+            loadTips();
+
+            // Device Requests
+            loadDeviceRequests();
+        }
+
+        function loadDownloads() {
+            db.ref('downloadableMovies').on('value', s => {
+                downloads={}; 
+                const g=document.getElementById('downloadsGrid'); 
+                g.innerHTML='';
+                let count=0;
+                s.forEach(c => { 
+                    downloads[c.key]={id:c.key,...c.val()};
+                    g.innerHTML+=`
+                        <div class="download-item">
+                            <img src="${c.val().posterURL || 'https://via.placeholder.com/200x150?text=No+Image'}" onerror="this.src='https://via.placeholder.com/200x150?text=No+Image'">
+                            <div class="download-info">
+                                <div class="download-title">${c.val().title || 'Untitled'}</div>
+                                <div class="download-desc">${c.val().description || 'No description'}</div>
+                                <div class="item-actions">
+                                    <button class="btn btn-p btn-sm" onclick="openDownloadModal('${c.key}')">Edit</button>
+                                    <button class="btn btn-d btn-sm" onclick="del('downloadableMovies','${c.key}')">Del</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    count++;
+                });
+                document.getElementById('cntDownloads').innerText = count + ' Files';
+            });
+        }
+
+        function loadTips() {
+            db.ref('tips').on('value', s => {
+                tips={}; 
+                const g=document.getElementById('tipsGrid'); 
+                g.innerHTML='';
+                s.forEach(c => { 
+                    tips[c.key]={id:c.key,...c.val()};
+                    g.innerHTML+=`
+                        <div class="tip-card">
+                            <div class="tip-header">
+                                <div class="tip-title">${c.val().title || 'Untitled'}</div>
+                                <div class="tip-category">${c.val().category || 'general'}</div>
+                            </div>
+                            <div class="tip-content">${c.val().content || 'No content'}</div>
+                            <div class="item-actions">
+                                <button class="btn btn-p btn-sm" onclick="openTipModal('${c.key}')">Edit</button>
+                                <button class="btn btn-d btn-sm" onclick="del('tips','${c.key}')">Del</button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        function loadDeviceRequests() {
+            db.ref('deviceRequests').on('value', s => {
+                const d=document.getElementById('devList'); 
+                d.innerHTML='';
+                let count=0;
+                s.forEach(r => { 
+                    const req=r.val();
+                    if(req.status==='pending') {
+                        d.innerHTML+=`
+                            <div class="device-card">
+                                <div class="device-header">
+                                    <div>
+                                        <b>${req.userName || 'Unknown'}</b>
+                                        <div style="color:var(--gray); font-size:0.9em;">${req.email}</div>
+                                    </div>
+                                    <div class="user-status status-trial">PENDING</div>
+                                </div>
+                                <div style="color:var(--gray); font-size:0.9em;">
+                                    Device: ${req.deviceId}<br>
+                                    Requested: ${new Date(req.timestamp).toLocaleString()}
+                                </div>
+                                <div class="device-actions">
+                                    <button class="btn btn-p btn-sm" onclick="approveDevice('${r.key}','${req.userUid}','${req.deviceId}')">Approve</button>
+                                    <button class="btn btn-d btn-sm" onclick="rejectDevice('${r.key}')">Reject</button>
+                                </div>
+                            </div>`;
+                        count++;
+                    }
+                });
+                document.getElementById('cntDev').innerText = count + ' Pending';
+            });
+        }
+
+        function loadChatList() {
+            db.ref('stanyBotMessages').on('value', s => {
+                const l=document.getElementById('chatList'); 
+                l.innerHTML='';
+                let newCount=0;
+                
+                s.forEach(userChat => {
+                    const userId = userChat.key;
+                    let lastMsg = null;
+                    let unread = false;
+                    
+                    userChat.forEach(msg => {
+                        const m = msg.val();
+                        if(!lastMsg || m.timestamp > lastMsg.timestamp) {
+                            lastMsg = m;
+                            if(m.sender === 'user' && (!m.read || m.read === false)) {
+                                unread = true;
+                                newCount++;
+                            }
+                        }
+                    });
+                    
+                    if(lastMsg) {
+                        const user = allUsers.find(u => u.key === userId);
+                        if(user) {
+                            l.innerHTML += `
+                                <div class="chat-user" onclick="openChatRoom('${userId}')">
+                                    <div class="chat-user-info">
+                                        <div class="chat-user-name">${user.name || 'User'}</div>
+                                        <div class="chat-user-email">${user.email}</div>
+                                        <div class="chat-user-msg">${lastMsg.text}</div>
+                                    </div>
+                                    ${unread ? '<div class="badge">NEW</div>' : ''}
+                                </div>`;
+                        }
+                    }
+                });
+                
+                document.getElementById('cntChat').innerText = newCount;
+            });
+        }
+
+        function openChatRoom(uid) {
+            chatUid = uid;
+            currentChatUser = allUsers.find(u => u.key === uid);
+            
+            document.getElementById('chatListContainer').style.display='none';
+            document.getElementById('chatRoom').style.display='flex';
+            
+            document.getElementById('chatHeaderName').innerText = currentChatUser.name || 'User';
+            document.getElementById('chatHeaderEmail').innerText = currentChatUser.email;
+            
+            loadChatMessages();
+        }
+
+        function closeChatRoom() {
+            document.getElementById('chatListContainer').style.display='block';
+            document.getElementById('chatRoom').style.display='none';
+            chatUid = null;
+            currentChatUser = null;
+        }
+
+        function loadChatMessages() {
+            if(!chatUid) return;
+            
+            const m=document.getElementById('chatMsgs');
+            m.innerHTML='';
+            
+            db.ref(`stanyBotMessages/${chatUid}`).limitToLast(50).on('value', s => {
+                m.innerHTML='';
+                s.forEach(msg => {
+                    const data = msg.val();
+                    const div = document.createElement('div');
+                    div.className = `msg msg-${data.sender}`;
+                    div.innerHTML = `
+                        <div class="msg-info">${new Date(data.timestamp).toLocaleString()}</div>
+                        ${data.text}
+                    `;
+                    m.appendChild(div);
+                    
+                    // Mark as read if admin is viewing
+                    if(data.sender === 'user' && (!data.read || data.read === false)) {
+                        db.ref(`stanyBotMessages/${chatUid}/${msg.key}/read`).set(true);
+                    }
+                });
+                m.scrollTop = m.scrollHeight;
+            });
+        }
+
+        function sendReply() {
+            if(!chatUid) return;
+            
+            const text = document.getElementById('chatInput').value.trim();
+            if(!text) return;
+            
+            db.ref(`stanyBotMessages/${chatUid}`).push({
+                text: text,
+                sender: 'admin',
+                timestamp: Date.now(),
+                read: false
+            });
+            
+            document.getElementById('chatInput').value = '';
+            
+            // Send notification to user
+            sendUserNotification(chatUid, "Admin Replied", `Admin: ${text}`);
+        }
+
+        // --- CATEGORIES MANAGEMENT ---
+        function loadCategories() {
+            db.ref('genres').on('value', s => {
+                categories = [];
+                const list = document.getElementById('categoryList');
+                list.innerHTML = '';
+                
+                s.forEach(c => {
+                    const cat = {id: c.key, ...c.val()};
+                    categories.push(cat);
+                    list.innerHTML += `
+                        <div class="sortable-item" data-id="${c.key}">
+                            <span>${cat.name}</span>
+                            <button class="btn btn-d btn-sm" onclick="deleteCategory('${c.key}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                // Load categories in channel/movie assignment dropdowns
+                updateCategoryDropdowns();
+                
+                // Load category stats
+                loadCategoryStats();
+            });
+        }
+
+        function addCategory() {
+            const name = document.getElementById('newCategoryName').value;
+            if(!name) return toast("Enter category name");
+            
+            db.ref('genres').push({name: name, order: categories.length})
+                .then(() => {
+                    document.getElementById('newCategoryName').value = '';
+                    toast("Category added");
+                });
+        }
+
+        function deleteCategory(id) {
+            if(confirm("Delete this category?")) {
+                db.ref('genres/'+id).remove()
+                    .then(() => toast("Category deleted"))
+                    .catch(e => toast("Error: "+e.message));
+            }
+        }
+
+        function updateCategoryDropdowns() {
+            // Update all category multi-select containers
+            const categoryCheckboxes = categories.map(cat => 
+                `<div class="multi-select-item">
+                    <input type="checkbox" id="cat-${cat.id}" value="${cat.name}">
+                    <label for="cat-${cat.id}">${cat.name}</label>
+                </div>`
+            ).join('');
+            
+            // Channel modal
+            document.getElementById('cCategory').innerHTML = categoryCheckboxes;
+            
+            // Movie modal  
+            document.getElementById('mCategory').innerHTML = categoryCheckboxes;
+            
+            // Assignment containers
+            document.getElementById('assignChannelCategory').innerHTML = categoryCheckboxes;
+            document.getElementById('assignMovieCategory').innerHTML = categoryCheckboxes;
+        }
+
+        function loadCategoryStats() {
+            const statsContainer = document.getElementById('categoryStats');
+            statsContainer.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const channelCount = Object.values(channels).filter(ch => 
+                    ch.categories && ch.categories.includes(cat.name)
+                ).length;
+                
+                const movieCount = Object.values(movies).filter(mv => 
+                    mv.genre && mv.genre.includes(cat.name)
+                ).length;
+                
+                statsContainer.innerHTML += `
+                    <div class="stat-card">
+                        <div class="stat-number">${channelCount + movieCount}</div>
+                        <div class="stat-label">${cat.name}</div>
+                        <div style="font-size:0.8em; color:var(--gray);">
+                            ${channelCount} channels, ${movieCount} movies
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function assignChannelCategories() {
+            const channelId = document.getElementById('assignChannelSelect').value;
+            const selectedCategories = Array.from(document.querySelectorAll('#assignChannelCategory input:checked'))
+                .map(cb => cb.value);
+            
+            if(!channelId) return toast("Select a channel");
+            if(selectedCategories.length === 0) return toast("Select at least one category");
+            
+            db.ref('channels/'+channelId+'/categories').set(selectedCategories)
+                .then(() => {
+                    toast("Categories assigned to channel");
+                    document.getElementById('assignChannelSelect').value = '';
+                    // Clear checkboxes
+                    document.querySelectorAll('#assignChannelCategory input:checked').forEach(cb => cb.checked = false);
+                });
+        }
+
+        function assignMovieCategories() {
+            const movieId = document.getElementById('assignMovieSelect').value;
+            const selectedCategories = Array.from(document.querySelectorAll('#assignMovieCategory input:checked'))
+                .map(cb => cb.value);
+            
+            if(!movieId) return toast("Select a movie");
+            if(selectedCategories.length === 0) return toast("Select at least one category");
+            
+            db.ref('movies/'+movieId+'/genre').set(selectedCategories)
+                .then(() => {
+                    toast("Categories assigned to movie");
+                    document.getElementById('assignMovieSelect').value = '';
+                    // Clear checkboxes
+                    document.querySelectorAll('#assignMovieCategory input:checked').forEach(cb => cb.checked = false);
+                });
+        }
+
+        // Update channel and movie dropdowns for assignment
+        function updateAssignmentDropdowns() {
+            // Channel dropdown
+            const channelSelect = document.getElementById('assignChannelSelect');
+            channelSelect.innerHTML = '<option value="">Select Channel</option>';
+            Object.values(channels).forEach(channel => {
+                channelSelect.innerHTML += `<option value="${channel.id}">${channel.name}</option>`;
+            });
+            
+            // Movie dropdown
+            const movieSelect = document.getElementById('assignMovieSelect');
+            movieSelect.innerHTML = '<option value="">Select Movie</option>';
+            Object.values(movies).forEach(movie => {
+                movieSelect.innerHTML += `<option value="${movie.id}">${movie.title}</option>`;
+            });
+        }
+
+        // --- BETTING TIPS MANAGEMENT ---
+        function initBettingTips() {
+            db.ref('bettingTips').on('value', s => {
+                bettingTips = {};
+                const list = document.getElementById('bettingTipsList');
+                list.innerHTML = '';
+                let count = 0;
+                
+                s.forEach(tip => {
+                    bettingTips[tip.key] = {id: tip.key, ...tip.val()};
+                    list.innerHTML += createBettingTipItem(bettingTips[tip.key]);
+                    count++;
+                });
+                
+                document.getElementById('cntBettingTips').innerText = count + ' Tips';
+            });
+            
+            // Setup booking codes functionality
+            setupBookingCodes();
+            
+            // Setup form submission
+            document.getElementById('addBettingTipForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addBettingTip();
+            });
+            
+            document.getElementById('editBettingTipForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateBettingTip();
+            });
+        }
+
+        function setupBookingCodes() {
+            // Add booking code for new tip
+            document.getElementById('addBookingCodeBtn').addEventListener('click', function() {
+                const platform = document.getElementById('bookingCodePlatform').value;
+                const code = document.getElementById('bookingCodeValue').value;
+                
+                if(!platform || !code) {
+                    toast("Please enter platform and code");
+                    return;
+                }
+                
+                currentBookingCodes.push({platform, code});
+                updateBookingCodesList();
+                
+                // Clear inputs
+                document.getElementById('bookingCodePlatform').value = '';
+                document.getElementById('bookingCodeValue').value = '';
+            });
+            
+            // Add booking code for edit tip
+            document.getElementById('editAddBookingCodeBtn').addEventListener('click', function() {
+                const platform = document.getElementById('editBookingCodePlatform').value;
+                const code = document.getElementById('editBookingCodeValue').value;
+                
+                if(!platform || !code) {
+                    toast("Please enter platform and code");
+                    return;
+                }
+                
+                currentEditBookingCodes.push({platform, code});
+                updateEditBookingCodesList();
+                
+                // Clear inputs
+                document.getElementById('editBookingCodePlatform').value = '';
+                document.getElementById('editBookingCodeValue').value = '';
+            });
+        }
+
+        function updateBookingCodesList() {
+            const list = document.getElementById('bookingCodesList');
+            list.innerHTML = '';
+            
+            currentBookingCodes.forEach((code, index) => {
+                list.innerHTML += `
+                    <div class="booking-code-item">
+                        <span>${code.platform}: ${code.code}</span>
+                        <button class="btn btn-d btn-sm" onclick="removeBookingCode(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateEditBookingCodesList() {
+            const list = document.getElementById('editBookingCodesList');
+            list.innerHTML = '';
+            
+            currentEditBookingCodes.forEach((code, index) => {
+                list.innerHTML += `
+                    <div class="booking-code-item">
+                        <span>${code.platform}: ${code.code}</span>
+                        <button class="btn btn-d btn-sm" onclick="removeEditBookingCode(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeBookingCode(index) {
+            currentBookingCodes.splice(index, 1);
+            updateBookingCodesList();
+        }
+
+        function removeEditBookingCode(index) {
+            currentEditBookingCodes.splice(index, 1);
+            updateEditBookingCodesList();
+        }
+
+        function addBettingTip() {
+            const tipData = {
+                title: document.getElementById('tipTitle').value,
+                team1: document.getElementById('team1').value,
+                team2: document.getElementById('team2').value,
+                prediction: document.getElementById('prediction').value,
+                odds: document.getElementById('odds').value,
+                stake: document.getElementById('stake').value || '',
+                status: document.getElementById('tipStatus').value,
+                result: document.getElementById('tipResult').value || '',
+                bookmakerLink: document.getElementById('bookmakerLink').value,
+                description: document.getElementById('tipDescription').value || '',
+                bookingCodes: currentBookingCodes,
+                createdAt: Date.now()
+            };
+            
+            db.ref('bettingTips').push(tipData)
+                .then(() => {
+                    toast("Betting tip added successfully!");
+                    // Reset form
+                    document.getElementById('addBettingTipForm').reset();
+                    currentBookingCodes = [];
+                    updateBookingCodesList();
+                })
+                .catch(error => {
+                    toast("Error adding tip: " + error.message);
+                });
+        }
+
+        function createBettingTipItem(tip) {
+            let statusClass = '';
+            switch(tip.status) {
+                case 'upcoming': statusClass = 'status-upcoming'; break;
+                case 'completed': statusClass = 'status-completed'; break;
+                case 'successful': statusClass = 'status-successful'; break;
+                case 'failed': statusClass = 'status-failed'; break;
+            }
+            
+            let codesHtml = '';
+            if(tip.bookingCodes && Array.isArray(tip.bookingCodes)) {
+                tip.bookingCodes.forEach(code => {
+                    codesHtml += `<div class="booking-code-item"><span>${code.platform}: ${code.code}</span></div>`;
+                });
+            }
+            
+            return `
+                <div class="betting-tip-card">
+                    <div class="betting-tip-header">
+                        <span class="user-status ${statusClass}">${tip.status.toUpperCase()}</span>
+                        <span>${new Date(tip.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="betting-tip-teams">${tip.team1} vs ${tip.team2}</div>
+                    <div class="betting-tip-title">${tip.title}</div>
+                    <div class="betting-tip-prediction">${tip.prediction}</div>
+                    <div class="betting-tip-odds">Odds: ${tip.odds}</div>
+                    ${tip.stake ? `<div><strong>Stake:</strong> ${tip.stake}</div>` : ''}
+                    ${tip.result ? `<div><strong>Result:</strong> ${tip.result}</div>` : ''}
+                    ${tip.description ? `<div>${tip.description}</div>` : ''}
+                    ${codesHtml}
+                    <div class="item-actions" style="margin-top:10px;">
+                        <button class="btn btn-p btn-sm" onclick="editBettingTip('${tip.id}')">Edit</button>
+                        <button class="btn btn-d btn-sm" onclick="del('bettingTips','${tip.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editBettingTip(id) {
+            const tip = bettingTips[id];
+            if(!tip) return;
+            
+            document.getElementById('editBettingTipId').value = id;
+            document.getElementById('editTipTitle').value = tip.title || '';
+            document.getElementById('editTeam1').value = tip.team1 || '';
+            document.getElementById('editTeam2').value = tip.team2 || '';
+            document.getElementById('editPrediction').value = tip.prediction || '';
+            document.getElementById('editOdds').value = tip.odds || '';
+            document.getElementById('editStake').value = tip.stake || '';
+            document.getElementById('editTipStatus').value = tip.status || 'upcoming';
+            document.getElementById('editTipResult').value = tip.result || '';
+            document.getElementById('editBookmakerLink').value = tip.bookmakerLink || '';
+            document.getElementById('editTipDescription').value = tip.description || '';
+            
+            // Load booking codes
+            currentEditBookingCodes = tip.bookingCodes && Array.isArray(tip.bookingCodes) ? [...tip.bookingCodes] : [];
+            updateEditBookingCodesList();
+            
+            document.getElementById('editBettingTipModal').style.display = 'flex';
+        }
+
+        function updateBettingTip() {
+            const id = document.getElementById('editBettingTipId').value;
+            const tipData = {
+                title: document.getElementById('editTipTitle').value,
+                team1: document.getElementById('editTeam1').value,
+                team2: document.getElementById('editTeam2').value,
+                prediction: document.getElementById('editPrediction').value,
+                odds: document.getElementById('editOdds').value,
+                stake: document.getElementById('editStake').value || '',
+                status: document.getElementById('editTipStatus').value,
+                result: document.getElementById('editTipResult').value || '',
+                bookmakerLink: document.getElementById('editBookmakerLink').value,
+                description: document.getElementById('editTipDescription').value || '',
+                bookingCodes: currentEditBookingCodes,
+                updatedAt: Date.now()
+            };
+            
+            db.ref('bettingTips/'+id).update(tipData)
+                .then(() => {
+                    toast("Betting tip updated successfully!");
+                    document.getElementById('editBettingTipModal').style.display = 'none';
+                })
+                .catch(error => {
+                    toast("Error updating tip: " + error.message);
+                });
+        }
+
+        // --- PREMIUM CONTENT MANAGEMENT ---
+        function loadPremiumContent() {
+            // Load popular movies
+            const popularMovies = Object.values(movies).filter(m => m.section === 'popular');
+            const popularGrid = document.getElementById('popularMovies');
+            popularGrid.innerHTML = '';
+            popularMovies.forEach(movie => {
+                popularGrid.innerHTML += createMovieCard(movie);
+            });
+            
+            // Load latest movies  
+            const latestMovies = Object.values(movies).filter(m => m.section === 'latest');
+            const latestGrid = document.getElementById('latestMovies');
+            latestGrid.innerHTML = '';
+            latestMovies.forEach(movie => {
+                latestGrid.innerHTML += createMovieCard(movie);
+            });
+        }
+
+        function createMovieCard(movie) {
+            return `
+                <div class="item-card">
+                    <img src="${movie.posterURL || 'https://via.placeholder.com/150x100?text=No+Image'}" class="item-img">
+                    <div class="item-body">
+                        <div class="item-title">${movie.title}</div>
+                        <div class="item-actions">
+                            <button class="btn btn-p btn-sm" onclick="openMovModal('${movie.id}')">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openMovModalWithSection(section) {
+            openMovModal();
+            document.getElementById('mSection').value = section;
+        }
+
+        function loadTrialSettings() {
+            db.ref('trialSettings').on('value', s => {
+                if(s.exists()) {
+                    trialSettings = s.val();
+                    document.getElementById('trialDuration').value = trialSettings.duration || 7;
+                    // Set the active unit button
+                    setTrialUnit(trialSettings.unit || 'hours');
+                }
+            });
+        }
+
+        function setTrialUnit(unit) {
+            trialSettings.unit = unit;
+            // Update button styles
+            document.querySelectorAll('.trial-unit-selector .btn').forEach(btn => {
+                btn.style.background = '#333';
+                btn.style.color = 'white';
+            });
+            event.target.style.background = 'var(--primary)';
+            event.target.style.color = 'black';
+        }
+
+        function saveTrialSettings() {
+            const duration = parseInt(document.getElementById('trialDuration').value);
+            if(duration < 1) {
+                toast("Please enter valid duration");
+                return;
+            }
+            
+            trialSettings.duration = duration;
+            
+            db.ref('trialSettings').set(trialSettings)
+                .then(() => toast("Trial settings saved"))
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        function assignTrialToDateUsers() {
+            const selectedDate = document.getElementById('autoTrialDate').value;
+            if(!selectedDate) {
+                toast("Please select a date");
+                return;
+            }
+            
+            const targetDate = new Date(selectedDate).toDateString();
+            let assigned = 0;
+            
+            allUsers.forEach(user => {
+                const joinDate = user.joinDate ? new Date(user.joinDate).toDateString() : new Date(user.createdAt || user.key).toDateString();
+                if(joinDate === targetDate && user.subscriptionType !== 'premium') {
+                    // Calculate expiry based on trial settings
+                    let expiry = Date.now();
+                    switch(trialSettings.unit) {
+                        case 'seconds': expiry += trialSettings.duration * 1000; break;
+                        case 'minutes': expiry += trialSettings.duration * 60 * 1000; break;
+                        case 'hours': expiry += trialSettings.duration * 60 * 60 * 1000; break;
+                        case 'days': expiry += trialSettings.duration * 24 * 60 * 60 * 1000; break;
+                    }
+                    
+                    db.ref('users/'+user.key).update({
+                        subscriptionType: 'trial',
+                        accessExpiry: expiry
+                    }).then(() => assigned++);
+                }
+            });
+            
+            setTimeout(() => {
+                toast(`Assigned trial to ${assigned} users from ${selectedDate}`);
+            }, 1000);
+        }
+
+        function massBlockExpired() {
+            const now = Date.now();
+            let blocked = 0;
+            
+            allUsers.forEach(user => {
+                if(user.accessExpiry && user.accessExpiry < now && !user.isBlocked) {
+                    db.ref('users/'+user.key+'/isBlocked').set(true)
+                        .then(() => blocked++);
+                }
+            });
+            
+            setTimeout(() => {
+                toast(`Blocked ${blocked} expired users`);
+            }, 1000);
+        }
+
+        // --- NEW USERS MANAGEMENT ---
+        function filterNewUsers(type) {
+            const list = document.getElementById('newUsersList');
+            list.innerHTML = '';
+            
+            let filtered = allUsers.filter(u => !u.isBlocked);
+            const now = new Date();
+            
+            switch(type) {
+                case 'today':
+                    const today = now.toDateString();
+                    filtered = filtered.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate).toDateString() : new Date(u.createdAt || u.key).toDateString();
+                        return joinDate === today;
+                    });
+                    break;
+                case 'yesterday':
+                    const yesterday = new Date(now.setDate(now.getDate() - 1)).toDateString();
+                    filtered = filtered.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate).toDateString() : new Date(u.createdAt || u.key).toDateString();
+                        return joinDate === yesterday;
+                    });
+                    break;
+                case 'week':
+                    const weekAgo = new Date(now.setDate(now.getDate() - 7));
+                    filtered = filtered.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                        return joinDate >= weekAgo;
+                    });
+                    break;
+                case 'month':
+                    const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+                    filtered = filtered.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                        return joinDate >= monthAgo;
+                    });
+                    break;
+                // 'all' shows all users
+            }
+            
+            filtered.forEach(u => {
+                const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                const daysAgo = Math.floor((new Date() - joinDate) / (1000 * 60 * 60 * 24));
+                
+                list.innerHTML += `
+                    <div class="user-row" onclick="openUserModal('${u.key}')">
+                        <div>
+                            <b>${u.name || 'No Name'}</b>
+                            <div style="color:var(--gray); font-size:0.9em;">${u.email}</div>
+                            <div style="font-size:0.8em; color:var(--gray);">
+                                Joined: ${joinDate.toLocaleDateString()} (${daysAgo} days ago)
+                            </div>
+                        </div>
+                        <div class="user-status status-new">NEW</div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterNewUsersByDate() {
+            const startDate = document.getElementById('newUsersStartDate').value;
+            const endDate = document.getElementById('newUsersEndDate').value;
+            
+            if(!startDate || !endDate) {
+                toast("Please select both start and end dates");
+                return;
+            }
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999); // End of the day
+            
+            const list = document.getElementById('newUsersList');
+            list.innerHTML = '';
+            
+            const filtered = allUsers.filter(u => {
+                if(u.isBlocked) return false;
+                const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                return joinDate >= start && joinDate <= end;
+            });
+            
+            filtered.forEach(u => {
+                const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                
+                list.innerHTML += `
+                    <div class="user-row" onclick="openUserModal('${u.key}')">
+                        <div>
+                            <b>${u.name || 'No Name'}</b>
+                            <div style="color:var(--gray); font-size:0.9em;">${u.email}</div>
+                            <div style="font-size:0.8em; color:var(--gray);">
+                                Joined: ${joinDate.toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div class="user-status status-new">NEW</div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- USER MANAGEMENT ---
+        function filterUsers(type) {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            
+            let filtered = allUsers;
+            
+            switch(type) {
+                case 'premium':
+                    filtered = allUsers.filter(u => u.subscriptionType === 'premium' && !u.isExpired && !u.isBlocked);
+                    break;
+                case 'trial':
+                    filtered = allUsers.filter(u => u.subscriptionType === 'trial' && !u.isExpired && !u.isBlocked);
+                    break;
+                case 'active':
+                    filtered = allUsers.filter(u => !u.isExpired && !u.isBlocked && u.accessExpiry);
+                    break;
+                case 'blocked':
+                    filtered = allUsers.filter(u => u.isBlocked);
+                    break;
+                case 'expired':
+                    filtered = allUsers.filter(u => u.isExpired && !u.isBlocked);
+                    break;
+                case 'new':
+                    const today = new Date().toDateString();
+                    filtered = allUsers.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate).toDateString() : new Date(u.createdAt || u.key).toDateString();
+                        return joinDate === today && !u.isBlocked;
+                    });
+                    break;
+            }
+            
+            filtered.forEach(u => {
+                let status = 'status-active';
+                let statusText = 'ACTIVE';
+                
+                if(u.isBlocked) {
+                    status = 'status-blocked';
+                    statusText = 'BLOCKED';
+                } else if(u.isExpired) {
+                    status = 'status-expired'; 
+                    statusText = 'EXPIRED';
+                } else if(u.subscriptionType === 'premium') {
+                    status = 'status-premium';
+                    statusText = 'PREMIUM';
+                } else if(u.subscriptionType === 'trial') {
+                    status = 'status-trial';
+                    statusText = 'TRIAL';
+                } else if(u.isNew) {
+                    status = 'status-new';
+                    statusText = 'NEW';
+                }
+                
+                const days = u.accessExpiry ? Math.ceil((u.accessExpiry - Date.now())/(1000*60*60*24)) : 0;
+                const joinDate = u.joinDate ? new Date(u.joinDate) : new Date(u.createdAt || u.key);
+                
+                list.innerHTML += `
+                    <div class="user-row" onclick="openUserModal('${u.key}')">
+                        <div>
+                            <b>${u.name || 'No Name'}</b>
+                            <div style="color:var(--gray); font-size:0.9em;">${u.email}</div>
+                            <div style="font-size:0.8em; color:var(--gray);">
+                                ${u.activeDeviceId ? 'Device: '+u.activeDeviceId.substring(0,8)+'...' : 'No Device'}
+                                ${days > 0 ? ' • '+days+' days left' : u.accessExpiry ? ' • EXPIRED' : ' • NO SUB'}
+                                ${u.isNew ? ' • <span style="color:var(--secondary);">NEW</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="user-status ${status}">${statusText}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function searchUI() {
+            const query = document.getElementById('searchUser').value.toLowerCase();
+            const rows = document.querySelectorAll('.user-row');
+            
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function openUserModal(uid) {
+            const u = allUsers.find(x=>x.key===uid);
+            if(!u) return;
+            
+            document.getElementById('umId').value = u.key;
+            document.getElementById('umName').innerText = u.name || 'No Name';
+            document.getElementById('umEmail').innerText = u.email;
+            document.getElementById('umSubType').value = u.subscriptionType || 'none';
+            document.getElementById('umDevice').value = u.activeDeviceId || 'No device';
+            
+            if(u.accessExpiry) {
+                const date = new Date(u.accessExpiry);
+                document.getElementById('umDate').value = date.toISOString().split('T')[0];
+            } else {
+                document.getElementById('umDate').value = '';
+            }
+            
+            document.getElementById('umBlockBtn').innerText = u.isBlocked ? 'UNBLOCK USER' : 'BLOCK USER';
+            document.getElementById('umBlockBtn').className = u.isBlocked ? 'btn btn-p' : 'btn btn-d';
+            
+            toggleSubscriptionFields();
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function toggleSubscriptionFields() {
+            const type = document.getElementById('umSubType').value;
+            const fields = document.getElementById('subFields');
+            fields.style.display = type === 'none' ? 'none' : 'block';
+        }
+
+        function addTime(days) {
+            const dateInput = document.getElementById('umDate');
+            let date = dateInput.value ? new Date(dateInput.value) : new Date();
+            date.setDate(date.getDate() + days);
+            dateInput.value = date.toISOString().split('T')[0];
+        }
+
+        function saveUserSub() {
+            const uid = document.getElementById('umId').value;
+            const type = document.getElementById('umSubType').value;
+            const dateStr = document.getElementById('umDate').value;
+            
+            const updates = {
+                subscriptionType: type
+            };
+            
+            if(type !== 'none' && dateStr) {
+                updates.accessExpiry = new Date(dateStr).getTime();
+            } else if(type === 'none') {
+                updates.accessExpiry = null;
+            }
+            
+            db.ref('users/'+uid).update(updates)
+                .then(() => {
+                    toast("User subscription updated");
+                    document.getElementById('userModal').style.display = 'none';
+                })
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        function toggleBlock() {
+            const uid = document.getElementById('umId').value;
+            const u = allUsers.find(x=>x.key===uid);
+            if(!u) return;
+            
+            db.ref('users/'+uid+'/isBlocked').set(!u.isBlocked)
+                .then(() => {
+                    toast(u.isBlocked ? "User unblocked" : "User blocked");
+                    document.getElementById('userModal').style.display = 'none';
+                })
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        function viewPass() {
+            const uid = document.getElementById('umId').value;
+            const u = allUsers.find(x=>x.key===uid);
+            if(!u) return;
+            
+            const list = document.getElementById('passList');
+            list.innerHTML = '';
+            
+            if(u.channelPasswords) {
+                for(let [chanId, pass] of Object.entries(u.channelPasswords)) {
+                    const chan = Object.values(channels).find(c=>c.id===chanId);
+                    list.innerHTML += `
+                        <div style="background:#333; padding:10px; margin-bottom:5px; border-radius:5px;">
+                            <b>${chan ? chan.name : 'Unknown Channel'}</b><br>
+                            <span style="color:var(--primary);">${pass}</span>
+                        </div>
+                    `;
+                }
+            } else {
+                list.innerHTML = '<div style="text-align:center; color:var(--gray);">No passwords set</div>';
+            }
+            
+            document.getElementById('passModal').style.display = 'flex';
+        }
+
+        function forceLogout() {
+            const uid = document.getElementById('umId').value;
+            
+            db.ref('users/'+uid+'/activeDeviceId').set(null)
+                .then(() => {
+                    toast("User will be logged out on next app open");
+                    document.getElementById('userModal').style.display = 'none';
+                })
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        // --- CHANNEL & MOVIE MANAGEMENT ---
+        function openChanModal(id) {
+            const modal = document.getElementById('chanModal');
+            const title = document.getElementById('cTitle');
+            
+            if(id) {
+                const c = channels[id];
+                if(c) {
+                    title.innerText = 'Edit Channel';
+                    document.getElementById('cId').value = id;
+                    document.getElementById('cName').value = c.name || '';
+                    document.getElementById('cLink').value = c.m3u8Link || '';
+                    document.getElementById('cImg').value = c.posterURL || '';
+                    document.getElementById('cType').value = c.playerType || 'internal';
+                    document.getElementById('cExt').value = c.externalCode || '';
+                    document.getElementById('cDesc').value = c.description || '';
+                    document.getElementById('cOrder').value = c.order || 999;
+                    
+                    // Set categories checkboxes
+                    if(c.categories && Array.isArray(c.categories)) {
+                        document.querySelectorAll('#cCategory input').forEach(checkbox => {
+                            checkbox.checked = c.categories.includes(checkbox.value);
+                        });
+                    }
+                }
+            } else {
+                title.innerText = 'Add Channel';
+                document.getElementById('cId').value = '';
+                document.getElementById('cName').value = '';
+                document.getElementById('cLink').value = '';
+                document.getElementById('cImg').value = '';
+                document.getElementById('cType').value = 'internal';
+                document.getElementById('cExt').value = '';
+                document.getElementById('cDesc').value = '';
+                document.getElementById('cOrder').value = 999;
+                // Clear checkboxes
+                document.querySelectorAll('#cCategory input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveChan() {
+            const id = document.getElementById('cId').value;
+            const data = {
+                name: document.getElementById('cName').value,
+                m3u8Link: document.getElementById('cLink').value,
+                posterURL: document.getElementById('cImg').value,
+                playerType: document.getElementById('cType').value,
+                externalCode: document.getElementById('cExt').value,
+                description: document.getElementById('cDesc').value,
+                order: parseInt(document.getElementById('cOrder').value) || 999,
+                updatedAt: Date.now()
+            };
+            
+            // Get selected categories from checkboxes
+            const selectedCategories = Array.from(document.querySelectorAll('#cCategory input:checked'))
+                .map(cb => cb.value);
+            if(selectedCategories.length > 0) {
+                data.categories = selectedCategories;
+            }
+            
+            if(id) {
+                db.ref('channels/'+id).update(data)
+                    .then(() => {
+                        toast("Channel updated");
+                        document.getElementById('chanModal').style.display = 'none';
+                    });
+            } else {
+                data.createdAt = Date.now();
+                db.ref('channels').push(data)
+                    .then(() => {
+                        toast("Channel added");
+                        document.getElementById('chanModal').style.display = 'none';
+                    });
+            }
+        }
+
+        function openMovModal(id) {
+            const modal = document.getElementById('movModal');
+            const title = document.getElementById('mTitle');
+            
+            if(id) {
+                const m = movies[id];
+                if(m) {
+                    title.innerText = 'Edit Movie';
+                    document.getElementById('mId').value = id;
+                    document.getElementById('mName').value = m.title || '';
+                    document.getElementById('mLink').value = m.movieURL || '';
+                    document.getElementById('mImg').value = m.posterURL || '';
+                    document.getElementById('mType').value = m.playerType || 'internal';
+                    document.getElementById('mExt').value = m.externalCode || '';
+                    document.getElementById('mDesc').value = m.description || '';
+                    document.getElementById('mSection').value = m.section || 'regular';
+                    
+                    // Set categories checkboxes
+                    if(m.genre && Array.isArray(m.genre)) {
+                        document.querySelectorAll('#mCategory input').forEach(checkbox => {
+                            checkbox.checked = m.genre.includes(checkbox.value);
+                        });
+                    }
+                }
+            } else {
+                title.innerText = 'Add Movie';
+                document.getElementById('mId').value = '';
+                document.getElementById('mName').value = '';
+                document.getElementById('mLink').value = '';
+                document.getElementById('mImg').value = '';
+                document.getElementById('mType').value = 'internal';
+                document.getElementById('mExt').value = '';
+                document.getElementById('mDesc').value = '';
+                document.getElementById('mSection').value = 'regular';
+                // Clear checkboxes
+                document.querySelectorAll('#mCategory input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveMov() {
+            const id = document.getElementById('mId').value;
+            const data = {
+                title: document.getElementById('mName').value,
+                movieURL: document.getElementById('mLink').value,
+                posterURL: document.getElementById('mImg').value,
+                playerType: document.getElementById('mType').value,
+                externalCode: document.getElementById('mExt').value,
+                description: document.getElementById('mDesc').value,
+                section: document.getElementById('mSection').value,
+                updatedAt: Date.now()
+            };
+            
+            // Get selected categories from checkboxes
+            const selectedCategories = Array.from(document.querySelectorAll('#mCategory input:checked'))
+                .map(cb => cb.value);
+            if(selectedCategories.length > 0) {
+                data.genre = selectedCategories;
+            }
+            
+            if(id) {
+                db.ref('movies/'+id).update(data)
+                    .then(() => {
+                        toast("Movie updated");
+                        document.getElementById('movModal').style.display = 'none';
+                    });
+            } else {
+                data.createdAt = Date.now();
+                db.ref('movies').push(data)
+                    .then(() => {
+                        toast("Movie added");
+                        document.getElementById('movModal').style.display = 'none';
+                    });
+            }
+        }
+
+        function openDownloadModal(id) {
+            const modal = document.getElementById('downloadModal');
+            
+            if(id) {
+                const d = downloads[id];
+                if(d) {
+                    document.getElementById('dlId').value = id;
+                    document.getElementById('dlTitle').value = d.title || '';
+                    document.getElementById('dlUrl').value = d.downloadURL || '';
+                    document.getElementById('dlImg').value = d.posterURL || '';
+                    document.getElementById('dlDesc').value = d.description || '';
+                }
+            } else {
+                document.getElementById('dlId').value = '';
+                document.getElementById('dlTitle').value = '';
+                document.getElementById('dlUrl').value = '';
+                document.getElementById('dlImg').value = '';
+                document.getElementById('dlDesc').value = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveDownload() {
+            const id = document.getElementById('dlId').value;
+            const data = {
+                title: document.getElementById('dlTitle').value,
+                downloadURL: document.getElementById('dlUrl').value,
+                posterURL: document.getElementById('dlImg').value,
+                description: document.getElementById('dlDesc').value,
+                updatedAt: Date.now()
+            };
+            
+            if(id) {
+                db.ref('downloadableMovies/'+id).update(data)
+                    .then(() => {
+                        toast("Download updated");
+                        document.getElementById('downloadModal').style.display = 'none';
+                    });
+            } else {
+                data.createdAt = Date.now();
+                db.ref('downloadableMovies').push(data)
+                    .then(() => {
+                        toast("Download added");
+                        document.getElementById('downloadModal').style.display = 'none';
+                    });
+            }
+        }
+
+        function openTipModal(id) {
+            const modal = document.getElementById('tipModal');
+            const title = document.getElementById('tipTitle');
+            
+            if(id) {
+                const t = tips[id];
+                if(t) {
+                    title.innerText = 'Edit Tip';
+                    document.getElementById('tipId').value = id;
+                    document.getElementById('tipName').value = t.title || '';
+                    document.getElementById('tipCategory').value = t.category || 'general';
+                    document.getElementById('tipContent').value = t.content || '';
+                }
+            } else {
+                title.innerText = 'Add Tip';
+                document.getElementById('tipId').value = '';
+                document.getElementById('tipName').value = '';
+                document.getElementById('tipCategory').value = 'general';
+                document.getElementById('tipContent').value = '';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveTip() {
+            const id = document.getElementById('tipId').value;
+            const data = {
+                title: document.getElementById('tipName').value,
+                category: document.getElementById('tipCategory').value,
+                content: document.getElementById('tipContent').value,
+                updatedAt: Date.now()
+            };
+            
+            if(id) {
+                db.ref('tips/'+id).update(data)
+                    .then(() => {
+                        toast("Tip updated");
+                        document.getElementById('tipModal').style.display = 'none';
+                    });
+            } else {
+                data.createdAt = Date.now();
+                db.ref('tips').push(data)
+                    .then(() => {
+                        toast("Tip added");
+                        document.getElementById('tipModal').style.display = 'none';
+                    });
+            }
+        }
+
+        // --- DEVICE REQUESTS ---
+        function approveDevice(requestId, userId, deviceId) {
+            db.ref('deviceRequests/'+requestId+'/status').set('approved')
+                .then(() => {
+                    db.ref('users/'+userId+'/activeDeviceId').set(deviceId);
+                    toast("Device approved");
+                })
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        function rejectDevice(requestId) {
+            db.ref('deviceRequests/'+requestId+'/status').set('rejected')
+                .then(() => toast("Device rejected"))
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        // --- SETTINGS ---
+        function loadSettings() {
+            db.ref('settings').on('value', s => {
+                if(s.exists()) {
+                    const data = s.val();
+                    document.getElementById('setAppName').value = data.appName || 'STANY MIN TV';
+                    document.getElementById('setColor').value = data.primaryColor || '#00e676';
+                    document.getElementById('setColorText').value = data.primaryColor || '#00e676';
+                    document.getElementById('setContact').value = data.adminContactNumber || '';
+                }
+            });
+        }
+
+        function saveSettings() {
+            const data = {
+                appName: document.getElementById('setAppName').value,
+                primaryColor: document.getElementById('setColorText').value,
+                adminContactNumber: document.getElementById('setContact').value,
+                updatedAt: Date.now()
+            };
+            
+            db.ref('settings').set(data)
+                .then(() => toast("Settings saved"))
+                .catch(e => toast("Error: "+e.message));
+        }
+
+        function clearAllDeviceRequests() {
+            if(confirm("Clear ALL device requests?")) {
+                db.ref('deviceRequests').remove()
+                    .then(() => toast("All device requests cleared"))
+                    .catch(e => toast("Error: "+e.message));
+            }
+        }
+
+        function resetAllUsers() {
+            if(confirm("DANGER: This will reset ALL users' device IDs. Continue?")) {
+                db.ref('users').once('value').then(s => {
+                    s.forEach(user => {
+                        db.ref('users/'+user.key+'/activeDeviceId').set(null);
+                    });
+                    toast("All users device IDs reset");
+                });
+            }
+        }
+
+        // --- NOTIFICATIONS ---
+        function sendNotif() {
+            const title = document.getElementById('nTitle').value;
+            const message = document.getElementById('nMsg').value;
+            const target = document.getElementById('nTarget').value;
+            
+            if(!title || !message) {
+                toast("Please enter title and message");
+                return;
+            }
+            
+            let usersToNotify = allUsers;
+            
+            switch(target) {
+                case 'premium':
+                    usersToNotify = allUsers.filter(u => u.subscriptionType === 'premium' && !u.isExpired && !u.isBlocked);
+                    break;
+                case 'trial':
+                    usersToNotify = allUsers.filter(u => u.subscriptionType === 'trial' && !u.isExpired && !u.isBlocked);
+                    break;
+                case 'active':
+                    usersToNotify = allUsers.filter(u => !u.isExpired && !u.isBlocked && u.accessExpiry);
+                    break;
+                case 'new':
+                    const today = new Date().toDateString();
+                    usersToNotify = allUsers.filter(u => {
+                        const joinDate = u.joinDate ? new Date(u.joinDate).toDateString() : new Date(u.createdAt || u.key).toDateString();
+                        return joinDate === today && !u.isBlocked;
+                    });
+                    break;
+            }
+            
+            let sent = 0;
+            usersToNotify.forEach(user => {
+                db.ref('userNotifications/'+user.key).push({
+                    title: title,
+                    message: message,
+                    timestamp: Date.now(),
+                    read: false
+                }).then(() => sent++);
+            });
+            
+            setTimeout(() => {
+                toast(`Notification sent to ${sent} users`);
+                document.getElementById('nTitle').value = '';
+                document.getElementById('nMsg').value = '';
+            }, 1000);
+        }
+
+        function sendUserNotification(userId, title, message) {
+            db.ref('userNotifications/'+userId).push({
+                title: title,
+                message: message,
+                timestamp: Date.now(),
+                read: false
+            });
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function del(type, id) {
+            if(confirm(`Delete this ${type.slice(0,-1)}?`)) {
+                db.ref(type+'/'+id).remove()
+                    .then(() => toast("Deleted"))
+                    .catch(e => toast("Error: "+e.message));
+            }
+        }
+
+        function toast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
             t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
+            setTimeout(() => { t.style.display = 'none'; }, 3000);
         }
+
+        // Initialize assignment dropdowns when data loads
+        setTimeout(() => {
+            updateAssignmentDropdowns();
+            updateCategoryDropdowns();
+        }, 2000);
+
     </script>
 </body>
 </html>
