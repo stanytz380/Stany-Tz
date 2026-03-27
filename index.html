@@ -1,784 +1,997 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>STANY MIN TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
-    <!-- Video Player -->
     <link href="https://unpkg.com/video.js@7.21.1/dist/video-js.min.css" rel="stylesheet">
     <script src="https://unpkg.com/video.js@7.21.1/dist/video.min.js"></script>
-    <script src="https://unpkg.com/@videojs/http-streaming@2.14.2/dist/videojs-http-streaming.min.js"></script>
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #00e676;
-            --secondary: #00bcd4;
-            --bg: #0a0a0f;
-            --card: #1a1a2e;
-            --text: #e0e0e0;
-            --success: #4caf50;
-            --error: #f44336;
-            --warning: #ff9800;
-            --info: #2196f3;
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --bg-card: #1e2532;
+            --bg-elevated: #252d3a;
+            --text-primary: #ffffff;
+            --text-secondary: #8b92a8;
+            --gradient-start: #ff4757;
+            --gradient-mid: #ff6b81;
+            --gradient-end: #2ed573;
+            --gradient-blue: #1e90ff;
+            --border-color: #2a3142;
+            --success: #2ed573;
+            --error: #ff4757;
+            --warning: #ffa502;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; user-select: none; -webkit-user-select: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
         body {
-            background: linear-gradient(135deg, #000000, #151525);
-            color: var(--text);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow-x: hidden;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
+        }
+
+        /* Gradient Button Style */
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-blue) 100%);
+            border: none;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-gradient:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         /* Loader */
-        #loader { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.95); 
-            z-index: 9999; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            transition: opacity 0.3s ease;
-        }
-        .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Locked/Expired Logic Styles */
-        .locked-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center;
-            z-index: 10; border-radius: 10px;
-        }
-        .lock-icon { font-size: 3em; color: gold; text-shadow: 0 0 10px orange; animation: pulse 2s infinite; }
-        
-        /* Blurring for Premium Content */
-        .blur-wrapper { position: relative; overflow: hidden; }
-        .blur-content { filter: blur(10px); pointer-events: none; opacity: 0.5; }
-        .blur-text-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 20; color: white; text-align: center; width: 100%;
-            text-shadow: 0 0 5px black; font-weight: bold;
-        }
-        
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* Standard UI */
-        .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        .auth-card { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--primary); text-align: center; }
-        .input-box { width: 100%; padding: 12px; margin-bottom: 15px; background: #0f1015; border: 1px solid #333; color: white; border-radius: 5px; outline: none; }
-        .btn { width: 100%; padding: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); border: none; color: black; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-
-        /* Cards Grid - SAME SIZE FOR ALL PAGES */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 15px;
-            padding: 0 15px 20px; 
-        }
-        
-        @media (max-width: 480px) {
-            .grid { 
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-            }
-        }
-        
-        .card { 
-            background: var(--card); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            border: 1px solid #333; 
-            position: relative;
-            aspect-ratio: 2/3;
-            transition: transform 0.2s;
-        }
-        .card:hover { transform: scale(1.05); }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card-info { 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            padding: 10px;
-            text-align: center; 
-            background: rgba(0,0,0,0.8);
-            font-size: 0.9em;
-            font-weight: bold;
-        }
-        .card-info h4 { 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            font-size: 1.1em;
-            font-weight: 700;
-        }
-
-        /* NEW: Improved Carousel */
-        .carousel {
-            width: 95%;
-            height: 220px;
-            overflow: hidden;
-            position: relative;
-            margin: 15px auto 20px;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-        }
-        .carousel-slide {
-            position: absolute;
+        #loader {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-            border-radius: 20px;
-            overflow: hidden;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
         }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--gradient-start);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: var(--gradient-blue);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .button-group .btn-gradient {
+            flex: 1;
+        }
+
+        .or-text {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .header-actions i {
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .header-actions i:hover {
+            color: var(--text-primary);
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            margin: 16px 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Share Section */
+        .share-section {
+            margin: 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .share-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .share-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+        }
+
+        .share-btn:active {
+            transform: scale(0.95);
+        }
+
+        .share-whatsapp { background: #25D366; }
+        .share-facebook { background: #1877F2; }
+        .share-twitter { background: #1DA1F2; }
+        .share-telegram { background: #0088cc; }
+        .share-copy { background: var(--bg-elevated); }
+
+        /* Carousel */
+        .carousel {
+            margin: 20px;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg-card);
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
         .carousel-slide.active {
             opacity: 1;
         }
+
         .carousel-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .carousel-caption {
-            position: absolute;
+
+        /* Section Title */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 20px 16px;
+            color: var(--text-primary);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 10px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--gradient-blue);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 7000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 28px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
             color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            padding: 14px 24px;
+            border-radius: 12px;
+            z-index: 9000;
+            opacity: 0;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            font-weight: 500;
         }
-        .carousel-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--primary);
-            font-family: 'Orbitron';
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
-        .carousel-description {
-            font-size: 1em;
-            color: #e0e0e0;
+
+        /* Page */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Profile */
+        .profile-header {
+            margin: 20px;
+            padding: 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .profile-status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .menu-list {
+            margin: 0 20px 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:active {
+            background: var(--bg-elevated);
+        }
+
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+            color: var(--text-secondary);
+            width: 24px;
+        }
+
+        .menu-item span {
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .menu-item .chevron {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Chat */
+        .chat-container {
+            height: calc(100vh - 180px);
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 80%;
+            font-size: 14px;
             line-height: 1.4;
         }
 
-        /* Betting Card */
-        .bet-card { background: var(--card); margin: 15px; padding: 15px; border-radius: 10px; border: 1px solid var(--primary); position: relative; }
-        .bet-head { display: flex; justify-content: space-between; font-weight: bold; color: var(--primary); margin-bottom: 10px; font-size: 1.1em; }
-        .bet-match { background: rgba(255,255,255,0.05); padding: 10px; text-align: center; margin-bottom: 10px; border-radius: 5px; font-weight: bold; font-size: 1.1em; }
-        .booking-code { background: rgba(255,193,7,0.2); color: #FFC107; padding: 8px; text-align: center; border-radius: 5px; margin-top: 10px; cursor: pointer; font-size: 1.1em; }
-
-        /* Downloads */
-        .dl-card { background: var(--card); margin: 15px; display: flex; border-radius: 10px; overflow: hidden; border: 1px solid #333; position: relative; }
-        .dl-card img { width: 100px; height: 140px; object-fit: cover; }
-        .dl-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .dl-btn { background: var(--secondary); color: black; text-align: center; padding: 8px; border-radius: 5px; text-decoration: none; font-weight: bold; margin-top: 5px; }
-
-        /* Chat & Profile */
-        .chat-container { height: calc(100vh - 150px); display: flex; flex-direction: column; padding: 15px; }
-        .chat-box { flex: 1; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 1em; }
-        .msg-user { align-self: flex-end; background: var(--primary); color: black; font-weight: bold; }
-        .msg-admin { align-self: flex-start; background: var(--secondary); color: black; font-weight: bold; }
-        .profile-box { margin: 20px; background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid var(--primary); }
-
-        /* Header & Nav */
-        .header { 
-            padding: 15px; 
-            background: var(--card); 
-            border-bottom: 1px solid #333; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
+        .message-user {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
-        .logo { font-family: 'Orbitron'; color: var(--primary); font-size: 1.4em; font-weight: bold; }
-        .header-icons { 
-            display: flex; 
-            gap: 20px; 
-            align-items: center; 
-        }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
-        .nav-item { color: #888; text-align: center; font-size: 0.8em; text-decoration: none; font-weight: bold; position: relative; }
-        .nav-item i { font-size: 1.5em; margin-bottom: 3px; display: block; }
-        .nav-item.active { color: var(--primary); }
 
-        /* NEW: Search Bar */
-        .search-container {
-            position: relative;
+        .message-admin {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-container {
             display: flex;
-            align-items: center;
+            gap: 8px;
         }
-        .search-input {
-            width: 0;
-            opacity: 0;
-            transition: all 0.3s ease;
-            border-radius: 20px;
-            padding: 8px 15px;
-            background: #0f1015;
-            border: 1px solid #333;
-            color: white;
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
             outline: none;
         }
-        .search-input.active {
-            width: 200px;
-            opacity: 1;
-            margin-right: 10px;
-        }
-        .search-icon {
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            border: none;
+            color: white;
             cursor: pointer;
-            font-size: 1.2em;
-            color: var(--primary);
-            transition: color 0.3s ease;
-        }
-        .search-icon:hover {
-            color: var(--secondary);
-        }
-
-        /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 7000; justify-content: center; align-items: center; }
-        .modal-box { background: var(--card); width: 90%; max-width: 400px; padding: 25px; border-radius: 10px; border: 1px solid var(--primary); position: relative; text-align: center; }
-        .close-modal { position: absolute; top: 10px; right: 15px; color: white; font-size: 24px; cursor: pointer; }
-        
-        /* Utilities */
-        .page { display: none; } .page.active { display: block; }
-        .section-title { 
-            margin: 20px 15px 10px; 
-            font-family: 'Orbitron'; 
-            color: var(--secondary); 
-            border-left: 4px solid var(--primary); 
-            padding-left: 10px; 
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-        .cat-btn { display: inline-block; padding: 8px 15px; margin: 5px; background: rgba(255,255,255,0.1); border: 1px solid var(--primary); border-radius: 20px; color: white; cursor: pointer; }
-        .cat-btn.active { background: var(--primary); color: black; }
-        
-        /* UPDATED: Category Grid Layout - SAME AS HOMEPAGE */
-        .category-section {
-            margin-bottom: 25px;
-        }
-        .category-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 15px 15px 10px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid var(--secondary);
-        }
-        
-        /* TOAST NOTIFICATIONS */
-        #toast { 
-            position: fixed; 
-            bottom: 80px; 
-            right: 20px; 
-            padding: 15px 20px; 
-            border-radius: 8px; 
-            transform: translateX(200%); 
-            transition: transform 0.3s ease; 
-            z-index: 9000; 
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 280px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            max-width: 90%;
-            word-wrap: break-word;
-        }
-        
-        .toast-success { 
-            background: var(--success); 
-            color: white;
-            border-left: 4px solid #2e7d32;
-        }
-        
-        .toast-error { 
-            background: var(--error); 
-            color: white;
-            border-left: 4px solid #c62828;
-        }
-        
-        .toast-warning { 
-            background: var(--warning); 
-            color: black;
-            border-left: 4px solid #ef6c00;
-        }
-        
-        .toast-info { 
-            background: var(--info); 
-            color: white;
-            border-left: 4px solid #1565c0;
-        }
-
-        .toast-premium { 
-            background: linear-gradient(45deg, #FFD700, #FFA000);
-            color: black;
-            border-left: 4px solid #FF6F00;
-        }
-        
-        .toast-chat { 
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: black;
-            border-left: 4px solid #00897B;
-        }
-        
-        /* Device Overlay */
-        #deviceOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0a0f; z-index: 8000; display: none;
-            flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
-        }
-
-        /* Loading States */
-        .loading-text {
-            text-align: center;
-            padding: 20px;
-            color: var(--gray);
-            font-style: italic;
-        }
-
-        /* Quick Load Styles */
-        .quick-load { animation: quickFade 0.3s ease-in-out; }
-        @keyframes quickFade { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Notification dots & counts */
-        .notification-dot {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 8px;
-            height: 8px;
-            background-color: var(--error);
-            border-radius: 50%;
-            display: none;
-        }
-        
-        .notification-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--error);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7em;
             display: flex;
             align-items: center;
             justify-content: center;
-            display: none;
         }
 
-        /* Notification bell with indicator */
-        .notification-bell-container {
-            position: relative;
-            cursor: pointer;
-        }
-
-        /* Guides/Tips Cards */
-        .guide-card { 
-            background: var(--card); 
-            margin: 15px; 
-            padding: 20px; 
-            border-radius: 10px; 
-            border: 1px solid var(--primary); 
-            position: relative;
-        }
-        .guide-category {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--primary);
-            color: black;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        /* Login page styling */
-        .login-header {
+        /* Loading text */
+        .loading-text {
             text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .login-header h2 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-            color: var(--primary);
-            font-family: 'Orbitron';
-        }
-        
-        .login-header p {
-            color: var(--secondary);
-            font-size: 1em;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        /* Error states */
-        .input-error {
-            border-color: var(--error) !important;
-            background: rgba(244, 67, 54, 0.1) !important;
+        /* Category buttons */
+        .category-tags {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 20px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
         }
-        
-        .login-error {
-            color: var(--error);
-            margin-top: 10px;
-            font-weight: bold;
+
+        .category-tags::-webkit-scrollbar {
             display: none;
         }
 
-        /* App Settings Styles */
-        .settings-card {
-            background: var(--card);
-            margin: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #333;
+        .category-tag {
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
-        .setting-item {
+
+        .category-tag.active {
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            border-color: transparent;
+        }
+
+        /* Betting card */
+        .bet-card {
+            margin: 16px 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .bet-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .bet-match {
+            background: var(--bg-elevated);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .bet-odds {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 5px;
+            margin-bottom: 12px;
         }
 
-        /* NEW: Custom Confirm Modal */
-        .confirm-modal {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid var(--primary);
-            text-align: center;
-            max-width: 350px;
-            width: 90%;
-        }
-        
-        .confirm-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .confirm-btn {
-            flex: 1;
+        .booking-code {
+            background: linear-gradient(90deg, rgba(255, 165, 2, 0.2), rgba(255, 165, 2, 0.1));
+            border: 1px solid var(--warning);
             padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--warning);
             cursor: pointer;
         }
-        
-        .confirm-yes {
-            background: var(--error);
-            color: white;
-        }
-        
-        .confirm-no {
-            background: var(--secondary);
-            color: black;
+
+        /* Hide scrollbar */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
     </style>
 </head>
 <body>
 
     <!-- Loader -->
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
     <!-- Toast -->
     <div id="toast"></div>
 
-    <!-- NEW: Custom Logout Confirm Modal -->
-    <div id="logoutConfirmModal" class="modal">
-        <div class="confirm-modal">
-            <i class="fas fa-sign-out-alt" style="font-size: 3em; color: var(--error); margin-bottom: 15px;"></i>
-            <h3 style="color: white; margin-bottom: 10px; font-size: 1.4em;">Confirm Logout</h3>
-            <p style="color: #ccc; margin-bottom: 20px; font-size: 1.1em;">Are you sure you want to logout from STANY MIN TV?</p>
-            <div class="confirm-buttons">
-                <button class="confirm-btn confirm-yes" onclick="confirmLogout()">Yes, Logout</button>
-                <button class="confirm-btn confirm-no" onclick="cancelLogout()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Device Approval Overlay -->
-    <div id="deviceOverlay">
-        <i class="fas fa-mobile-alt" style="font-size: 4em; color: #FFC107;"></i>
-        <h2 style="color: white; margin: 20px 0; font-size: 1.5em;">Device Verification Required</h2>
-        <p id="deviceMsg" style="color: #ccc; margin-bottom: 20px; font-size: 1.1em; max-width: 300px;">
-            You're trying to login from a new device. Please wait for admin approval.
-        </p>
-        <button id="refreshDevBtn" class="btn" onclick="refreshDeviceStatus()" style="max-width: 200px; background: #FFC107; color: black; font-weight: bold;">
-            <i class="fas fa-sync-alt"></i> Check Status
-        </button>
-        <button class="btn" style="background: #d32f2f; margin-top: 10px; max-width: 200px; font-weight: bold;" onclick="logoutFromDevice()">
-            <i class="fas fa-sign-out-alt"></i> Back to Login
-        </button>
-    </div>
-
-    <!-- Auth -->
+    <!-- Auth Screen -->
     <div id="authPages" class="auth-screen">
         <div id="loginPage" class="auth-card">
-            <div class="login-header">
-                <h2>STANY MIN TV</h2>
-                <p>Welcome Back!</p>
+            <div class="auth-header">
+                <h1>STANY MIN TV</h1>
+                <p>Karibu tena</p>
             </div>
-            <input type="email" id="lemail" class="input-box" placeholder="Email">
-            <input type="password" id="lpass" class="input-box" placeholder="Password">
-            <div id="loginError" class="login-error">Login failed. Please check your credentials.</div>
-            <button class="btn" onclick="login()" style="font-weight: bold;">Login</button>
-            <p style="margin-top:15px; cursor:pointer; color:var(--secondary); font-weight: bold;" onclick="document.getElementById('loginPage').style.display='none'; document.getElementById('regPage').style.display='block';">Create Account</p>
+            <input type="email" id="lemail" class="input-field" placeholder="Barua pepe">
+            <input type="password" id="lpass" class="input-field" placeholder="Nenosiri">
+            <button class="btn-gradient" onclick="login()">Ingia</button>
+            <p class="or-text">au</p>
+            <button class="btn-gradient" style="background: var(--bg-elevated); border: 1px solid var(--border-color);" onclick="showRegister()">Jisajili</button>
         </div>
+
         <div id="regPage" class="auth-card" style="display:none;">
-            <div class="login-header">
-                <h2>Create Account</h2>
-                <p>Join STANY MIN TV</p>
+            <div class="auth-header">
+                <h1>Unda Akaunti</h1>
+                <p>Jiunge nasi leo</p>
             </div>
-            <input type="text" id="rname" class="input-box" placeholder="Full Name">
-            <input type="email" id="remail" class="input-box" placeholder="Email">
-            <input type="password" id="rpass" class="input-box" placeholder="Password">
-            <div id="regError" class="login-error" style="display:none;"></div>
-            <button class="btn" onclick="register()" style="font-weight: bold;">Register</button>
-            <p style="margin-top:15px; cursor:pointer; color:var(--secondary); font-weight: bold;" onclick="document.getElementById('regPage').style.display='none'; document.getElementById('loginPage').style.display='block';">Back to Login</p>
+            <input type="text" id="rname" class="input-field" placeholder="Jina kamili">
+            <input type="email" id="remail" class="input-field" placeholder="Barua pepe">
+            <input type="password" id="rpass" class="input-field" placeholder="Nenosiri">
+            <button class="btn-gradient" onclick="register()">Jisajili</button>
+            <p class="or-text">Tayari una akaunti?</p>
+            <button class="btn-gradient" style="background: var(--bg-elevated); border: 1px solid var(--border-color);" onclick="showLogin()">Ingia</button>
         </div>
     </div>
 
     <!-- Main App -->
     <div id="mainApp" style="display:none;">
+        <!-- Header -->
         <div class="header">
             <div class="logo">STANY MIN TV</div>
-            <div class="header-icons">
-                <!-- Search Icon -->
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="globalSearch()">
-                    <i class="fas fa-search search-icon" onclick="toggleSearch()"></i>
-                </div>
-                <i class="fas fa-sync-alt" onclick="quickRefresh()" style="cursor:pointer; color:var(--primary);"></i>
-                <div class="notification-bell-container" onclick="showNotifModal()">
-                    <i class="fas fa-bell"></i>
-                    <span id="bellNotification" class="notification-dot"></span>
-                    <span id="bellNotificationCount" class="notification-count"></span>
-                </div>
+            <div class="header-actions">
+                <i class="fas fa-search" onclick="toggleSearch()"></i>
+                <i class="fas fa-bell" onclick="showNotifications()"></i>
             </div>
         </div>
 
-        <!-- HOME -->
+        <!-- Search -->
+        <div class="search-container" id="searchContainer" style="display:none;">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Tafuta..." onkeyup="globalSearch()">
+        </div>
+
+        <!-- HOME PAGE -->
         <div id="home" class="page active">
-            <!-- Improved Carousel -->
+            <!-- Share Section -->
+            <div class="share-section">
+                <div class="share-title">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Shiriki STANY MIN TV</span>
+                </div>
+                <div class="share-buttons">
+                    <button class="share-btn share-whatsapp" onclick="shareApp('whatsapp')">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="share-btn share-facebook" onclick="shareApp('facebook')">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="share-btn share-twitter" onclick="shareApp('twitter')">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="share-btn share-telegram" onclick="shareApp('telegram')">
+                        <i class="fab fa-telegram-plane"></i>
+                    </button>
+                    <button class="share-btn share-copy" onclick="copyLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carousel -->
             <div class="carousel" id="carousel">
-                <div class="loading-text">Loading carousel...</div>
+                <div class="loading-text">Inapakia...</div>
             </div>
 
-            <div id="catTags" style="padding:0 15px; overflow-x:auto; white-space:nowrap; margin-bottom:10px;"></div>
-            <h3 class="section-title">Live Channels</h3>
+            <!-- Categories -->
+            <div class="category-tags" id="catTags"></div>
+
+            <!-- Channels -->
+            <h3 class="section-title">Vitanzi Moja Kwa Moja</h3>
             <div class="grid" id="chanGrid">
-                <div class="loading-text">Loading channels...</div>
+                <div class="loading-text">Inapakia...</div>
             </div>
-            <h3 class="section-title">Movies</h3>
+
+            <!-- Movies -->
+            <h3 class="section-title">Filamu</h3>
             <div class="grid" id="movGrid">
-                <div class="loading-text">Loading movies...</div>
+                <div class="loading-text">Inapakia...</div>
             </div>
         </div>
 
-        <!-- UPDATED: Categories Page - SAME CARD SIZE AS HOMEPAGE -->
+        <!-- CATEGORIES PAGE -->
         <div id="cats" class="page">
-            <h3 class="section-title">Categories</h3>
+            <h3 class="section-title">Aina</h3>
             <div id="catContent">
-                <div class="loading-text">Loading categories...</div>
+                <div class="loading-text">Inapakia...</div>
             </div>
         </div>
 
-        <!-- DOWNLOADS -->
+        <!-- DOWNLOADS PAGE -->
         <div id="downloads" class="page">
-            <h3 class="section-title">Downloads</h3>
+            <h3 class="section-title">Vilivyopakuliwa</h3>
             <div id="dlContent">
-                <div class="loading-text">Loading downloads...</div>
+                <div class="loading-text">Hakuna vitu vya kupakua</div>
             </div>
         </div>
 
-        <!-- TIPS -->
+        <!-- TIPS PAGE -->
         <div id="tips" class="page">
-            <h3 class="section-title">Betting Tips</h3>
+            <h3 class="section-title">Vidokezo vya Kubeti</h3>
             <div id="tipsContent">
-                <div class="loading-text">Loading tips...</div>
-            </div>
-            
-            <h3 class="section-title" style="margin-top: 30px;">Tips & Guides</h3>
-            <div id="guidesContent">
-                <div class="loading-text">Loading guides...</div>
+                <div class="loading-text">Inapakia...</div>
             </div>
         </div>
 
-        <!-- BOT -->
+        <!-- CHAT PAGE -->
         <div id="bot" class="page">
             <div class="chat-container">
                 <div class="chat-box" id="chatBox">
-                    <div class="msg msg-admin" style="font-weight: bold;">Welcome to Stany Bot! How can I help you?</div>
+                    <div class="message message-admin">
+                        Karibu! Tunaweza kukusaidia vipi leo?
+                    </div>
                 </div>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="chatInput" class="input-box" style="margin:0; border-radius:20px;" placeholder="Message...">
-                    <button class="btn" style="width:50px; border-radius:50%; margin:0; font-weight: bold;" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Andika ujumbe...">
+                    <button class="send-btn" onclick="sendChat()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- PROFILE -->
+        <!-- PROFILE PAGE -->
         <div id="profile" class="page">
-            <div class="profile-box">
-                <h2 id="pName" style="color:var(--primary); font-size: 1.4em;">User</h2>
-                <p id="pEmail" style="color:#aaa; font-size: 1.1em;">email</p>
-                <h3 id="pDays" style="margin-top:10px; font-size: 1.2em;">...</h3>
-                <button class="btn" style="margin-top:10px; background:var(--secondary); color:black; font-weight: bold;" onclick="quickRefresh()">Refresh App Data</button>
-                <button class="btn" style="margin-top:10px; background:#d32f2f; color:white; font-weight: bold;" onclick="showLogoutConfirm()">Logout</button>
+            <div class="profile-header">
+                <div class="profile-name" id="pName">Mtumiaji</div>
+                <div class="profile-email" id="pEmail">email@example.com</div>
+                <div class="profile-status" id="pDays">Siku 7 zimebaki</div>
             </div>
-            <div class="profile-box">
-                <h3 style="font-size: 1.2em;">Channel Passwords</h3>
-                <select id="pChanSel" class="input-box"><option>Select Channel</option></select>
-                <input type="password" id="pNewPass" class="input-box" placeholder="Set Password">
-                <button class="btn" onclick="savePass()" style="font-weight: bold;">Save Password</button>
-                <div id="pPassList" style="margin-top:10px;"></div>
+
+            <div class="menu-list">
+                <div class="menu-item" onclick="quickRefresh()">
+                    <div class="menu-item-left">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Onyesha Upya</span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </div>
+                <div class="menu-item" onclick="showLogoutConfirm()">
+                    <div class="menu-item-left">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Toka</span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </div>
             </div>
-            
-            <!-- App Settings Display -->
-            <div class="profile-box">
-                <h3 style="font-size: 1.2em;">App Settings</h3>
-                <div class="settings-card">
-                    <div class="setting-item">
-                        <span>Card Size:</span>
-                        <span id="settingCardSize">Medium</span>
+
+            <div class="menu-list">
+                <div class="menu-item">
+                    <div class="menu-item-left">
+                        <i class="fas fa-lock"></i>
+                        <span>Nenosiri la Vitanzi</span>
                     </div>
-                    <div class="setting-item">
-                        <span>Font Size:</span>
-                        <span id="settingFontSize">Medium</span>
-                    </div>
-                    <div class="setting-item">
-                        <span>Theme Color:</span>
-                        <span id="settingThemeColor" style="color:var(--primary)">Green</span>
-                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
                 </div>
             </div>
         </div>
 
-        <!-- NAV -->
+        <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <a onclick="nav('home',this)" class="nav-item active"><i class="fas fa-home"></i>Home</a>
-            <a onclick="nav('cats',this)" class="nav-item"><i class="fas fa-list"></i>Catg</a>
-            <a onclick="nav('downloads',this)" class="nav-item"><i class="fas fa-download"></i>Down</a>
-            <a onclick="nav('tips',this)" class="nav-item"><i class="fas fa-futbol"></i>Tips</a>
-            <a onclick="nav('bot',this)" class="nav-item" style="position:relative;">
-                <i class="fas fa-robot"></i>Bot
-                <span id="botNotification" class="notification-dot"></span>
-                <span id="botNotificationCount" class="notification-count"></span>
-            </a>
-            <a onclick="nav('profile',this)" class="nav-item"><i class="fas fa-user"></i>Me</a>
+            <div class="nav-item active" onclick="nav('home', this)">
+                <i class="fas fa-home"></i>
+                <span>Nyumbani</span>
+            </div>
+            <div class="nav-item" onclick="nav('cats', this)">
+                <i class="fas fa-th-large"></i>
+                <span>Aina</span>
+            </div>
+            <div class="nav-item" onclick="nav('downloads', this)">
+                <i class="fas fa-download"></i>
+                <span>Pakua</span>
+            </div>
+            <div class="nav-item" onclick="nav('tips', this)">
+                <i class="fas fa-futbol"></i>
+                <span>Beti</span>
+            </div>
+            <div class="nav-item" onclick="nav('bot', this)">
+                <i class="fas fa-comments"></i>
+                <span>Msaada</span>
+            </div>
+            <div class="nav-item" onclick="nav('profile', this)">
+                <i class="fas fa-user"></i>
+                <span>Mimi</span>
+            </div>
         </div>
     </div>
 
-    <!-- MODALS -->
-    <div id="blockModal" class="modal">
-        <div class="modal-box">
-            <span class="close-modal" onclick="document.getElementById('blockModal').style.display='none'">×</span>
-            <i class="fas fa-lock" style="font-size:3em; color:red; margin-bottom:15px;"></i>
-            <h3 style="color:white; font-size: 1.4em;">Access Expired</h3>
-            <p style="color:#ccc; margin:15px 0; font-size: 1.1em;">Your subscription has ended. Please renew to access this content.</p>
-            <button class="btn" onclick="openWhatsApp()" style="background:#25D366; color:white; font-weight: bold;"><i class="fab fa-whatsapp"></i> Contact Admin</button>
-            <button class="btn" onclick="nav('bot'); document.getElementById('blockModal').style.display='none';" style="background:var(--secondary); margin-top:10px; color:black; font-weight: bold;"><i class="fas fa-robot"></i> Use Stany Bot</button>
+    <!-- Modals -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content" style="position: relative;">
+            <h3 class="modal-title">Toka</h3>
+            <p class="modal-text">Je! Una uhakika unataka kutoka sasa?</p>
+            <button class="btn-gradient" onclick="confirmLogout()" style="margin-bottom: 12px;">Ndio</button>
+            <button class="btn-gradient" onclick="cancelLogout()" style="background: var(--bg-elevated); border: 1px solid var(--border-color);">Ghairi</button>
         </div>
     </div>
 
     <div id="detailModal" class="modal">
-        <div class="modal-box">
-            <span class="close-modal" onclick="document.getElementById('detailModal').style.display='none'">×</span>
-            <img id="dImg" src="" style="width:100%; height:180px; object-fit:cover; border-radius:10px;">
-            <h3 id="dTitle" style="color:var(--primary); margin:10px 0; font-size: 1.3em;"></h3>
-            <p id="dDesc" style="color:#aaa; font-size:1em; margin-bottom:15px;"></p>
-            <button class="btn" id="dBtn" style="font-weight: bold;">Watch Now</button>
+        <div class="modal-content" style="position: relative;">
+            <i class="fas fa-times close-modal" onclick="closeDetailModal()"></i>
+            <img id="dImg" src="" style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:16px;">
+            <h3 id="dTitle" class="modal-title"></h3>
+            <p id="dDesc" class="modal-text"></p>
+            
+            <!-- Share in modal -->
+            <div class="share-section" style="margin: 16px 0;">
+                <div class="share-title">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Shiriki</span>
+                </div>
+                <div class="share-buttons">
+                    <button class="share-btn share-whatsapp" onclick="shareContent('whatsapp')">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="share-btn share-facebook" onclick="shareContent('facebook')">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="share-btn share-twitter" onclick="shareContent('twitter')">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="share-btn share-copy" onclick="copyContentLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn-gradient" id="dBtn">Tazama Sasa</button>
         </div>
     </div>
 
-    <div id="playerModal" class="modal">
-        <div class="modal-box" style="width:100%; height:100%; max-width:100%; background:black; padding:0; border:none;">
-            <span class="close-modal" style="z-index:99; background:rgba(0,0,0,0.5); width:40px; border-radius:50%;" onclick="closePlayer()">×</span>
-            <video id="videoJS" class="video-js vjs-default-skin vjs-big-play-centered" controls style="width:100%; height:100%;"></video>
-        </div>
-    </div>
-
-    <div id="passPrompt" class="modal">
-        <div class="modal-box">
-            <span class="close-modal" onclick="document.getElementById('passPrompt').style.display='none'">×</span>
-            <h3 style="font-size: 1.3em;">Enter Password</h3>
-            <p id="ppName" style="color:#aaa; margin:10px 0; font-size: 1.1em;"></p>
-            <input type="password" id="ppInput" class="input-box" style="text-align:center;">
-            <button class="btn" onclick="unlockChan()" style="font-weight: bold;">Unlock</button>
-        </div>
-    </div>
-
-    <div id="deletePassModal" class="modal">
-        <div class="modal-box">
-            <span class="close-modal" onclick="document.getElementById('deletePassModal').style.display='none'">×</span>
-            <i class="fas fa-shield-alt" style="font-size:3em; color:var(--primary); margin-bottom:15px;"></i>
-            <h3 style="color:white; font-size: 1.3em;">Confirm Password Deletion</h3>
-            <p id="deleteChanName" style="color:#aaa; margin:10px 0; font-size: 1.1em;"></p>
-            <p style="color:#ccc; margin-bottom:15px; font-size: 1em;">Enter current password to delete:</p>
-            <input type="password" id="deletePassInput" class="input-box" style="text-align:center;" placeholder="Enter current password">
-            <button class="btn" onclick="confirmDeletePass()" style="font-weight: bold; background:var(--error);">Delete Password</button>
-            <button class="btn" onclick="document.getElementById('deletePassModal').style.display='none'" style="font-weight: bold; margin-top:10px; background:#333;">Cancel</button>
-        </div>
-    </div>
-    
-    <!-- Notification Modal -->
-    <div id="notifModal" class="modal">
-        <div class="modal-box">
-            <span class="close-modal" onclick="closeNotifModal()">×</span>
-            <h3 style="color:var(--primary); font-size: 1.3em;">Notifications</h3>
-            <div id="notifList" style="margin-top:15px; max-height:300px; overflow-y:auto;"></div>
+    <div id="playerModal" class="modal" style="padding:0;">
+        <div style="width:100%; height:100%; background:#000; position:relative;">
+            <i class="fas fa-times" onclick="closePlayer()" style="position:absolute; top:20px; right:20px; color:white; font-size:24px; z-index:100; cursor:pointer;"></i>
+            <video id="videoJS" class="video-js vjs-default-skin" controls style="width:100%; height:100%;"></video>
         </div>
     </div>
 
     <script>
-        // CONFIG
+        // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyABEnVaSOR5b1FL1V3-C13KoR9O7MqAoHg",
-            authDomain: "studio-3650831122-2eea3.firebaseapp.com",
-            databaseURL: "https://studio-3650831122-2eea3-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "studio-3650831122-2eea3",
-            storageBucket: "studio-3650831122-2eea3.firebasestorage.app",
-            messagingSenderId: "893787872699",
-            appId: "1:893787872699:web:91268a1b8fb18b7bc4f89e"
+            apiKey: "AIzaSyAGQqAiYCnWR7X8XkxEXCGu19PU45qXDnc",
+            authDomain: "stanyappstore.firebaseapp.com",
+            projectId: "stanyappstore",
+            storageBucket: "stanyappstore.firebasestorage.app",
+            messagingSenderId: "735017831251",
+            appId: "1:735017831251:web:9fa4184ef141349fb9afa6",
+            measurementId: "G-EM3RTMBKTN"
         };
-        
-        // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            console.log("✅ Firebase initialized successfully");
-        } catch (error) {
-            console.log("✅ Firebase already initialized");
-        }
-        
+
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
@@ -786,1538 +999,291 @@
         let userIsExpired = false;
         let allData = {movies:[], channels:[]};
         let player = null;
-        let pendingChan = null;
-        let adminContact = "";
-        const deviceId = localStorage.getItem('did') || 'dev_'+Date.now();
+        let deviceId = localStorage.getItem('did') || 'dev_'+Date.now();
         localStorage.setItem('did', deviceId);
-        
-        // App Settings
-        let appSettings = {
-            cardSize: 'medium',
-            fontSize: 'medium',
-            carouselInterval: 5000,
-            lockedChannels: [],
-            freeChannels: [],
-            channelScripts: {}
-        };
-        
-        // Variables for password deletion
-        let pendingDeleteChannelId = null;
-        let pendingDeleteChannelName = "";
-        
-        // Caching for faster loading
-        let cachedData = {
-            channels: null,
-            movies: null,
-            lastUpdated: null
-        };
-        
-        // Chat notification tracking
-        let unreadMessages = 0;
-        let lastCheckedChat = Date.now();
-        
-        // Notification tracking
-        let unreadNotifications = 0;
-        let lastCheckedNotif = Date.now();
-        
-        // Carousel
-        let carouselSlides = [];
-        let currentCarouselSlide = 0;
-        let carouselInterval = null;
-        
-        // Device Check Interval
-        let deviceCheckInterval = null;
-        
-        const specialMap = {
-            "AZAM SPORTS 1":"SP1", "AZAM SPORTS 2":"SP2", "AZAM SPORTS 3":"SP3", "AZAM SPORTS 4":"SP4",
-            "AZAM ONE HD":"AZ1", "AZAM TWO HD":"AZ2", "CHEKA PLUS":"CHK", "BRAZZERS":"BXX", "KIX":"KIX", "WASAFI":"WSF"
-        };
 
-        // Search functionality
-        let isSearchActive = false;
-
-        // AUTH STATE HANDLER
+        // Auth State
         auth.onAuthStateChanged(u => {
-            console.log("🔄 Auth state changed:", u ? "User logged in" : "No user");
             if(u) {
                 document.getElementById('authPages').style.display='none';
                 document.getElementById('loader').style.display='flex';
-                
-                setTimeout(() => {
-                    checkDevice(u.uid);
-                }, 1000);
-                
+                setTimeout(() => checkDevice(u.uid), 1000);
             } else {
                 document.getElementById('authPages').style.display='flex';
                 document.getElementById('mainApp').style.display='none';
                 document.getElementById('loader').style.display='none';
-                document.getElementById('loginPage').style.display='block';
-                document.getElementById('regPage').style.display='none';
-                
-                // Clear any intervals when logged out
-                if (deviceCheckInterval) {
-                    clearInterval(deviceCheckInterval);
-                    deviceCheckInterval = null;
-                }
-                
-                // Clear carousel interval
-                if (carouselInterval) {
-                    clearInterval(carouselInterval);
-                    carouselInterval = null;
-                }
             }
         });
 
-        // NEW: Custom Logout Functions
-        function showLogoutConfirm() {
-            document.getElementById('logoutConfirmModal').style.display = 'flex';
+        function showRegister() {
+            document.getElementById('loginPage').style.display='none';
+            document.getElementById('regPage').style.display='block';
         }
 
-        function cancelLogout() {
-            document.getElementById('logoutConfirmModal').style.display = 'none';
+        function showLogin() {
+            document.getElementById('regPage').style.display='none';
+            document.getElementById('loginPage').style.display='block';
         }
 
-        function confirmLogout() {
-            console.log("🚪 Logging out user");
-            
-            if (deviceCheckInterval) {
-                clearInterval(deviceCheckInterval);
-                deviceCheckInterval = null;
-            }
-            
-            if (carouselInterval) {
-                clearInterval(carouselInterval);
-                carouselInterval = null;
-            }
-            
-            auth.signOut();
-            document.getElementById('logoutConfirmModal').style.display = 'none';
-            showToast("👋 Logged out successfully", "info");
-            
-            document.getElementById('lemail').value = '';
-            document.getElementById('lpass').value = '';
-        }
-
-        // Toggle Search Function
-        function toggleSearch() {
-            const searchInput = document.getElementById('searchInput');
-            isSearchActive = !isSearchActive;
-            
-            if (isSearchActive) {
-                searchInput.classList.add('active');
-                searchInput.focus();
-            } else {
-                searchInput.classList.remove('active');
-                searchInput.value = '';
-                // Clear search and show all content
-                if(document.getElementById('home').classList.contains('active')) {
-                    filterHome('all');
-                }
-            }
-        }
-
-        // Improved Global Search
-        function globalSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            if(!query) {
-                if(document.getElementById('home').classList.contains('active')) {
-                    filterHome('all');
-                }
+        function login() {
+            const email = document.getElementById('lemail').value;
+            const password = document.getElementById('lpass').value;
+            if(!email || !password) {
+                showToast('Tafaza ingiza barua pepe na nenosiri');
                 return;
             }
-            
-            if(document.getElementById('home').classList.contains('active')) {
-                const mg = document.getElementById('movGrid'); 
-                const cg = document.getElementById('chanGrid');
-                mg.innerHTML = ''; 
-                cg.innerHTML = '';
-                
-                allData.movies.forEach(m => { 
-                    if(m.title && m.title.toLowerCase().includes(query)) {
-                        mg.innerHTML += createCard(m); 
-                    }
-                });
-                
-                allData.channels.forEach(c => { 
-                    if(c.name && c.name.toLowerCase().includes(query)) {
-                        cg.innerHTML += createCard(c); 
-                    }
-                });
-                
-                if(mg.innerHTML === '') mg.innerHTML = '<div class="loading-text">No movies found</div>';
-                if(cg.innerHTML === '') cg.innerHTML = '<div class="loading-text">No channels found</div>';
-            }
-        }
-
-        // DEVICE CHECK
-        function checkDevice(uid) {
-            console.log("🔍 Checking device for user:", uid);
-            console.log("📱 Current device ID:", deviceId);
-            
-            document.getElementById('loader').style.display = 'flex';
-            
-            // Load cached data first for instant display
-            loadCachedData();
-            
-            // Get user data first, then proceed
-            db.ref('users/'+uid).once('value').then(userSnap => {
-                const u = userSnap.val();
-                console.log("📱 User data loaded:", u);
-                
-                if(!u) { 
-                    console.log("❌ No user data found - signing out");
-                    auth.signOut(); 
-                    return; 
-                }
-                
-                if(u.isBlocked) { 
-                    console.log("🚫 User is blocked");
-                    showBlockScreen("Account Blocked"); 
-                    return; 
-                }
-
-                // DEVICE CHECK LOGIC
-                if(!u.activeDeviceId) {
-                    console.log("📱 First time login - registering device");
-                    registerNewDevice(uid, u);
-                }
-                else if(u.activeDeviceId !== deviceId) {
-                    console.log("⚠️ Device mismatch - requiring admin approval");
-                    console.log("🆔 Stored device:", u.activeDeviceId);
-                    console.log("🆔 Current device:", deviceId);
-                    handleDeviceMismatch(uid);
-                } else {
-                    console.log("✅ Device matches - initializing app");
-                    initializeUserApp(uid, u);
-                }
-            }).catch(error => {
-                console.error("❌ Error loading user data:", error);
-                showToast("Error loading user data", "error");
-                document.getElementById('loader').style.display = 'none';
-            });
-        }
-
-        // NEW DEVICE REGISTRATION
-        function registerNewDevice(uid, userData) {
-            db.ref('users/'+uid).update({
-                activeDeviceId: deviceId,
-                lastLogin: Date.now()
-            }).then(() => {
-                console.log("✅ Device registered successfully");
-                userIsExpired = false;
-                if(userData.accessExpiry && userData.accessExpiry < Date.now()) userIsExpired = true;
-                currentUser = {uid:uid, ...userData, activeDeviceId: deviceId};
-                
-                // Load essential data
-                loadEssentialData();
-                initApp();
-                
-            }).catch(error => {
-                console.error("❌ Device registration error:", error);
-                showToast("Device setup failed", "error");
-                document.getElementById('loader').style.display = 'none';
-            });
-        }
-
-        // DEVICE MISMATCH HANDLING
-        function handleDeviceMismatch(uid) {
-            showDeviceWait(uid);
-            createDeviceRequest(uid);
-            startDeviceApprovalCheck(uid);
-        }
-
-        // APP INITIALIZATION
-        function initializeUserApp(uid, userData) {
-            userIsExpired = false;
-            if(userData.accessExpiry && userData.accessExpiry < Date.now()) userIsExpired = true;
-
-            currentUser = {uid:uid, ...userData};
-            
-            // Load essential data
-            loadEssentialData();
-            initApp();
-        }
-
-        // DEVICE APPROVAL CHECK
-        function startDeviceApprovalCheck(uid) {
-            if (deviceCheckInterval) {
-                clearInterval(deviceCheckInterval);
-            }
-            
-            deviceCheckInterval = setInterval(() => {
-                checkDeviceApprovalStatus(uid);
-            }, 2000);
-        }
-
-        // DEVICE APPROVAL STATUS CHECK
-        async function checkDeviceApprovalStatus(uid) {
-            try {
-                const s = await db.ref('deviceRequests/'+uid).once('value');
-                const r = s.val();
-
-                if (r && r.status === 'approved' && r.deviceId === deviceId) {
-                    // Device approved - update user and initialize app
-                    await db.ref('users/'+uid).update({
-                        activeDeviceId: deviceId,
-                        lastDeviceApproval: Date.now()
-                    });
-                    await db.ref('deviceRequests/'+uid).remove();
-                    
-                    // Clear the interval
-                    if (deviceCheckInterval) {
-                        clearInterval(deviceCheckInterval);
-                        deviceCheckInterval = null;
-                    }
-                    
-                    document.getElementById('deviceOverlay').style.display = 'none';
-                    showToast("🎉 Device approved! Welcome to STANY MIN TV", "success");
-                    
-                    // Reload essential data
-                    document.getElementById('loader').style.display = 'flex';
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                    
-                } else if (r && r.status === 'rejected') {
-                    // Clear the interval if rejected
-                    if (deviceCheckInterval) {
-                        clearInterval(deviceCheckInterval);
-                        deviceCheckInterval = null;
-                    }
-                    document.getElementById('deviceMsg').innerText = "❌ Admin Rejected Request. Please contact support.";
-                    showToast("Device request was rejected", "error");
-                }
-            } catch (error) {
-                console.error("Error checking device approval:", error);
-            }
-        }
-
-        // DEVICE REQUEST CREATION
-        function createDeviceRequest(uid) {
-            const user = auth.currentUser;
-            if (!user) {
-                console.log("❌ No authenticated user");
-                return;
-            }
-            
-            const requestData = {
-                email: user.email, 
-                deviceId: deviceId, 
-                status: 'pending', 
-                timestamp: Date.now(),
-                userName: user.displayName || 'Unknown User',
-                userUid: uid,
-                userEmail: user.email
-            };
-            
-            console.log("📨 Creating device request:", requestData);
-            
-            db.ref('deviceRequests/'+uid).set(requestData)
+            auth.signInWithEmailAndPassword(email, password)
                 .then(() => {
-                    console.log("✅ Device request created successfully in database");
-                    showToast("📱 Device approval requested. Waiting for admin...", "info");
+                    showToast('Umeingia kwa mafanikio');
                 })
-                .catch(error => {
-                    console.error("❌ Failed to create device request:", error);
-                    setTimeout(() => createDeviceRequest(uid), 3000);
-                });
+                .catch(e => showToast(e.message));
         }
 
-        // SHOW DEVICE WAIT SCREEN
-        function showDeviceWait(uid) {
-            console.log("⏳ Showing device wait screen for user:", uid);
-            document.getElementById('deviceOverlay').style.display='flex';
-            document.getElementById('loader').style.display='none';
-            document.getElementById('deviceMsg').innerText = "⏳ Waiting for Admin Approval... Auto-checking every 2 seconds.";
-        }
-
-        // REFRESH DEVICE STATUS
-        async function refreshDeviceStatus() {
-            const btn = document.getElementById('refreshDevBtn');
-            const originalText = btn.innerText;
-            btn.innerText = "🔄 Checking...";
-            btn.disabled = true;
-            
-            try {
-                const uid = auth.currentUser.uid;
-                console.log("🔄 Manual device status check for:", uid);
-                
-                const s = await db.ref('deviceRequests/'+uid).once('value');
-                const r = s.val();
-
-                console.log("📋 Device request data:", r);
-
-                if (r && r.status === 'approved' && r.deviceId === deviceId) {
-                    console.log("✅ Device approved - updating user record");
-                    await db.ref('users/'+uid).update({
-                        activeDeviceId: deviceId,
-                        lastDeviceApproval: Date.now()
-                    });
-                    await db.ref('deviceRequests/'+uid).remove();
-                    
-                    document.getElementById('deviceOverlay').style.display = 'none';
-                    showToast("🎉 Device approved! Welcome to STANY MIN TV", "success");
-                    
-                    document.getElementById('loader').style.display = 'flex';
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                    
-                } else if (r && r.status === 'rejected') {
-                    console.log("❌ Device request rejected");
-                    document.getElementById('deviceMsg').innerText = "❌ Admin Rejected Request. Please contact support.";
-                    btn.innerText = "❌ Rejected";
-                    showToast("Device request was rejected", "error");
-                } else {
-                    console.log("⏳ Device request still pending");
-                    document.getElementById('deviceMsg').innerText = "⏳ Still Pending... Auto-checking every 2 seconds.";
-                    btn.innerText = originalText;
-                    showToast("Status: Still pending. Auto-checking...", "info");
-                }
-            } catch (error) {
-                console.error("❌ Error checking device status:", error);
-                showToast("Error checking status", "error");
-                btn.innerText = originalText;
-            } finally {
-                btn.disabled = false;
-            }
-        }
-
-        // LOGOUT FROM DEVICE APPROVAL
-        function logoutFromDevice() {
-            console.log("🚪 Logging out from device approval screen");
-            
-            if (deviceCheckInterval) {
-                clearInterval(deviceCheckInterval);
-                deviceCheckInterval = null;
-            }
-            
-            auth.signOut();
-            document.getElementById('deviceOverlay').style.display = 'none';
-            document.getElementById('authPages').style.display = 'flex';
-            document.getElementById('loginPage').style.display = 'block';
-            
-            showToast("👋 Returned to login page", "info");
-        }
-
-        // QUICK REFRESH
-        function quickRefresh() {
-            console.log("🔄 Quick refresh triggered");
-            document.getElementById('loader').style.display='flex';
-            
-            if(currentUser && currentUser.uid) {
-                loadEssentialData();
-                setTimeout(() => {
-                    document.getElementById('loader').style.display='none';
-                    showToast("🔄 App data refreshed successfully!", "success");
-                }, 1000);
-            } else {
-                setTimeout(() => {
-                    document.getElementById('loader').style.display='none';
-                    showToast("🔄 App data refreshed successfully!", "success");
-                }, 800);
-            }
-        }
-
-        // SHOW BLOCK SCREEN
-        function showBlockScreen(msg) {
-            document.getElementById('mainApp').style.display='none';
-            document.getElementById('deviceOverlay').style.display='flex';
-            document.getElementById('deviceMsg').innerText = msg;
-            document.getElementById('refreshDevBtn').style.display='none';
-        }
-
-        // INIT APP
-        function initApp() {
-            console.log("🚀 Initializing app for user:", currentUser?.email);
-            
-            document.getElementById('loader').style.display='none';
-            document.getElementById('deviceOverlay').style.display='none';
-            document.getElementById('mainApp').style.display='block';
-            
-            if (!currentUser) {
-                console.error("❌ No current user found in initApp");
+        function register() {
+            const name = document.getElementById('rname').value;
+            const email = document.getElementById('remail').value;
+            const password = document.getElementById('rpass').value;
+            if(!name || !email || !password) {
+                showToast('Tafaza jaza sehemu zote');
                 return;
             }
-            
-            document.getElementById('pName').innerText = currentUser.name || 'User';
-            document.getElementById('pEmail').innerText = currentUser.email;
-            
-            const days = currentUser.accessExpiry ? Math.ceil((currentUser.accessExpiry - Date.now())/(1000*60*60*24)) : 0;
-            const statusEl = document.getElementById('pDays');
-            if(userIsExpired) { 
-                statusEl.innerText = "EXPIRED"; 
-                statusEl.style.color = "red"; 
-            } else { 
-                statusEl.innerText = (days > 0 ? days + " DAYS LEFT" : "TRIAL / FREE"); 
-                statusEl.style.color = "var(--primary)"; 
-            }
-
-            // Apply app settings
-            applyAppSettings();
-            
-            setupBot();
-            setupNotif();
-            checkUnreadMessages();
-            
-            showToast("🎉 Welcome back to STANY MIN TV!", "success");
-            console.log("✅ App initialized successfully");
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(user => {
+                    return db.ref('users/' + user.user.uid).set({
+                        name: name,
+                        email: email,
+                        activeDeviceId: deviceId,
+                        registeredAt: Date.now(),
+                        accessExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000)
+                    });
+                })
+                .then(() => showToast('Usajili umekamilika'))
+                .catch(e => showToast(e.message));
         }
 
-        // DATA LOADING - OPTIMIZED
-        function loadCachedData() {
-            const cached = localStorage.getItem('stanyCachedData');
-            if(cached) {
-                try {
-                    cachedData = JSON.parse(cached);
-                    if(cachedData.channels) {
-                        displayChannels(cachedData.channels);
-                    }
-                    if(cachedData.movies) {
-                        displayMovies(cachedData.movies);
-                    }
-                } catch(e) {
-                    console.log('Cache load error');
-                }
-            }
-        }
-
-        function saveToCache(data) {
-            cachedData = {
-                channels: data.channels || cachedData.channels,
-                movies: data.movies || cachedData.movies,
-                lastUpdated: Date.now()
-            };
-            localStorage.setItem('stanyCachedData', JSON.stringify(cachedData));
-        }
-
-        // LOAD ESSENTIAL DATA
-        function loadEssentialData() {
-            console.log("📥 Loading essential data");
-            
-            // Load app settings first with real-time listener
-            loadAppSettings();
-            
-            // Load channels with real-time listener - ORDER PRESERVED
-            db.ref('channels').on('value', s => {
-                processChannelsData(s);
-            });
-            
-            // Load movies with real-time listener
-            db.ref('movies').on('value', s => {
-                processMoviesData(s);
-            });
-            
-            // Load categories with real-time listener
-            db.ref('genres').on('value', s => {
-                const t = document.getElementById('catTags'); 
-                const c = document.getElementById('catContent');
-                t.innerHTML = `<button class="cat-btn active" onclick="filterHome('all')">All</button>`; 
-                c.innerHTML='';
-                s.forEach(g => {
-                    const n = g.val().name;
-                    t.innerHTML += `<button class="cat-btn" onclick="filterHome('${n}')">${n}</button>`;
-                    // UPDATED: Same layout as homepage for categories
-                    c.innerHTML += `<div class="category-section">
-                        <div class="category-title">${n}</div>
-                        <div class="grid" id="cat_${n.replace(/s/g,'')}"><div class="loading-text">Loading...</div></div>
-                    </div>`;
-                });
-                setTimeout(fillCats, 500);
-            });
-            
-            // Load carousel with real-time listener
-            loadCarousel();
-            
-            // Load other data
-            setTimeout(loadNonEssentialData, 500);
-        }
-
-        // LOAD APP SETTINGS with real-time updates
-        function loadAppSettings() {
-            db.ref('appSettings').on('value', snapshot => {
-                if (snapshot.exists()) {
-                    appSettings = snapshot.val();
-                    console.log("✅ App settings loaded:", appSettings);
-                    applyAppSettings();
-                    
-                    // Show notification when settings are updated
-                    showToast("⚙️ App settings updated", "info");
-                }
-            });
-        }
-
-        // APPLY APP SETTINGS
-        function applyAppSettings() {
-            // Apply card size
-            if (appSettings.cardSize) {
-                const cards = document.querySelectorAll('.card');
-                cards.forEach(card => {
-                    card.style.transform = appSettings.cardSize === 'large' ? 'scale(1.1)' : 
-                                         appSettings.cardSize === 'small' ? 'scale(0.9)' : 'scale(1)';
-                });
-                document.getElementById('settingCardSize').textContent = appSettings.cardSize.charAt(0).toUpperCase() + appSettings.cardSize.slice(1);
-            }
-            
-            // Apply font size
-            if (appSettings.fontSize) {
-                document.body.style.fontSize = appSettings.fontSize === 'large' ? '18px' : 
-                                              appSettings.fontSize === 'small' ? '14px' : '16px';
-                document.getElementById('settingFontSize').textContent = appSettings.fontSize.charAt(0).toUpperCase() + appSettings.fontSize.slice(1);
-            }
-            
-            // Update carousel interval
-            if (appSettings.carouselInterval) {
-                startCarousel();
-            }
-        }
-
-        // Improved Carousel Loading
-        function loadCarousel() {
-            db.ref('carousel').on('value', snapshot => {
-                const carousel = document.getElementById('carousel');
-                carousel.innerHTML = '';
-                carouselSlides = [];
-                
-                if (!snapshot.exists()) {
-                    carousel.innerHTML = '<div class="loading-text">No carousel slides available</div>';
+        function checkDevice(uid) {
+            db.ref('users/'+uid).once('value').then(snap => {
+                const u = snap.val();
+                if(!u || u.isBlocked) {
+                    auth.signOut();
                     return;
                 }
-                
-                snapshot.forEach(slide => {
-                    const slideData = slide.val();
-                    carouselSlides.push(slideData);
+                if(!u.activeDeviceId || u.activeDeviceId === deviceId) {
+                    initializeApp(uid, u);
+                } else {
+                    showToast('Kifaa hiki hakijaidhinishwa');
+                    auth.signOut();
+                }
+            });
+        }
+
+        function initializeApp(uid, userData) {
+            currentUser = {uid:uid, ...userData};
+            userIsExpired = userData.accessExpiry && userData.accessExpiry < Date.now();
+            document.getElementById('loader').style.display='none';
+            document.getElementById('mainApp').style.display='block';
+            document.getElementById('pName').textContent = userData.name || 'Mtumiaji';
+            document.getElementById('pEmail').textContent = userData.email;
+            const days = userData.accessExpiry ? Math.ceil((userData.accessExpiry - Date.now())/(1000*60*60*24)) : 0;
+            document.getElementById('pDays').textContent = userIsExpired ? 'Imeisha' : days + ' siku zimebaki';
+            loadEssentialData();
+            showToast('Karibu STANY MIN TV');
+        }
+
+        function loadEssentialData() {
+            db.ref('channels').on('value', s => {
+                const channels = [];
+                s.forEach(c => channels.push({id:c.key, ...c.val(), type:'channel'}));
+                allData.channels = channels;
+                displayChannels(channels);
+            });
+
+            db.ref('movies').on('value', s => {
+                const movies = [];
+                s.forEach(c => movies.push({id:c.key, ...c.val(), type:'movie'}));
+                allData.movies = movies;
+                displayMovies(movies);
+            });
+
+            db.ref('genres').on('value', s => {
+                const tags = document.getElementById('catTags');
+                tags.innerHTML = '<div class="category-tag active" onclick="filterHome(\'all\', this)">Zote</div>';
+                s.forEach(g => {
+                    const name = g.val().name;
+                    tags.innerHTML += '<div class="category-tag" onclick="filterHome(\''+name+'\', this)">'+name+'</div>';
                 });
-                
-                if (carouselSlides.length > 0) {
-                    displayCarouselSlide(0);
-                    startCarousel();
-                    showToast("🔄 Carousel updated", "info");
-                }
             });
         }
 
-        // Improved Carousel Display
-        function displayCarouselSlide(index) {
-            const carousel = document.getElementById('carousel');
-            const slide = carouselSlides[index];
-            
-            carousel.innerHTML = `
-                <div class="carousel-slide active">
-                    <img src="${slide.imageURL || 'https://via.placeholder.com/400x200?text=No+Image'}" 
-                         onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
-                    <div class="carousel-caption">
-                        <div class="carousel-title">${slide.title || 'No Title'}</div>
-                        <div class="carousel-description">${slide.description || ''}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // START CAROUSEL
-        function startCarousel() {
-            if (carouselInterval) {
-                clearInterval(carouselInterval);
-            }
-            
-            if (carouselSlides.length > 1) {
-                const interval = appSettings.carouselInterval || 5000;
-                carouselInterval = setInterval(() => {
-                    currentCarouselSlide = (currentCarouselSlide + 1) % carouselSlides.length;
-                    displayCarouselSlide(currentCarouselSlide);
-                }, interval);
-            }
-        }
-
-        // PROCESS CHANNELS DATA with real-time updates - ORDER PRESERVED
-        function processChannelsData(snapshot) {
-            const channelsData = [];
-            snapshot.forEach(c => {
-                const channel = {id:c.key, ...c.val(), type:'channel'};
-                
-                // Check if channel is locked or free
-                channel.isLocked = userIsExpired && 
-                                 appSettings.lockedChannels && 
-                                 appSettings.lockedChannels.includes(channel.id) &&
-                                 !(appSettings.freeChannels && appSettings.freeChannels.includes(channel.id));
-                
-                channelsData.push(channel);
-            });
-            
-            // PRESERVE THE EXACT ORDER FROM FIREBASE - SORT BY ORDER FIELD
-            channelsData.sort((a, b) => (a.order || 999) - (b.order || 999));
-            allData.channels = channelsData;
-            
-            // Update both homepage and categories page
-            displayChannels(channelsData);
-            
-            // Update categories page if active
-            if (document.getElementById('cats').classList.contains('active')) {
-                fillCats();
-            }
-            
-            saveToCache({channels: channelsData});
-            
-            // Show update notification
-            showToast("📺 Channels updated", "info");
-        }
-
-        // PROCESS MOVIES DATA with real-time updates
-        function processMoviesData(snapshot) {
-            const moviesData = [];
-            snapshot.forEach(c => {
-                moviesData.push({id:c.key, ...c.val(), type:'movie'});
-            });
-            allData.movies = moviesData;
-            displayMovies(moviesData);
-            
-            // Update categories page if active
-            if (document.getElementById('cats').classList.contains('active')) {
-                fillCats();
-            }
-            
-            saveToCache({movies: moviesData});
-            
-            // Show update notification
-            showToast("🎬 Movies updated", "info");
-        }
-
-        // LOAD NON-ESSENTIAL DATA with real-time updates
-        function loadNonEssentialData() {
-            console.log("📥 Loading non-essential data");
-            
-            // Betting Tips with real-time updates
-            db.ref('bettingTips').on('value', s => {
-                const d = document.getElementById('tipsContent'); 
-                d.innerHTML='';
-                if (s.exists()) {
-                    s.forEach(c => {
-                        const tip = c.val();
-                        let formattedDate = 'N/A';
-                        if (tip.createdAt) {
-                            const date = new Date(tip.createdAt);
-                            const day = String(date.getDate()).padStart(2, '0');
-                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                            const year = date.getFullYear();
-                            formattedDate = `${day}/${month}/${year}`;
-                        }
-                        tip.formattedDate = formattedDate;
-                        d.innerHTML += createBettingTip(tip);
-                    });
-                    showToast("⚽ Betting tips updated", "info");
-                } else {
-                    d.innerHTML = '<div class="loading-text">No tips available yet</div>';
-                }
-            });
-            
-            // Load Guides & Tips with real-time updates
-            loadGuides();
-            
-            // Downloads with real-time updates
-            db.ref('downloadableMovies').on('value', s => {
-                const d = document.getElementById('dlContent'); 
-                d.innerHTML='';
-                if (s.exists()) {
-                    s.forEach(c => d.innerHTML += createDl(c.val()));
-                    showToast("📥 Downloads updated", "info");
-                } else {
-                    d.innerHTML = '<div class="loading-text">No downloads available yet</div>';
-                }
-            });
-
-            // Load passwords list
-            loadPassList();
-        }
-
-        // LOAD GUIDES & TIPS with real-time updates
-        function loadGuides() {
-            db.ref('tips').on('value', s => {
-                const d = document.getElementById('guidesContent'); 
-                d.innerHTML = '';
-                if (s.exists()) {
-                    s.forEach(c => {
-                        const guide = c.val();
-                        d.innerHTML += createGuide(guide);
-                    });
-                    showToast("💡 Guides updated", "info");
-                } else {
-                    d.innerHTML = '<div class="loading-text">No guides available yet</div>';
-                }
-            });
-        }
-
-        // CREATE GUIDE CARD
-        function createGuide(guide) {
-            if(userIsExpired && guide.category === 'premium') {
-                return `<div class="guide-card blur-wrapper" onclick="showBlockModal()">
-                    <div class="blur-content">
-                        <h3 style="color:var(--primary); margin-bottom:10px; font-size: 1.2em;">${guide.title || 'No Title'}</h3>
-                        <p style="color:#aaa;">${guide.content || 'No content available'}</p>
-                    </div>
-                    <div class="blur-text-overlay"><i class="fas fa-lock"></i> PREMIUM CONTENT</div>
-                </div>`;
-            }
-            
-            return `<div class="guide-card quick-load">
-                <span class="guide-category">${guide.category || 'General'}</span>
-                <h3 style="color:var(--primary); margin-bottom:10px; font-size: 1.2em;">${guide.title || 'No Title'}</h3>
-                <p style="color:#aaa; line-height:1.5;">${guide.content || 'No content available'}</p>
-                ${guide.updatedAt ? `<p style="color:#666; font-size:0.8em; margin-top:10px;">Updated: ${new Date(guide.updatedAt).toLocaleDateString()}</p>` : ''}
-            </div>`;
-        }
-
-        // CREATE BETTING TIP
-        function createBettingTip(t) {
-            if(userIsExpired) {
-                return `<div class="blur-wrapper" onclick="showBlockModal()">
-                    <div class="blur-content">
-                         <div class="bet-card"><div class="bet-head"><span>XXX</span></div><h3>LOCKED</h3><div class="bet-match">XXX VS XXX</div></div>
-                    </div>
-                    <div class="blur-text-overlay"><i class="fas fa-lock"></i> PREMIUM ONLY</div>
-                </div>`;
-            }
-            
-            let codes = '';
-            if(t.bookingCodes && Array.isArray(t.bookingCodes)) {
-                t.bookingCodes.forEach(code => {
-                    codes += `<div class="booking-code" onclick="copy('${code.code}')">${code.platform}: ${code.code}</div>`;
-                });
-            } else if(t.bookingCodes) {
-                for(let [k,v] of Object.entries(t.bookingCodes)) {
-                    codes += `<div class="booking-code" onclick="copy('${v}')">${k}: ${v}</div>`;
-                }
-            }
-            
-            return `<div class="bet-card quick-load">
-                <div class="bet-head">
-                    <span>${t.status || 'Pending'}</span>
-                    <span>${t.formattedDate || 'N/A'}</span>
-                </div>
-                <h3 style="text-align:center; margin-bottom:10px; font-size: 1.2em;">${t.title || 'No Title'}</h3>
-                <div class="bet-match">${t.team1 || 'Team A'} VS ${t.team2 || 'Team B'}</div>
-                <div style="font-size: 1.1em; margin-bottom:8px;">
-                    <strong>Tip:</strong> ${t.prediction || 'N/A'} 
-                    <strong style="color:var(--warning);">@ ${t.odds || 'N/A'}</strong>
-                </div>
-                ${t.stake ? `<div style="font-size: 1em; margin-bottom:8px;"><strong>Stake:</strong> ${t.stake}</div>` : ''}
-                ${t.result ? `<div style="font-size: 1em; margin-bottom:8px; color:${t.status === 'successful' ? 'var(--success)' : t.status === 'failed' ? 'var(--error)' : 'var(--info)'}"><strong>Result:</strong> ${t.result}</div>` : ''}
-                ${t.description ? `<div style="font-size: 0.9em; color:#aaa; margin-bottom:10px;">${t.description}</div>` : ''}
-                ${codes}
-                ${t.bookmakerLink ? `<a href="${t.bookmakerLink}" target="_blank" style="display:block; text-align:center; background:var(--info); color:white; padding:8px; border-radius:5px; margin-top:10px; text-decoration:none;">View on Bookmaker</a>` : ''}
-            </div>`;
-        }
-
-        // DISPLAY CHANNELS - SAME ORDER FOR HOMEPAGE AND CATEGORY PAGE
         function displayChannels(channels) {
-            const g = document.getElementById('chanGrid'); 
-            if(channels.length === 0) {
-                g.innerHTML = '<div class="loading-text">No channels available</div>';
-                return;
-            }
-            
-            let html = '';
-            channels.forEach(ch => {
-                html += createCard(ch);
-            });
-            g.innerHTML = html;
+            const grid = document.getElementById('chanGrid');
+            grid.innerHTML = channels.map(ch => createCard(ch)).join('');
         }
 
-        // DISPLAY MOVIES
         function displayMovies(movies) {
-            const g = document.getElementById('movGrid'); 
-            if(movies.length === 0) {
-                g.innerHTML = '<div class="loading-text">No movies available</div>';
-                return;
-            }
-            
-            let html = '';
-            movies.forEach(m => {
-                html += createCard(m);
-            });
-            g.innerHTML = html;
+            const grid = document.getElementById('movGrid');
+            grid.innerHTML = movies.map(m => createCard(m)).join('');
         }
 
-        // CREATE CARD - SAME FOR ALL PAGES
         function createCard(item) {
-            let isLocked = userIsExpired;
-            
-            // Check if this specific channel is locked
-            if(item.type === 'channel' && item.isLocked) {
-                isLocked = true;
-            }
-            
-            // Always allow TBC1
-            if(item.type === 'channel' && item.name && item.name.toUpperCase().includes('TBC1')) isLocked = false;
-
-            const overlay = isLocked ? `<div class="locked-overlay"><i class="fas fa-lock lock-icon"></i></div>` : '';
-            return `<div class="card quick-load" onclick="handleClick('${item.type}','${item.id}', ${isLocked})">
-                ${overlay}
-                <img src="${item.posterURL || 'https://via.placeholder.com/150x200?text=No+Image'}" onerror="this.src='https://via.placeholder.com/150x200?text=No+Image'">
-                <div class="card-info"><h4>${item.name||item.title||'Untitled'}</h4></div>
-            </div>`;
+            const isLocked = userIsExpired && item.type === 'channel';
+            return '<div class="card" onclick="handleClick(\''+item.type+'\',\''+item.id+'\','+isLocked+')">'+
+                (isLocked ? '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; border-radius:12px;"><i class="fas fa-lock" style="color:white; font-size:24px;"></i></div>' : '')+
+                '<img src="'+(item.posterURL || 'https://via.placeholder.com/150x200')+'" onerror="this.src=\'https://via.placeholder.com/150x200\'">'+
+                '<div class="card-info"><div class="card-title">'+(item.name||item.title||'Untitled')+'</div></div>'+
+            '</div>';
         }
 
-        // CREATE DOWNLOAD CARD
-        function createDl(d) {
-            if(userIsExpired) {
-                return `<div class="dl-card" onclick="showBlockModal()">
-                    <div class="locked-overlay"><i class="fas fa-lock lock-icon"></i></div>
-                    <img src="${d.posterURL || 'https://via.placeholder.com/100x140?text=No+Image'}"><div class="dl-info"><h4>${d.title || 'Untitled'}</h4></div>
-                </div>`;
-            }
-            return `<div class="dl-card quick-load">
-                <img src="${d.posterURL || 'https://via.placeholder.com/100x140?text=No+Image'}">
-                <div class="dl-info"><h4>${d.title || 'Untitled'}</h4><a href="${d.downloadURL || '#'}" class="dl-btn" target="_blank">Download</a></div>
-            </div>`;
-        }
-
-        // HANDLE CLICK
         function handleClick(type, id, locked) {
-            if(locked) { showBlockModal(); return; }
+            if(locked) { showToast('Usajili wako umeisha'); return; }
             const item = type==='channel' ? allData.channels.find(x=>x.id===id) : allData.movies.find(x=>x.id===id);
-            if (!item) {
-                showToast("Item not found", "error");
-                return;
-            }
-            document.getElementById('dImg').src = item.posterURL || 'https://via.placeholder.com/300x180?text=No+Image';
-            document.getElementById('dTitle').innerText = item.name||item.title||'Untitled';
-            document.getElementById('dDesc').innerText = item.description || 'No description available';
+            if(!item) return;
+            document.getElementById('dImg').src = item.posterURL || 'https://via.placeholder.com/300x180';
+            document.getElementById('dTitle').textContent = item.name||item.title||'Untitled';
+            document.getElementById('dDesc').textContent = item.description || 'Hakuna maelezo';
             document.getElementById('dBtn').onclick = () => {
-                document.getElementById('detailModal').style.display='none';
-                if(type==='channel') checkChanPass(item); else playContent(item);
+                closeDetailModal();
+                playContent(item);
             };
             document.getElementById('detailModal').style.display='flex';
         }
 
-        // SHOW BLOCK MODAL
-        function showBlockModal() { document.getElementById('blockModal').style.display='flex'; }
-        
-        // OPEN WHATSAPP
-        function openWhatsApp() { 
-            if(adminContact) {
-                const message = `Hello Admin, I need assistance with my STANY MIN TV account.`;
-                window.open(`https://wa.me/${adminContact}?text=${encodeURIComponent(message)}`, '_blank'); 
-            } else {
-                showToast("No admin contact found", "warning");
-            }
-        }
-
-        // PLAY CONTENT
         function playContent(item) {
-            // Execute channel script if available
-            if(item.type === 'channel' && appSettings.channelScripts && appSettings.channelScripts[item.id]) {
-                try {
-                    eval(appSettings.channelScripts[item.id]);
-                } catch(e) {
-                    console.error("Channel script error:", e);
-                }
-            }
-            
-            if(item.playerType === 'external_section') {
-                let code = item.externalCode;
-                if(!code && item.name) {
-                    const up = item.name.toUpperCase();
-                    for(let [k,v] of Object.entries(specialMap)) {
-                        if(up.includes(k)) {
-                            code = v;
-                            break;
-                        }
-                    }
-                }
-                if(code) { 
-                    window.location.href = 'go:'+code; 
-                    return; 
-                }
-            }
-            else if(item.playerType === 'external_browser') {
-                window.open(item.m3u8Link || item.movieURL, '_blank'); 
-                return;
-            }
-            
-            if((!item.playerType || item.playerType === 'internal') && item.name) {
-                const up = item.name.toUpperCase();
-                for(let [k,v] of Object.entries(specialMap)) {
-                    if(up.includes(k)) { 
-                        window.location.href = 'go:'+v; 
-                        return; 
-                    }
-                }
-            }
-
             const url = item.m3u8Link || item.movieURL;
-            if(!url) { 
-                showToast("No URL available for this content", "error"); 
-                return; 
-            }
+            if(!url) { showToast('Hakuna link ya kutazama'); return; }
             document.getElementById('playerModal').style.display='flex';
             if(!player) {
-                player = videojs('videoJS', {
-                    fluid: true, 
-                    autoplay: true,
-                    preload: 'auto'
-                });
+                player = videojs('videoJS', {fluid: true, autoplay: true});
             }
             player.src({src:url, type: url.includes('.m3u8')?'application/x-mpegURL':'video/mp4'});
             player.play();
         }
 
-        // CHANNEL PASSWORDS
-        function checkChanPass(c) {
-            if(currentUser.channelPasswords && currentUser.channelPasswords[c.id]) {
-                pendingChan = c;
-                document.getElementById('ppName').innerText = c.name || 'Channel';
-                document.getElementById('passPrompt').style.display='flex';
+        function filterHome(category, el) {
+            document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            
+            const mg = document.getElementById('movGrid');
+            const cg = document.getElementById('chanGrid');
+            
+            if(category === 'all') {
+                mg.innerHTML = allData.movies.map(m => createCard(m)).join('');
+                cg.innerHTML = allData.channels.map(c => createCard(c)).join('');
             } else {
-                playContent(c);
+                mg.innerHTML = allData.movies.filter(m => m.genre && m.genre.includes(category)).map(m => createCard(m)).join('');
+                cg.innerHTML = allData.channels.filter(c => c.categories && c.categories.includes(category)).map(c => createCard(c)).join('');
             }
         }
 
-        function unlockChan() {
-            const inputPass = document.getElementById('ppInput').value;
-            if(inputPass === currentUser.channelPasswords[pendingChan.id]) {
-                document.getElementById('passPrompt').style.display='none';
-                document.getElementById('ppInput').value='';
-                playContent(pendingChan);
-                showToast("🔓 Channel unlocked successfully!", "success");
-            } else {
-                showToast("❌ Wrong password", "error");
-            }
+        function shareApp(platform) {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('Tazama STANY MIN TV - Vitanzi, Filamu na zaidi!');
+            let shareUrl = '';
+            if(platform === 'whatsapp') shareUrl = 'https://wa.me/?text='+text+' '+url;
+            else if(platform === 'facebook') shareUrl = 'https://facebook.com/sharer.php?u='+url;
+            else if(platform === 'twitter') shareUrl = 'https://twitter.com/intent/tweet?url='+url+'&text='+text;
+            else if(platform === 'telegram') shareUrl = 'https://t.me/share/url?url='+url+'&text='+text;
+            window.open(shareUrl, '_blank');
         }
 
-        function savePass() {
-            const channelId = document.getElementById('pChanSel').value; 
-            const password = document.getElementById('pNewPass').value;
-            
-            if(!channelId || channelId === 'Select Channel') {
-                showToast("Please select a channel first", "warning");
-                return;
-            }
-            
-            if(!password) {
-                showToast("Please enter a password", "warning");
-                return;
-            }
-            
-            db.ref(`users/${currentUser.uid}/channelPasswords/${channelId}`).set(password)
-                .then(() => {
-                    showToast("🔐 Password saved successfully!", "success");
-                    document.getElementById('pNewPass').value='';
-                    if(!currentUser.channelPasswords) currentUser.channelPasswords = {};
-                    currentUser.channelPasswords[channelId] = password;
-                    loadPassList();
-                })
-                .catch(error => {
-                    showToast("Error saving password: " + error.message, "error");
-                });
+        function shareContent(platform) {
+            shareApp(platform);
         }
 
-        function loadPassList() {
-            const d = document.getElementById('pPassList'); 
-            d.innerHTML='';
-            
-            if(currentUser.channelPasswords && Object.keys(currentUser.channelPasswords).length > 0) {
-                for(let [channelId, password] of Object.entries(currentUser.channelPasswords)) {
-                    const channelName = allData.channels.find(x=>x.id===channelId)?.name || 'Unknown Channel';
-                    d.innerHTML += `<div style="background:#333; padding:10px; margin-bottom:8px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <strong style="font-size: 1.1em;">${channelName}</strong>
-                            <div style="font-size:0.8em; color:#aaa;">${'*'.repeat(password.length)}</div>
-                        </div>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer; font-size: 1.1em;" onclick="showDeletePassModal('${channelId}', '${channelName.replace(/'/g, "\\'")}')"></i>
-                    </div>`;
-                }
-            } else {
-                d.innerHTML = '<div style="text-align:center; color:#888; padding:10px;">No passwords set yet</div>';
-            }
-            
-            // Update channel selector
-            const sel = document.getElementById('pChanSel'); 
-            sel.innerHTML = '<option>Select Channel</option>';
-            allData.channels.forEach(ch => {
-                sel.innerHTML += `<option value="${ch.id}">${ch.name}</option>`;
-            });
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('Link imenakiliwa');
         }
 
-        function showDeletePassModal(channelId, channelName) {
-            pendingDeleteChannelId = channelId;
-            pendingDeleteChannelName = channelName;
-            document.getElementById('deleteChanName').innerText = channelName;
-            document.getElementById('deletePassInput').value = '';
-            document.getElementById('deletePassModal').style.display = 'flex';
+        function copyContentLink() {
+            copyLink();
         }
 
-        function confirmDeletePass() {
-            const inputPass = document.getElementById('deletePassInput').value;
-            const currentPassword = currentUser.channelPasswords[pendingDeleteChannelId];
-            
-            if(!inputPass) {
-                showToast("Please enter the current password", "warning");
-                return;
-            }
-            
-            if(inputPass === currentPassword) {
-                db.ref(`users/${currentUser.uid}/channelPasswords/${pendingDeleteChannelId}`).remove()
-                    .then(() => {
-                        showToast("🗑️ Password deleted successfully!", "success");
-                        delete currentUser.channelPasswords[pendingDeleteChannelId];
-                        document.getElementById('deletePassModal').style.display = 'none';
-                        setTimeout(loadPassList, 300);
-                    })
-                    .catch(error => {
-                        showToast("Error deleting password", "error");
-                    });
-            } else {
-                showToast("Incorrect password. Please try again.", "error");
-            }
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
         }
 
-        // BOT FUNCTIONALITY
-        function setupBot() {
-            db.ref(`stanyBotMessages/${currentUser.uid}`).limitToLast(20).on('child_added', s=>{
-                const m = s.val();
-                const d = document.createElement('div'); 
-                d.className = `msg msg-${m.sender} quick-load`; 
-                d.innerText = m.text;
-                const b = document.getElementById('chatBox'); 
-                b.appendChild(d); 
-                b.scrollTop = b.scrollHeight;
-                
-                if(m.sender === 'admin' && m.timestamp > lastCheckedChat) {
-                    updateChatNotification();
-                    showToast("💬 New message from admin", "chat");
-                }
-            });
+        function globalSearch() {
+            const query = document.querySelector('.search-input').value.toLowerCase();
+            if(!query) { loadEssentialData(); return; }
+            
+            const mg = document.getElementById('movGrid');
+            const cg = document.getElementById('chanGrid');
+            mg.innerHTML = allData.movies.filter(m => m.title && m.title.toLowerCase().includes(query)).map(m => createCard(m)).join('');
+            cg.innerHTML = allData.channels.filter(c => c.name && c.name.toLowerCase().includes(query)).map(c => createCard(c)).join('');
         }
 
         function sendChat() {
-            const text = document.getElementById('chatInput').value.trim();
-            if(!text) {
-                showToast("Please enter a message", "warning");
-                return;
-            }
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
             
-            db.ref(`stanyBotMessages/${currentUser.uid}`).push({
-                text: text, 
-                sender: 'user', 
-                timestamp: Date.now(),
-                userName: currentUser.name,
-                userEmail: currentUser.email,
-                userId: currentUser.uid
+            db.ref('stanyBotMessages/'+currentUser.uid).push({
+                text: text,
+                sender: 'user',
+                timestamp: Date.now()
             });
-            
-            document.getElementById('chatInput').value='';
-            showToast("💬 Message sent successfully!", "chat");
-            
-            const lastReply = localStorage.getItem('botLastReply');
-            if(!lastReply || (Date.now() - lastReply > 86400000)) {
-                setTimeout(() => {
-                    db.ref(`stanyBotMessages/${currentUser.uid}`).push({
-                        text: "Admin received your message. We will reply soon.", 
-                        sender: 'admin', 
-                        timestamp: Date.now()
-                    });
-                }, 1000);
-                localStorage.setItem('botLastReply', Date.now());
-            }
-        }
-
-        // CHECK UNREAD MESSAGES
-        function checkUnreadMessages() {
-            if (!currentUser) return;
-            
-            db.ref(`stanyBotMessages/${currentUser.uid}`).orderByChild('timestamp').startAt(lastCheckedChat).once('value')
-            .then(snapshot => {
-                let unreadCount = 0;
-                snapshot.forEach(child => {
-                    const msg = child.val();
-                    if (msg.sender === 'admin' && msg.timestamp > lastCheckedChat) {
-                        unreadCount++;
-                    }
-                });
-                
-                if (unreadCount > 0) {
-                    updateChatNotification(unreadCount);
-                }
-            });
-        }
-
-        function updateChatNotification(count = 1) {
-            unreadMessages += count;
-            
-            const dot = document.getElementById('botNotification');
-            const countEl = document.getElementById('botNotificationCount');
-            
-            if (unreadMessages === 1) {
-                dot.style.display = 'block';
-                countEl.style.display = 'none';
-            } else if (unreadMessages > 1) {
-                dot.style.display = 'none';
-                countEl.style.display = 'flex';
-                countEl.textContent = unreadMessages > 9 ? '9+' : unreadMessages;
-            }
-        }
-
-        function clearChatNotifications() {
-            unreadMessages = 0;
-            lastCheckedChat = Date.now();
-            
-            const dot = document.getElementById('botNotification');
-            const countEl = document.getElementById('botNotificationCount');
-            
-            dot.style.display = 'none';
-            countEl.style.display = 'none';
-            
-            localStorage.setItem('lastCheckedChat', lastCheckedChat);
-        }
-
-        // NOTIFICATION SYSTEM
-        function setupNotif() {
-            db.ref(`userNotifications/${currentUser.uid}`).limitToLast(10).on('child_added', s=>{
-                const n = s.val();
-                
-                if(Date.now() - n.timestamp < 30000) {
-                    showToast("📢 " + (n.title || "New Notification"), "info");
-                }
-                
-                if(n.timestamp > lastCheckedNotif) {
-                    updateBellNotification();
-                }
-                
-                document.getElementById('notifList').innerHTML = 
-                    `<div style="background:#333; padding:10px; margin-bottom:5px; border-radius:5px;">
-                        <b style="font-size: 1.1em;">${n.title || 'Notification'}</b><br>
-                        ${n.message || ''}
-                        <div style="font-size:0.7em; color:#888; margin-top:5px;">${new Date(n.timestamp).toLocaleString()}</div>
-                    </div>` + document.getElementById('notifList').innerHTML;
-            });
-            
-            checkUnreadNotifications();
-        }
-
-        function checkUnreadNotifications() {
-            if (!currentUser) return;
-            
-            db.ref(`userNotifications/${currentUser.uid}`).orderByChild('timestamp').startAt(lastCheckedNotif).once('value')
-            .then(snapshot => {
-                let unreadCount = 0;
-                snapshot.forEach(child => {
-                    const notif = child.val();
-                    if (notif.timestamp > lastCheckedNotif) {
-                        unreadCount++;
-                    }
-                });
-                
-                if (unreadCount > 0) {
-                    updateBellNotification(unreadCount);
-                }
-            });
-        }
-
-        function updateBellNotification(count = 1) {
-            unreadNotifications += count;
-            
-            const dot = document.getElementById('bellNotification');
-            const countEl = document.getElementById('bellNotificationCount');
-            
-            if (unreadNotifications === 1) {
-                dot.style.display = 'block';
-                countEl.style.display = 'none';
-            } else if (unreadNotifications > 1) {
-                dot.style.display = 'none';
-                countEl.style.display = 'flex';
-                countEl.textContent = unreadNotifications > 9 ? '9+' : unreadNotifications;
-            }
-        }
-
-        function clearBellNotifications() {
-            unreadNotifications = 0;
-            lastCheckedNotif = Date.now();
-            
-            const dot = document.getElementById('bellNotification');
-            const countEl = document.getElementById('bellNotificationCount');
-            
-            dot.style.display = 'none';
-            countEl.style.display = 'none';
-            
-            localStorage.setItem('lastCheckedNotif', lastCheckedNotif);
-        }
-
-        // NOTIFICATION MODAL FUNCTIONS
-        function showNotifModal() {
-            document.getElementById('notifModal').style.display='flex';
-            clearBellNotifications();
-        }
-
-        function closeNotifModal() {
-            document.getElementById('notifModal').style.display='none';
-            clearBellNotifications();
-        }
-
-        // OTHER FUNCTIONS
-        function loadSettings() { 
-            db.ref('settings/adminContactNumber').on('value', s => {
-                adminContact = s.val();
-            }); 
-        }
-        
-        function filterHome(category) {
-            const mg = document.getElementById('movGrid'); 
-            const cg = document.getElementById('chanGrid');
-            mg.innerHTML = ''; 
-            cg.innerHTML = '';
-            
-            // Update active category button
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            allData.movies.forEach(m => { 
-                if(category === 'all' || (m.genre && m.genre.includes(category))) {
-                    mg.innerHTML += createCard(m); 
-                }
-            });
-            
-            allData.channels.forEach(ch => { 
-                if(category === 'all' || (ch.categories && ch.categories.includes(category))) {
-                    cg.innerHTML += createCard(ch); 
-                }
-            });
-            
-            if(mg.innerHTML === '') mg.innerHTML = '<div class="loading-text">No movies found</div>';
-            if(cg.innerHTML === '') cg.innerHTML = '<div class="loading-text">No channels found</div>';
-        }
-
-        // UPDATED: Category Layout - SAME ORDER AND CARD SIZE AS HOMEPAGE
-        function fillCats() {
-            db.ref('genres').once('value', s => {
-                s.forEach(g => {
-                    const name = g.val().name;
-                    const container = document.getElementById(`cat_${name.replace(/s/g,'')}`);
-                    if(container) { 
-                        container.innerHTML = ''; 
-                        
-                        // Use the same order as homepage for channels
-                        allData.channels.forEach(c => {
-                            if(c.categories && c.categories.includes(name)) {
-                                container.innerHTML += createCard(c);
-                            }
-                        });
-                        
-                        allData.movies.forEach(m => {
-                            if(m.genre && m.genre.includes(name)) {
-                                container.innerHTML += createCard(m);
-                            }
-                        });
-                        
-                        if(container.innerHTML === '') {
-                            container.innerHTML = '<div class="loading-text">No content in this category</div>';
-                        }
-                    }
-                });
-            });
-        }
-        
-        // TOAST NOTIFICATION SYSTEM
-        function showToast(message, type = "info") {
-            const toast = document.getElementById('toast');
-            const icons = {
-                success: "fas fa-check-circle",
-                error: "fas fa-exclamation-circle",
-                warning: "fas fa-exclamation-triangle",
-                info: "fas fa-info-circle",
-                chat: "fas fa-comment",
-                premium: "fas fa-crown"
-            };
-            
-            const defaultIcon = "fas fa-info-circle";
-            
-            toast.innerHTML = `<i class="${icons[type] || defaultIcon}"></i> ${message}`;
-            toast.className = `toast-${type}`;
-            toast.style.transform = 'translateX(0)';
+            input.value = '';
             
             setTimeout(() => {
-                toast.style.transform = 'translateX(200%)';
-            }, 4000);
-        }
-
-        // BASIC FUNCTIONS
-        function nav(page, element) { 
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active')); 
-            document.getElementById(page).classList.add('active'); 
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); 
-            if(element) element.classList.add('active'); 
-            
-            if (page === 'bot') {
-                clearChatNotifications();
-            }
-            
-            // Hide search when navigating
-            if (isSearchActive) {
-                toggleSearch();
-            }
-            
-            // Refresh data when switching to categories page
-            if (page === 'cats') {
-                fillCats();
-            }
-        }
-        
-        function copy(text) { 
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("📋 Copied to clipboard!", "success");
-            }).catch(() => {
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                showToast("📋 Copied!", "success");
-            });
-        }
-        
-        function closePlayer() { 
-            document.getElementById('playerModal').style.display = 'none'; 
-            if(player) {
-                player.pause();
-                player.reset();
-            }
-        }
-        
-        // LOGIN FUNCTION
-        function login() { 
-            const email = document.getElementById('lemail').value;
-            const password = document.getElementById('lpass').value;
-            const loginError = document.getElementById('loginError');
-            
-            document.getElementById('lemail').classList.remove('input-error');
-            document.getElementById('lpass').classList.remove('input-error');
-            loginError.style.display = 'none';
-            
-            if(!email || !password) {
-                showToast("Please enter email and password", "warning");
-                if(!email) document.getElementById('lemail').classList.add('input-error');
-                if(!password) document.getElementById('lpass').classList.add('input-error');
-                return;
-            }
-            
-            console.log("🔐 Attempting login for:", email);
-            
-            const loginBtn = document.querySelector('#loginPage .btn');
-            const originalText = loginBtn.innerHTML;
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-            loginBtn.disabled = true;
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    console.log("✅ Login successful for:", email);
-                    showToast("🔐 Login successful!", "success");
-                    document.getElementById('loader').style.display = 'flex';
-                    
-                    loginBtn.innerHTML = originalText;
-                    loginBtn.disabled = false;
-                })
-                .catch(e => {
-                    console.error("❌ Login failed:", e.message);
-                    
-                    loginError.style.display = 'block';
-                    document.getElementById('lemail').classList.add('input-error');
-                    document.getElementById('lpass').classList.add('input-error');
-                    
-                    showToast("❌ " + e.message, "error");
-                    
-                    loginBtn.innerHTML = originalText;
-                    loginBtn.disabled = false;
+                db.ref('stanyBotMessages/'+currentUser.uid).push({
+                    text: 'Tumepokea ujumbe wako. Tutakujibu hivi karibuni.',
+                    sender: 'admin',
+                    timestamp: Date.now()
                 });
-        }
-        
-        // REGISTER FUNCTION
-        function register() { 
-            const name = document.getElementById('rname').value;
-            const email = document.getElementById('remail').value;
-            const password = document.getElementById('rpass').value;
-            const regError = document.getElementById('regError');
-            
-            document.getElementById('rname').classList.remove('input-error');
-            document.getElementById('remail').classList.remove('input-error');
-            document.getElementById('rpass').classList.remove('input-error');
-            regError.style.display = 'none';
-            
-            if(!name || !email || !password) {
-                showToast("Please fill all fields", "warning");
-                if(!name) document.getElementById('rname').classList.add('input-error');
-                if(!email) document.getElementById('remail').classList.add('input-error');
-                if(!password) document.getElementById('rpass').classList.add('input-error');
-                return;
-            }
-            
-            console.log("📝 Attempting registration for:", email);
-            
-            const regBtn = document.querySelector('#regPage .btn');
-            const originalText = regBtn.innerHTML;
-            regBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
-            regBtn.disabled = true;
-
-            db.ref('users').orderByChild('activeDeviceId').equalTo(deviceId).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        console.log("❌ Device already registered to another account");
-                        showToast("This device is already registered. Please login instead.", "error");
-                        
-                        regBtn.innerHTML = originalText;
-                        regBtn.disabled = false;
-                        return;
-                    }
-                    
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .then(user => {
-                            console.log("✅ User created, now saving to database");
-                            return db.ref('users/' + user.user.uid).set({
-                                name: name,
-                                email: email,
-                                activeDeviceId: deviceId,
-                                registeredAt: Date.now(),
-                                accessExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                            });
-                        })
-                        .then(() => {
-                            console.log("✅ Registration completed successfully");
-                            showToast("🎉 Registration successful!", "success");
-                            
-                            regBtn.innerHTML = originalText;
-                            regBtn.disabled = false;
-                        })
-                        .catch(e => {
-                            console.error("❌ Registration failed:", e.message);
-                            regError.style.display = 'block';
-                            regError.textContent = e.message;
-                            showToast("❌ " + e.message, "error");
-                            
-                            regBtn.innerHTML = originalText;
-                            regBtn.disabled = false;
-                        });
-                })
-                .catch(error => {
-                    console.error("❌ Error checking device registration:", error);
-                    showToast("Error checking device registration: " + error.message, "error");
-                    
-                    regBtn.innerHTML = originalText;
-                    regBtn.disabled = false;
-                });
+            }, 1000);
         }
 
-        // FALLBACK INITIALIZATION
-        setTimeout(() => {
-            if(auth.currentUser && document.getElementById('authPages').style.display === 'flex') {
-                console.log("🔄 Manual auth state recovery");
-                document.getElementById('authPages').style.display='none';
-                document.getElementById('loader').style.display='flex';
-                checkDevice(auth.currentUser.uid);
-            }
-        }, 2000);
+        function nav(page, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
 
+        function showLogoutConfirm() {
+            document.getElementById('logoutModal').style.display='flex';
+        }
+
+        function cancelLogout() {
+            document.getElementById('logoutModal').style.display='none';
+        }
+
+        function confirmLogout() {
+            auth.signOut();
+            document.getElementById('logoutModal').style.display='none';
+            showToast('Umetoka kwa mafanikio');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display='none';
+        }
+
+        function closePlayer() {
+            document.getElementById('playerModal').style.display='none';
+            if(player) { player.pause(); }
+        }
+
+        function quickRefresh() {
+            showToast('Imeoneshwa upya');
+        }
+
+        function showNotifications() {
+            showToast('Hakuna arifa mpya');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Setup chat listener
+        db.ref('stanyBotMessages').on('child_added', s => {
+            // Chat handling
+        });
     </script>
 </body>
 </html>
