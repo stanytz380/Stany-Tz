@@ -1,101 +1,180 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>STANY MIN TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Open Graph / Social Media Preview -->
+    <meta property="og:title" content="STANY MIN TV - Premium Entertainment">
+    <meta property="og:description" content="Watch Live TV, Movies, Sports & More. Premium streaming experience with thousands of channels and movies.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
+    <meta property="og:url" content="https://stanyappstore.web.app">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="STANY MIN TV">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="STANY MIN TV - Premium Entertainment">
+    <meta name="twitter:description" content="Watch Live TV, Movies, Sports & More. Premium streaming experience.">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg">
+    
+    <title>STANY MIN TV - Premium Entertainment</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <link href="https://unpkg.com/video.js@7.21.1/dist/video-js.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/video.js@7.21.1/dist/video.min.js"></script>
+    
+    <!-- Video.js Premium -->
+    <link href="https://unpkg.com/video.js@8.6.1/dist/video-js.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/@videojs/themes@1.0.1/dist/fantasy/index.css" rel="stylesheet">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- i18next for Multiple Languages -->
+    <script src="https://unpkg.com/i18next@23.5.0/i18next.min.js"></script>
     
     <style>
         :root {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --bg-card: #1e2532;
-            --bg-elevated: #252d3a;
-            --text-primary: #ffffff;
-            --text-secondary: #8b92a8;
-            --gradient-start: #ff4757;
-            --gradient-mid: #ff6b81;
-            --gradient-end: #2ed573;
-            --gradient-blue: #1e90ff;
-            --border-color: #2a3142;
-            --success: #2ed573;
-            --error: #ff4757;
-            --warning: #ffa502;
+            --ios-bg: #000000;
+            --ios-card: rgba(28, 28, 30, 0.65);
+            --ios-card-solid: #1c1c1e;
+            --ios-glass: rgba(255, 255, 255, 0.08);
+            --ios-border: rgba(255, 255, 255, 0.1);
+            --ios-blue: #0A84FF;
+            --ios-green: #30D158;
+            --ios-red: #FF453A;
+            --ios-orange: #FF9F0A;
+            --ios-gray: #8E8E93;
+            --ios-light-gray: #C7C7CC;
+            --ios-text: #FFFFFF;
+            --ios-text-secondary: #98989D;
+            --gradient-primary: linear-gradient(135deg, #FF2D55 0%, #5856D6 50%, #0A84FF 100%);
+            --gradient-secondary: linear-gradient(135deg, #FF375F 0%, #00C7BE 100%);
+            --glass-blur: blur(20px) saturate(180%);
+            --shadow-ios: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 40px rgba(10, 132, 255, 0.3);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            font-family: 'SF Pro Display', 'Inter', -apple-system, sans-serif;
         }
 
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: var(--ios-bg);
+            color: var(--ios-text);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             overflow-x: hidden;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
 
-        /* Gradient Button Style */
-        .btn-gradient {
-            background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-blue) 100%);
-            border: none;
-            color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            width: 100%;
-            text-align: center;
+        /* iOS Glassmorphism */
+        .ios-glass {
+            background: var(--ios-glass);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--ios-border);
         }
 
-        .btn-gradient:active {
-            transform: scale(0.98);
-            opacity: 0.9;
+        .ios-card {
+            background: var(--ios-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--ios-border);
+            border-radius: 20px;
         }
 
-        /* Loader */
+        /* Premium Loader */
         #loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-primary);
-            z-index: 9999;
+            background: var(--ios-bg);
+            z-index: 99999;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            gap: 20px;
+            gap: 24px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--gradient-start);
+        .loader-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 28px;
+            object-fit: cover;
+            box-shadow: var(--shadow-glow);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ios-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--ios-glass);
+            border-top-color: var(--ios-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        /* iOS Style Buttons */
+        .ios-button {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(10, 132, 255, 0.3);
+        }
+
+        .ios-button:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .ios-button-secondary {
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            box-shadow: none;
+        }
+
+        .ios-button-large {
+            padding: 18px 32px;
+            font-size: 18px;
+            border-radius: 16px;
         }
 
         /* Auth Screen */
@@ -105,93 +184,138 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-primary);
-            z-index: 2000;
+            background: var(--ios-bg);
+            z-index: 10000;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 24px;
         }
 
-        .auth-card {
+        .auth-container {
             width: 100%;
-            max-width: 400px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 32px;
-            border: 1px solid var(--border-color);
+            max-width: 420px;
         }
 
-        .auth-header {
+        .auth-logo {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
-        .auth-header h1 {
-            font-size: 28px;
+        .auth-logo img {
+            width: 120px;
+            height: 120px;
+            border-radius: 32px;
+            object-fit: cover;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 34px;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
         }
 
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 15px;
+        .auth-subtitle {
+            color: var(--ios-text-secondary);
+            font-size: 17px;
         }
 
-        .input-field {
+        .ios-input {
             width: 100%;
-            padding: 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 15px;
+            padding: 18px 20px;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            border-radius: 14px;
+            color: var(--ios-text);
+            font-size: 17px;
             margin-bottom: 16px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
 
-        .input-field:focus {
-            border-color: var(--gradient-blue);
+        .ios-input:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
         }
 
-        .button-group {
-            display: flex;
-            gap: 12px;
+        .ios-input::placeholder {
+            color: var(--ios-gray);
+        }
+
+        /* Language Selector */
+        .language-selector {
             margin-bottom: 24px;
         }
 
-        .button-group .btn-gradient {
-            flex: 1;
+        .language-label {
+            color: var(--ios-text-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .or-text {
-            text-align: center;
-            color: var(--text-secondary);
-            margin: 16px 0;
-            font-size: 14px;
+        .language-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .language-option {
+            padding: 10px 20px;
+            background: var(--ios-glass);
+            border: 2px solid var(--ios-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .language-option.active {
+            border-color: var(--ios-blue);
+            background: rgba(10, 132, 255, 0.2);
+            color: var(--ios-blue);
         }
 
         /* Header */
         .header {
-            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--ios-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--border-color);
         }
 
-        .logo {
-            font-size: 20px;
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .header-title {
+            font-size: 22px;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -199,58 +323,150 @@
         .header-actions {
             display: flex;
             gap: 16px;
-            align-items: center;
         }
 
-        .header-actions i {
-            font-size: 18px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .header-actions i:hover {
-            color: var(--text-primary);
-        }
-
-        /* Search */
-        .search-container {
-            position: relative;
-            margin: 16px 20px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 16px 12px 44px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+        .header-icon {
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 15px;
-            outline: none;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--ios-text);
+            font-size: 18px;
         }
 
-        .search-icon {
+        .header-icon:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin: 16px 20px;
+            position: relative;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+        }
+
+        .search-icon-left {
             position: absolute;
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-secondary);
+            color: var(--ios-gray);
+            font-size: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            border-radius: 14px;
+            color: var(--ios-text);
+            font-size: 16px;
+            outline: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input:focus {
+            border-color: var(--ios-blue);
+        }
+
+        /* iOS Style Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-top: 1px solid var(--ios-border);
+            padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 64px;
+        }
+
+        .nav-item:active {
+            transform: scale(0.92);
+        }
+
+        .nav-item.active {
+            background: rgba(10, 132, 255, 0.15);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            color: var(--ios-text-secondary);
+            transition: all 0.3s;
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--ios-blue);
+            transform: scale(1.1);
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ios-text-secondary);
+            transition: all 0.3s;
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--ios-blue);
+            font-weight: 600;
         }
 
         /* Share Section */
         .share-section {
             margin: 20px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .share-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            z-index: -1;
         }
 
         .share-title {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--ios-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -258,41 +474,43 @@
 
         .share-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
         }
 
-        .share-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+        .share-button {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
 
-        .share-btn:active {
-            transform: scale(0.95);
+        .share-button:active {
+            transform: scale(0.9) rotate(-5deg);
         }
 
         .share-whatsapp { background: #25D366; }
         .share-facebook { background: #1877F2; }
         .share-twitter { background: #1DA1F2; }
         .share-telegram { background: #0088cc; }
-        .share-copy { background: var(--bg-elevated); }
+        .share-copy { background: var(--ios-card-solid); }
 
         /* Carousel */
-        .carousel {
+        .carousel-container {
             margin: 20px;
-            height: 200px;
-            border-radius: 16px;
+            height: 220px;
+            border-radius: 24px;
             overflow: hidden;
             position: relative;
-            background: var(--bg-card);
+            box-shadow: var(--shadow-ios);
         }
 
         .carousel-slide {
@@ -300,7 +518,7 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.5s;
+            transition: opacity 0.6s ease;
         }
 
         .carousel-slide.active {
@@ -313,16 +531,48 @@
             object-fit: cover;
         }
 
-        /* Section Title */
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 24px 20px 16px;
-            color: var(--text-primary);
+        .carousel-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
         }
 
-        /* Grid */
-        .grid {
+        .carousel-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .carousel-desc {
+            font-size: 14px;
+            color: var(--ios-light-gray);
+        }
+
+        /* Section Title */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 28px 20px 16px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .see-all {
+            color: var(--ios-blue);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Content Grid */
+        .content-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
@@ -330,83 +580,140 @@
         }
 
         @media (max-width: 480px) {
-            .grid {
+            .content-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        .card {
-            background: var(--bg-card);
-            border-radius: 12px;
+        .content-card {
+            position: relative;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s;
             cursor: pointer;
-        }
-
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .card img {
-            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             aspect-ratio: 2/3;
+            background: var(--ios-card-solid);
+        }
+
+        .content-card:active {
+            transform: scale(0.95);
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.3s;
         }
 
-        .card-info {
-            padding: 10px;
+        .content-card:hover img {
+            transform: scale(1.05);
         }
 
-        .card-title {
+        .content-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+        }
+
+        .content-title {
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
+        .locked-overlay {
+            position: absolute;
+            top: 0;
             left: 0;
             right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 8px 16px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
+            justify-content: center;
+            border-radius: 16px;
         }
 
-        .nav-item.active {
-            color: var(--gradient-blue);
+        .lock-icon {
+            font-size: 32px;
+            color: white;
         }
 
-        .nav-item i {
-            font-size: 22px;
+        /* Category Tags */
+        .category-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
-        .nav-item span {
-            font-size: 11px;
+        .category-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tag {
+            padding: 10px 20px;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
 
-        /* Modal */
+        .category-tag:active {
+            transform: scale(0.95);
+        }
+
+        .category-tag.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* Premium Video Player */
+        .video-js {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        .video-js .vjs-big-play-button {
+            background: rgba(10, 132, 255, 0.9) !important;
+            border: none !important;
+            border-radius: 50% !important;
+            width: 70px !important;
+            height: 70px !important;
+            line-height: 70px !important;
+            font-size: 32px !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 8px 32px rgba(10, 132, 255, 0.5);
+        }
+
+        .video-js .vjs-control-bar {
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+        }
+
+        .video-js .vjs-play-progress {
+            background: var(--ios-blue) !important;
+        }
+
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -414,60 +721,95 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 7000;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 20000;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
         .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 28px;
+            background: var(--ios-card-solid);
+            border-radius: 28px;
+            padding: 32px;
             width: 100%;
-            max-width: 400px;
-            border: 1px solid var(--border-color);
-            text-align: center;
+            max-width: 420px;
+            border: 1px solid var(--ios-border);
+            box-shadow: var(--shadow-ios);
+            animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-title {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 12px;
+            text-align: center;
         }
 
         .modal-text {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            font-size: 15px;
+            color: var(--ios-text-secondary);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 28px;
+            line-height: 1.5;
         }
 
-        .close-modal {
+        .modal-close {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            color: var(--text-secondary);
-            font-size: 24px;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            color: var(--ios-text);
+            font-size: 18px;
+            transition: all 0.3s;
         }
 
-        /* Toast */
+        .modal-close:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Toast Notification */
         #toast {
             position: fixed;
-            bottom: 100px;
+            bottom: 120px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: var(--bg-elevated);
+            background: var(--ios-card-solid);
             color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            z-index: 9000;
+            padding: 16px 28px;
+            border-radius: 16px;
+            border: 1px solid var(--ios-border);
+            box-shadow: var(--shadow-ios);
+            z-index: 30000;
             opacity: 0;
-            transition: all 0.3s;
-            border: 1px solid var(--border-color);
-            font-size: 14px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(20px);
         }
 
         #toast.show {
@@ -475,50 +817,83 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Page */
+        /* Pages */
         .page {
             display: none;
+            animation: pageFade 0.3s ease;
         }
 
         .page.active {
             display: block;
         }
 
-        /* Profile */
+        @keyframes pageFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Profile Page */
         .profile-header {
             margin: 20px;
-            padding: 24px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
+            padding: 32px;
+            border-radius: 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: var(--gradient-primary);
+            opacity: 0.2;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-name {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-email {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 16px;
+            color: var(--ios-text-secondary);
+            font-size: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        .profile-status {
+        .profile-badge {
             display: inline-block;
-            padding: 6px 12px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 8px 20px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
+            position: relative;
+            z-index: 1;
         }
 
-        .menu-list {
-            margin: 0 20px 20px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
+        .menu-section {
+            margin: 0 20px 24px;
+            border-radius: 20px;
             overflow: hidden;
         }
 
@@ -526,10 +901,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 18px 20px;
+            background: var(--ios-glass);
+            border-bottom: 1px solid var(--ios-border);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
 
         .menu-item:last-child {
@@ -537,186 +914,168 @@
         }
 
         .menu-item:active {
-            background: var(--bg-elevated);
+            background: rgba(255, 255, 255, 0.12);
         }
 
-        .menu-item-left {
+        .menu-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .menu-item i {
-            font-size: 18px;
-            color: var(--text-secondary);
-            width: 24px;
+        .menu-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: var(--ios-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-blue);
+            font-size: 16px;
         }
 
-        .menu-item span {
-            font-size: 15px;
-            color: var(--text-primary);
+        .menu-text {
+            font-size: 17px;
+            font-weight: 500;
         }
 
-        .menu-item .chevron {
-            color: var(--text-secondary);
+        .menu-chevron {
+            color: var(--ios-gray);
             font-size: 14px;
         }
 
         /* Chat */
         .chat-container {
-            height: calc(100vh - 180px);
+            height: calc(100vh - 200px);
             display: flex;
             flex-direction: column;
             margin: 20px;
+            border-radius: 24px;
+            overflow: hidden;
         }
 
-        .chat-box {
+        .chat-messages {
             flex: 1;
             overflow-y: auto;
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .message {
-            margin-bottom: 12px;
-            padding: 12px 16px;
-            border-radius: 16px;
-            max-width: 80%;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message-user {
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message-admin {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-color);
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-input-container {
+            padding: 20px;
             display: flex;
-            gap: 8px;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.4;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background: var(--gradient-primary);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .chat-message.admin {
+            align-self: flex-start;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            border-bottom-left-radius: 6px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: var(--ios-card-solid);
+            border-top: 1px solid var(--ios-border);
         }
 
         .chat-input {
             flex: 1;
-            padding: 14px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 15px;
+            padding: 14px 20px;
+            background: var(--ios-glass);
+            border: 1px solid var(--ios-border);
+            border-radius: 24px;
+            color: var(--ios-text);
+            font-size: 16px;
             outline: none;
         }
 
-        .send-btn {
+        .chat-send {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
+            border-radius: 50%;
+            background: var(--gradient-primary);
             border: none;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
         }
 
-        /* Loading text */
-        .loading-text {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-secondary);
-            font-size: 14px;
+        .chat-send:active {
+            transform: scale(0.92);
         }
 
-        /* Category buttons */
-        .category-tags {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 0 20px;
-            margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-
-        .category-tags::-webkit-scrollbar {
-            display: none;
-        }
-
-        .category-tag {
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .category-tag.active {
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-blue));
-            border-color: transparent;
-        }
-
-        /* Betting card */
-        .bet-card {
-            margin: 16px 20px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .bet-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .bet-match {
-            background: var(--bg-elevated);
-            padding: 16px;
+        /* Loading States */
+        .loading-skeleton {
+            background: linear-gradient(90deg, var(--ios-glass) 25%, var(--ios-border) 50%, var(--ios-glass) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
             border-radius: 12px;
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 12px;
         }
 
-        .bet-odds {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
-        .booking-code {
-            background: linear-gradient(90deg, rgba(255, 165, 2, 0.2), rgba(255, 165, 2, 0.1));
-            border: 1px solid var(--warning);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-            color: var(--warning);
-            cursor: pointer;
+        /* Responsive */
+        @media (max-width: 380px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-label {
+                font-size: 10px;
+            }
         }
 
-        /* Hide scrollbar */
+        /* Scrollbar Styling */
         ::-webkit-scrollbar {
-            width: 0px;
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
             background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--ios-gray);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ios-light-gray);
         }
     </style>
 </head>
@@ -724,37 +1083,71 @@
 
     <!-- Loader -->
     <div id="loader">
-        <div class="spinner"></div>
+        <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV" class="loader-logo">
+        <div class="ios-spinner"></div>
     </div>
 
     <!-- Toast -->
-    <div id="toast"></div>
+    <div id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Notification</span>
+    </div>
 
     <!-- Auth Screen -->
     <div id="authPages" class="auth-screen">
-        <div id="loginPage" class="auth-card">
-            <div class="auth-header">
-                <h1>STANY MIN TV</h1>
-                <p>Karibu tena</p>
-            </div>
-            <input type="email" id="lemail" class="input-field" placeholder="Barua pepe">
-            <input type="password" id="lpass" class="input-field" placeholder="Nenosiri">
-            <button class="btn-gradient" onclick="login()">Ingia</button>
-            <p class="or-text">au</p>
-            <button class="btn-gradient" style="background: var(--bg-elevated); border: 1px solid var(--border-color);" onclick="showRegister()">Jisajili</button>
-        </div>
+        <div class="auth-container">
+            <div id="loginPage">
+                <div class="auth-logo">
+                    <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV">
+                    <h1 class="auth-title" data-i18n="appTitle">STANY MIN TV</h1>
+                    <p class="auth-subtitle" data-i18n="welcomeBack">Welcome Back</p>
+                </div>
+                
+                <div class="language-selector">
+                    <div class="language-label" data-i18n="selectLanguage">Select Language</div>
+                    <div class="language-options">
+                        <div class="language-option active" onclick="changeLanguage('en')" data-lang="en">English</div>
+                        <div class="language-option" onclick="changeLanguage('sw')" data-lang="sw">Kiswahili</div>
+                        <div class="language-option" onclick="changeLanguage('fr')" data-lang="fr">Français</div>
+                    </div>
+                </div>
 
-        <div id="regPage" class="auth-card" style="display:none;">
-            <div class="auth-header">
-                <h1>Unda Akaunti</h1>
-                <p>Jiunge nasi leo</p>
+                <input type="email" id="lemail" class="ios-input" data-i18n-placeholder="email" placeholder="Email">
+                <input type="password" id="lpass" class="ios-input" data-i18n-placeholder="password" placeholder="Password">
+                <button class="ios-button ios-button-large" onclick="login()" data-i18n="signIn">Sign In</button>
+                
+                <p style="text-align: center; margin-top: 24px; color: var(--ios-text-secondary);">
+                    <span data-i18n="noAccount">Don't have an account?</span>
+                    <span style="color: var(--ios-blue); cursor: pointer; margin-left: 8px;" onclick="showRegister()" data-i18n="signUp">Sign Up</span>
+                </p>
             </div>
-            <input type="text" id="rname" class="input-field" placeholder="Jina kamili">
-            <input type="email" id="remail" class="input-field" placeholder="Barua pepe">
-            <input type="password" id="rpass" class="input-field" placeholder="Nenosiri">
-            <button class="btn-gradient" onclick="register()">Jisajili</button>
-            <p class="or-text">Tayari una akaunti?</p>
-            <button class="btn-gradient" style="background: var(--bg-elevated); border: 1px solid var(--border-color);" onclick="showLogin()">Ingia</button>
+
+            <div id="regPage" style="display:none;">
+                <div class="auth-logo">
+                    <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="STANY MIN TV">
+                    <h1 class="auth-title" data-i18n="createAccount">Create Account</h1>
+                    <p class="auth-subtitle" data-i18n="joinUs">Join Us Today</p>
+                </div>
+
+                <div class="language-selector">
+                    <div class="language-label" data-i18n="selectLanguage">Select Language</div>
+                    <div class="language-options">
+                        <div class="language-option active" onclick="changeLanguage('en')" data-lang="en">English</div>
+                        <div class="language-option" onclick="changeLanguage('sw')" data-lang="sw">Kiswahili</div>
+                        <div class="language-option" onclick="changeLanguage('fr')" data-lang="fr">Français</div>
+                    </div>
+                </div>
+
+                <input type="text" id="rname" class="ios-input" data-i18n-placeholder="fullName" placeholder="Full Name">
+                <input type="email" id="remail" class="ios-input" data-i18n-placeholder="email" placeholder="Email">
+                <input type="password" id="rpass" class="ios-input" data-i18n-placeholder="password" placeholder="Password">
+                <button class="ios-button ios-button-large" onclick="register()" data-i18n="createAccount">Create Account</button>
+                
+                <p style="text-align: center; margin-top: 24px; color: var(--ios-text-secondary);">
+                    <span data-i18n="haveAccount">Already have an account?</span>
+                    <span style="color: var(--ios-blue); cursor: pointer; margin-left: 8px;" onclick="showLogin()" data-i18n="signIn">Sign In</span>
+                </p>
+            </div>
         </div>
     </div>
 
@@ -762,102 +1155,123 @@
     <div id="mainApp" style="display:none;">
         <!-- Header -->
         <div class="header">
-            <div class="logo">STANY MIN TV</div>
+            <div class="header-logo">
+                <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="Logo">
+                <div class="header-title">STANY MIN TV</div>
+            </div>
             <div class="header-actions">
-                <i class="fas fa-search" onclick="toggleSearch()"></i>
-                <i class="fas fa-bell" onclick="showNotifications()"></i>
+                <div class="header-icon" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="header-icon" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                </div>
             </div>
         </div>
 
-        <!-- Search -->
-        <div class="search-container" id="searchContainer" style="display:none;">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Tafuta..." onkeyup="globalSearch()">
+        <!-- Search Bar -->
+        <div class="search-bar" id="searchBar" style="display:none;">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon-left"></i>
+                <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="search" placeholder="Search..." onkeyup="globalSearch()">
+            </div>
         </div>
 
         <!-- HOME PAGE -->
         <div id="home" class="page active">
             <!-- Share Section -->
-            <div class="share-section">
+            <div class="share-section ios-card">
                 <div class="share-title">
                     <i class="fas fa-share-alt"></i>
-                    <span>Shiriki STANY MIN TV</span>
+                    <span data-i18n="shareApp">Share STANY MIN TV</span>
                 </div>
                 <div class="share-buttons">
-                    <button class="share-btn share-whatsapp" onclick="shareApp('whatsapp')">
+                    <button class="share-button share-whatsapp" onclick="shareApp('whatsapp')">
                         <i class="fab fa-whatsapp"></i>
                     </button>
-                    <button class="share-btn share-facebook" onclick="shareApp('facebook')">
+                    <button class="share-button share-facebook" onclick="shareApp('facebook')">
                         <i class="fab fa-facebook-f"></i>
                     </button>
-                    <button class="share-btn share-twitter" onclick="shareApp('twitter')">
+                    <button class="share-button share-twitter" onclick="shareApp('twitter')">
                         <i class="fab fa-twitter"></i>
                     </button>
-                    <button class="share-btn share-telegram" onclick="shareApp('telegram')">
+                    <button class="share-button share-telegram" onclick="shareApp('telegram')">
                         <i class="fab fa-telegram-plane"></i>
                     </button>
-                    <button class="share-btn share-copy" onclick="copyLink()">
+                    <button class="share-button share-copy" onclick="copyLink()">
                         <i class="fas fa-link"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Carousel -->
-            <div class="carousel" id="carousel">
-                <div class="loading-text">Inapakia...</div>
+            <div class="carousel-container ios-card" id="carousel">
+                <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--ios-text-secondary);">
+                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
+                    <span data-i18n="loading">Loading...</span>
+                </div>
             </div>
 
             <!-- Categories -->
-            <div class="category-tags" id="catTags"></div>
+            <div class="category-scroll" id="categoryTags"></div>
 
-            <!-- Channels -->
-            <h3 class="section-title">Vitanzi Moja Kwa Moja</h3>
-            <div class="grid" id="chanGrid">
-                <div class="loading-text">Inapakia...</div>
+            <!-- Live Channels -->
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="liveChannels">Live Channels</h2>
+                <span class="see-all" data-i18n="seeAll">See All</span>
+            </div>
+            <div class="content-grid" id="chanGrid">
+                <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--ios-text-secondary);">
+                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
+                    <span data-i18n="loading">Loading...</span>
+                </div>
             </div>
 
             <!-- Movies -->
-            <h3 class="section-title">Filamu</h3>
-            <div class="grid" id="movGrid">
-                <div class="loading-text">Inapakia...</div>
+            <div class="section-header">
+                <h2 class="section-title" data-i18n="movies">Movies</h2>
+                <span class="see-all" data-i18n="seeAll">See All</span>
+            </div>
+            <div class="content-grid" id="movGrid">
+                <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--ios-text-secondary);">
+                    <i class="fas fa-spinner fa-spin" style="margin-right:12px;"></i>
+                    <span data-i18n="loading">Loading...</span>
+                </div>
             </div>
         </div>
 
         <!-- CATEGORIES PAGE -->
         <div id="cats" class="page">
-            <h3 class="section-title">Aina</h3>
-            <div id="catContent">
-                <div class="loading-text">Inapakia...</div>
-            </div>
+            <h2 class="section-title" style="margin:20px;" data-i18n="categories">Categories</h2>
+            <div id="catContent"></div>
         </div>
 
         <!-- DOWNLOADS PAGE -->
         <div id="downloads" class="page">
-            <h3 class="section-title">Vilivyopakuliwa</h3>
-            <div id="dlContent">
-                <div class="loading-text">Hakuna vitu vya kupakua</div>
+            <h2 class="section-title" style="margin:20px;" data-i18n="downloads">Downloads</h2>
+            <div id="dlContent" style="padding:40px 20px; text-align:center; color:var(--ios-text-secondary);">
+                <i class="fas fa-download" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i>
+                <p data-i18n="noDownloads">No downloads yet</p>
             </div>
         </div>
 
         <!-- TIPS PAGE -->
         <div id="tips" class="page">
-            <h3 class="section-title">Vidokezo vya Kubeti</h3>
-            <div id="tipsContent">
-                <div class="loading-text">Inapakia...</div>
-            </div>
+            <h2 class="section-title" style="margin:20px;" data-i18n="bettingTips">Betting Tips</h2>
+            <div id="tipsContent" style="padding:0 20px;"></div>
         </div>
 
         <!-- CHAT PAGE -->
         <div id="bot" class="page">
-            <div class="chat-container">
-                <div class="chat-box" id="chatBox">
-                    <div class="message message-admin">
-                        Karibu! Tunaweza kukusaidia vipi leo?
+            <div class="chat-container ios-card">
+                <div class="chat-messages" id="chatBox">
+                    <div class="chat-message admin" data-i18n="welcomeChat">
+                        Welcome! How can we help you today?
                     </div>
                 </div>
-                <div class="chat-input-container">
-                    <input type="text" id="chatInput" class="chat-input" placeholder="Andika ujumbe...">
-                    <button class="send-btn" onclick="sendChat()">
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" data-i18n-placeholder="typeMessage" placeholder="Type a message...">
+                    <button class="chat-send" onclick="sendChat()">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -866,118 +1280,139 @@
 
         <!-- PROFILE PAGE -->
         <div id="profile" class="page">
-            <div class="profile-header">
-                <div class="profile-name" id="pName">Mtumiaji</div>
+            <div class="profile-header ios-card">
+                <img src="https://raw.githubusercontent.com/stanytz380/IAMLEGEND/refs/heads/main/IMG_1637.jpeg" alt="Profile" class="profile-avatar">
+                <div class="profile-name" id="pName">User</div>
                 <div class="profile-email" id="pEmail">email@example.com</div>
-                <div class="profile-status" id="pDays">Siku 7 zimebaki</div>
+                <div class="profile-badge" id="pDays">7 days left</div>
             </div>
 
-            <div class="menu-list">
+            <div class="menu-section ios-card">
                 <div class="menu-item" onclick="quickRefresh()">
-                    <div class="menu-item-left">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Onyesha Upya</span>
+                    <div class="menu-left">
+                        <div class="menu-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <span class="menu-text" data-i18n="refresh">Refresh</span>
                     </div>
-                    <i class="fas fa-chevron-right chevron"></i>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
-                <div class="menu-item" onclick="showLogoutConfirm()">
-                    <div class="menu-item-left">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Toka</span>
+                <div class="menu-item" onclick="showLanguageSettings()">
+                    <div class="menu-left">
+                        <div class="menu-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <span class="menu-text" data-i18n="language">Language</span>
                     </div>
-                    <i class="fas fa-chevron-right chevron"></i>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
             </div>
 
-            <div class="menu-list">
-                <div class="menu-item">
-                    <div class="menu-item-left">
-                        <i class="fas fa-lock"></i>
-                        <span>Nenosiri la Vitanzi</span>
+            <div class="menu-section ios-card">
+                <div class="menu-item" onclick="showLogoutConfirm()">
+                    <div class="menu-left">
+                        <div class="menu-icon" style="color:var(--ios-red);">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <span class="menu-text" style="color:var(--ios-red);" data-i18n="logout">Logout</span>
                     </div>
-                    <i class="fas fa-chevron-right chevron"></i>
+                    <i class="fas fa-chevron-right menu-chevron"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Navigation - iOS Style -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="nav('home', this)">
-                <i class="fas fa-home"></i>
-                <span>Nyumbani</span>
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label" data-i18n="navHome">Home</span>
             </div>
             <div class="nav-item" onclick="nav('cats', this)">
-                <i class="fas fa-th-large"></i>
-                <span>Aina</span>
+                <i class="fas fa-th-large nav-icon"></i>
+                <span class="nav-label" data-i18n="navCategories">Categories</span>
             </div>
             <div class="nav-item" onclick="nav('downloads', this)">
-                <i class="fas fa-download"></i>
-                <span>Pakua</span>
+                <i class="fas fa-download nav-icon"></i>
+                <span class="nav-label" data-i18n="navDownloads">Downloads</span>
             </div>
             <div class="nav-item" onclick="nav('tips', this)">
-                <i class="fas fa-futbol"></i>
-                <span>Beti</span>
+                <i class="fas fa-futbol nav-icon"></i>
+                <span class="nav-label" data-i18n="navTips">Tips</span>
             </div>
             <div class="nav-item" onclick="nav('bot', this)">
-                <i class="fas fa-comments"></i>
-                <span>Msaada</span>
+                <i class="fas fa-comments nav-icon"></i>
+                <span class="nav-label" data-i18n="navChat">Chat</span>
             </div>
             <div class="nav-item" onclick="nav('profile', this)">
-                <i class="fas fa-user"></i>
-                <span>Mimi</span>
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label" data-i18n="navProfile">Profile</span>
             </div>
         </div>
     </div>
 
     <!-- Modals -->
     <div id="logoutModal" class="modal">
-        <div class="modal-content" style="position: relative;">
-            <h3 class="modal-title">Toka</h3>
-            <p class="modal-text">Je! Una uhakika unataka kutoka sasa?</p>
-            <button class="btn-gradient" onclick="confirmLogout()" style="margin-bottom: 12px;">Ndio</button>
-            <button class="btn-gradient" onclick="cancelLogout()" style="background: var(--bg-elevated); border: 1px solid var(--border-color);">Ghairi</button>
+        <div class="modal-content" style="position:relative;">
+            <div class="modal-close" onclick="cancelLogout()">
+                <i class="fas fa-times"></i>
+            </div>
+            <div style="text-align:center; margin-bottom:24px;">
+                <i class="fas fa-sign-out-alt" style="font-size:48px; color:var(--ios-red); margin-bottom:16px;"></i>
+            </div>
+            <h3 class="modal-title" data-i18n="logout">Logout</h3>
+            <p class="modal-text" data-i18n="confirmLogout">Are you sure you want to logout?</p>
+            <button class="ios-button" onclick="confirmLogout()" style="margin-bottom:12px; background:var(--ios-red);" data-i18n="yesLogout">Yes, Logout</button>
+            <button class="ios-button ios-button-secondary" onclick="cancelLogout()" data-i18n="cancel">Cancel</button>
         </div>
     </div>
 
     <div id="detailModal" class="modal">
-        <div class="modal-content" style="position: relative;">
-            <i class="fas fa-times close-modal" onclick="closeDetailModal()"></i>
-            <img id="dImg" src="" style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:16px;">
-            <h3 id="dTitle" class="modal-title"></h3>
-            <p id="dDesc" class="modal-text"></p>
+        <div class="modal-content" style="position:relative; max-width:500px;">
+            <div class="modal-close" onclick="closeDetailModal()">
+                <i class="fas fa-times"></i>
+            </div>
+            <img id="dImg" src="" style="width:100%; height:220px; object-fit:cover; border-radius:16px; margin-bottom:20px;">
+            <h3 class="modal-title" id="dTitle"></h3>
+            <p class="modal-text" id="dDesc" style="text-align:left;"></p>
             
             <!-- Share in modal -->
-            <div class="share-section" style="margin: 16px 0;">
+            <div class="share-section ios-card" style="margin:20px 0;">
                 <div class="share-title">
                     <i class="fas fa-share-alt"></i>
-                    <span>Shiriki</span>
+                    <span data-i18n="shareThis">Share This</span>
                 </div>
                 <div class="share-buttons">
-                    <button class="share-btn share-whatsapp" onclick="shareContent('whatsapp')">
+                    <button class="share-button share-whatsapp" onclick="shareContent('whatsapp')">
                         <i class="fab fa-whatsapp"></i>
                     </button>
-                    <button class="share-btn share-facebook" onclick="shareContent('facebook')">
+                    <button class="share-button share-facebook" onclick="shareContent('facebook')">
                         <i class="fab fa-facebook-f"></i>
                     </button>
-                    <button class="share-btn share-twitter" onclick="shareContent('twitter')">
+                    <button class="share-button share-twitter" onclick="shareContent('twitter')">
                         <i class="fab fa-twitter"></i>
                     </button>
-                    <button class="share-btn share-copy" onclick="copyContentLink()">
+                    <button class="share-button share-copy" onclick="copyContentLink()">
                         <i class="fas fa-link"></i>
                     </button>
                 </div>
             </div>
 
-            <button class="btn-gradient" id="dBtn">Tazama Sasa</button>
+            <button class="ios-button ios-button-large" id="dBtn" data-i18n="watchNow">Watch Now</button>
         </div>
     </div>
 
-    <div id="playerModal" class="modal" style="padding:0;">
-        <div style="width:100%; height:100%; background:#000; position:relative;">
-            <i class="fas fa-times" onclick="closePlayer()" style="position:absolute; top:20px; right:20px; color:white; font-size:24px; z-index:100; cursor:pointer;"></i>
-            <video id="videoJS" class="video-js vjs-default-skin" controls style="width:100%; height:100%;"></video>
+    <div id="playerModal" class="modal" style="padding:0; background:#000;">
+        <div style="width:100%; height:100%; position:relative;">
+            <div class="modal-close" onclick="closePlayer()" style="top:20px; right:20px; z-index:100; background:rgba(0,0,0,0.6);">
+                <i class="fas fa-times"></i>
+            </div>
+            <video id="videoJS" class="video-js vjs-fluid vjs-big-play-centered" controls preload="auto" data-setup='{}'></video>
         </div>
     </div>
+
+    <!-- Video.js -->
+    <script src="https://unpkg.com/video.js@8.6.1/dist/video.min.js"></script>
+    <script src="https://unpkg.com/@videojs/http-streaming@3.1.0/dist/videojs-http-streaming.min.js"></script>
 
     <script>
         // Firebase Config
@@ -995,47 +1430,200 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // Translations
+        const translations = {
+            en: {
+                appTitle: 'STANY MIN TV',
+                welcomeBack: 'Welcome Back',
+                createAccount: 'Create Account',
+                joinUs: 'Join Us Today',
+                selectLanguage: 'Select Language',
+                email: 'Email',
+                password: 'Password',
+                fullName: 'Full Name',
+                signIn: 'Sign In',
+                signUp: 'Sign Up',
+                noAccount: "Don't have an account?",
+                haveAccount: 'Already have an account?',
+                shareApp: 'Share STANY MIN TV',
+                loading: 'Loading...',
+                liveChannels: 'Live Channels',
+                movies: 'Movies',
+                seeAll: 'See All',
+                categories: 'Categories',
+                downloads: 'Downloads',
+                bettingTips: 'Betting Tips',
+                welcomeChat: 'Welcome! How can we help you today?',
+                typeMessage: 'Type a message...',
+                refresh: 'Refresh',
+                language: 'Language',
+                logout: 'Logout',
+                confirmLogout: 'Are you sure you want to logout?',
+                yesLogout: 'Yes, Logout',
+                cancel: 'Cancel',
+                shareThis: 'Share This',
+                watchNow: 'Watch Now',
+                navHome: 'Home',
+                navCategories: 'Categories',
+                navDownloads: 'Downloads',
+                navTips: 'Tips',
+                navChat: 'Chat',
+                navProfile: 'Profile',
+                search: 'Search...',
+                noDownloads: 'No downloads yet'
+            },
+            sw: {
+                appTitle: 'STANY MIN TV',
+                welcomeBack: 'Karibu Tena',
+                createAccount: 'Unda Akaunti',
+                joinUs: 'Jiunge Nasi Leo',
+                selectLanguage: 'Chagua Lugha',
+                email: 'Barua Pepe',
+                password: 'Nenosiri',
+                fullName: 'Jina Kamili',
+                signIn: 'Ingia',
+                signUp: 'Jisajili',
+                noAccount: 'Huna akaunti?',
+                haveAccount: 'Tayari una akaunti?',
+                shareApp: 'Shiriki STANY MIN TV',
+                loading: 'Inapakia...',
+                liveChannels: 'Vitanzi Moja Kwa Moja',
+                movies: 'Filamu',
+                seeAll: 'Ona Zote',
+                categories: 'Aina',
+                downloads: 'Vilivyopakuliwa',
+                bettingTips: 'Vidokezo vya Kubeti',
+                welcomeChat: 'Karibu! Tunaweza kukusaidia vipi leo?',
+                typeMessage: 'Andika ujumbe...',
+                refresh: 'Onyesha Upya',
+                language: 'Lugha',
+                logout: 'Toka',
+                confirmLogout: 'Una uhakika unataka kutoka?',
+                yesLogout: 'Ndio, Toka',
+                cancel: 'Ghairi',
+                shareThis: 'Shiriki Hii',
+                watchNow: 'Tazama Sasa',
+                navHome: 'Nyumbani',
+                navCategories: 'Aina',
+                navDownloads: 'Pakua',
+                navTips: 'Vidokezo',
+                navChat: 'Msaada',
+                navProfile: 'Mimi',
+                search: 'Tafuta...',
+                noDownloads: 'Hakuna vilivyopakuliwa'
+            },
+            fr: {
+                appTitle: 'STANY MIN TV',
+                welcomeBack: 'Bon Retour',
+                createAccount: 'Créer un Compte',
+                joinUs: 'Rejoignez-nous',
+                selectLanguage: 'Choisir la Langue',
+                email: 'Email',
+                password: 'Mot de passe',
+                fullName: 'Nom Complet',
+                signIn: 'Se Connecter',
+                signUp: "S'inscrire",
+                noAccount: "Vous n'avez pas de compte?",
+                haveAccount: 'Vous avez déjà un compte?',
+                shareApp: 'Partager STANY MIN TV',
+                loading: 'Chargement...',
+                liveChannels: 'Chaînes en Direct',
+                movies: 'Films',
+                seeAll: 'Voir Tout',
+                categories: 'Catégories',
+                downloads: 'Téléchargements',
+                bettingTips: 'Conseils de Paris',
+                welcomeChat: 'Bienvenue! Comment pouvons-nous vous aider?',
+                typeMessage: 'Écrivez un message...',
+                refresh: 'Rafraîchir',
+                language: 'Langue',
+                logout: 'Déconnexion',
+                confirmLogout: 'Êtes-vous sûr de vouloir vous déconnecter?',
+                yesLogout: 'Oui, Déconnexion',
+                cancel: 'Annuler',
+                shareThis: 'Partager',
+                watchNow: 'Regarder',
+                navHome: 'Accueil',
+                navCategories: 'Catégories',
+                navDownloads: 'Télécharger',
+                navTips: 'Conseils',
+                navChat: 'Chat',
+                navProfile: 'Profil',
+                search: 'Rechercher...',
+                noDownloads: 'Aucun téléchargement'
+            }
+        };
+
+        let currentLang = localStorage.getItem('language') || 'en';
+
+        // Initialize i18n
+        function initI18n() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang][key]) {
+                    el.placeholder = translations[currentLang][key];
+                }
+            });
+
+            // Update language selector
+            document.querySelectorAll('.language-option').forEach(opt => {
+                opt.classList.toggle('active', opt.getAttribute('data-lang') === currentLang);
+            });
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            initI18n();
+        }
+
+        // Global Variables
         let currentUser = null;
         let userIsExpired = false;
-        let allData = {movies:[], channels:[]};
+        let allData = { movies: [], channels: [] };
         let player = null;
-        let deviceId = localStorage.getItem('did') || 'dev_'+Date.now();
+        let deviceId = localStorage.getItem('did') || 'dev_' + Date.now();
         localStorage.setItem('did', deviceId);
 
         // Auth State
         auth.onAuthStateChanged(u => {
-            if(u) {
-                document.getElementById('authPages').style.display='none';
-                document.getElementById('loader').style.display='flex';
+            if (u) {
+                document.getElementById('authPages').style.display = 'none';
+                document.getElementById('loader').style.display = 'flex';
                 setTimeout(() => checkDevice(u.uid), 1000);
             } else {
-                document.getElementById('authPages').style.display='flex';
-                document.getElementById('mainApp').style.display='none';
-                document.getElementById('loader').style.display='none';
+                document.getElementById('authPages').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loader').style.display = 'none';
             }
         });
 
         function showRegister() {
-            document.getElementById('loginPage').style.display='none';
-            document.getElementById('regPage').style.display='block';
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('regPage').style.display = 'block';
         }
 
         function showLogin() {
-            document.getElementById('regPage').style.display='none';
-            document.getElementById('loginPage').style.display='block';
+            document.getElementById('regPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'block';
         }
 
         function login() {
             const email = document.getElementById('lemail').value;
             const password = document.getElementById('lpass').value;
-            if(!email || !password) {
-                showToast('Tafaza ingiza barua pepe na nenosiri');
+            if (!email || !password) {
+                showToast(currentLang === 'sw' ? 'Tafaza ingiza barua pepe na nenosiri' : 'Please enter email and password');
                 return;
             }
             auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showToast('Umeingia kwa mafanikio');
-                })
+                .then(() => showToast(currentLang === 'sw' ? 'Umeingia kwa mafanikio' : 'Signed in successfully'))
                 .catch(e => showToast(e.message));
         }
 
@@ -1043,8 +1631,8 @@
             const name = document.getElementById('rname').value;
             const email = document.getElementById('remail').value;
             const password = document.getElementById('rpass').value;
-            if(!name || !email || !password) {
-                showToast('Tafaza jaza sehemu zote');
+            if (!name || !email || !password) {
+                showToast(currentLang === 'sw' ? 'Tafaza jaza sehemu zote' : 'Please fill all fields');
                 return;
             }
             auth.createUserWithEmailAndPassword(email, password)
@@ -1052,65 +1640,78 @@
                     return db.ref('users/' + user.user.uid).set({
                         name: name,
                         email: email,
+                        language: currentLang,
                         activeDeviceId: deviceId,
                         registeredAt: Date.now(),
                         accessExpiry: Date.now() + (7 * 24 * 60 * 60 * 1000)
                     });
                 })
-                .then(() => showToast('Usajili umekamilika'))
+                .then(() => showToast(currentLang === 'sw' ? 'Usajili umekamilika' : 'Registration successful'))
                 .catch(e => showToast(e.message));
         }
 
         function checkDevice(uid) {
-            db.ref('users/'+uid).once('value').then(snap => {
+            db.ref('users/' + uid).once('value').then(snap => {
                 const u = snap.val();
-                if(!u || u.isBlocked) {
+                if (!u || u.isBlocked) {
                     auth.signOut();
                     return;
                 }
-                if(!u.activeDeviceId || u.activeDeviceId === deviceId) {
+                if (!u.activeDeviceId || u.activeDeviceId === deviceId) {
                     initializeApp(uid, u);
                 } else {
-                    showToast('Kifaa hiki hakijaidhinishwa');
+                    showToast('Device not authorized');
                     auth.signOut();
                 }
             });
         }
 
         function initializeApp(uid, userData) {
-            currentUser = {uid:uid, ...userData};
+            currentUser = { uid: uid, ...userData };
             userIsExpired = userData.accessExpiry && userData.accessExpiry < Date.now();
-            document.getElementById('loader').style.display='none';
-            document.getElementById('mainApp').style.display='block';
-            document.getElementById('pName').textContent = userData.name || 'Mtumiaji';
+            
+            // Update language from user preference
+            if (userData.language) {
+                currentLang = userData.language;
+                initI18n();
+            }
+
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('pName').textContent = userData.name || 'User';
             document.getElementById('pEmail').textContent = userData.email;
-            const days = userData.accessExpiry ? Math.ceil((userData.accessExpiry - Date.now())/(1000*60*60*24)) : 0;
-            document.getElementById('pDays').textContent = userIsExpired ? 'Imeisha' : days + ' siku zimebaki';
+            
+            const days = userData.accessExpiry ? Math.ceil((userData.accessExpiry - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+            document.getElementById('pDays').textContent = userIsExpired ? 
+                (currentLang === 'sw' ? 'Imeisha' : 'Expired') : 
+                (days + ' ' + (currentLang === 'sw' ? 'siku zimebaki' : 'days left'));
+            
             loadEssentialData();
-            showToast('Karibu STANY MIN TV');
+            showToast(currentLang === 'sw' ? 'Karibu STANY MIN TV' : 'Welcome to STANY MIN TV');
         }
 
         function loadEssentialData() {
             db.ref('channels').on('value', s => {
                 const channels = [];
-                s.forEach(c => channels.push({id:c.key, ...c.val(), type:'channel'}));
+                s.forEach(c => channels.push({ id: c.key, ...c.val(), type: 'channel' }));
                 allData.channels = channels;
                 displayChannels(channels);
             });
 
             db.ref('movies').on('value', s => {
                 const movies = [];
-                s.forEach(c => movies.push({id:c.key, ...c.val(), type:'movie'}));
+                s.forEach(c => movies.push({ id: c.key, ...c.val(), type: 'movie' }));
                 allData.movies = movies;
                 displayMovies(movies);
             });
 
             db.ref('genres').on('value', s => {
-                const tags = document.getElementById('catTags');
-                tags.innerHTML = '<div class="category-tag active" onclick="filterHome(\'all\', this)">Zote</div>';
+                const tags = document.getElementById('categoryTags');
+                const allText = currentLang === 'sw' ? 'Zote' : (currentLang === 'fr' ? 'Toutes' : 'All');
+                tags.innerHTML = '<div class="category-tag active" onclick="filterHome(\'all\', this)">' + allText + '</div>';
                 s.forEach(g => {
                     const name = g.val().name;
-                    tags.innerHTML += '<div class="category-tag" onclick="filterHome(\''+name+'\', this)">'+name+'</div>';
+                    tags.innerHTML += '<div class="category-tag" onclick="filterHome(\'' + name + '\', this)">' + name + '</div>';
                 });
             });
         }
@@ -1127,46 +1728,69 @@
 
         function createCard(item) {
             const isLocked = userIsExpired && item.type === 'channel';
-            return '<div class="card" onclick="handleClick(\''+item.type+'\',\''+item.id+'\','+isLocked+')">'+
-                (isLocked ? '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; border-radius:12px;"><i class="fas fa-lock" style="color:white; font-size:24px;"></i></div>' : '')+
-                '<img src="'+(item.posterURL || 'https://via.placeholder.com/150x200')+'" onerror="this.src=\'https://via.placeholder.com/150x200\'">'+
-                '<div class="card-info"><div class="card-title">'+(item.name||item.title||'Untitled')+'</div></div>'+
-            '</div>';
+            return '<div class="content-card" onclick="handleClick(\'' + item.type + '\',\'' + item.id + '\',' + isLocked + ')">' +
+                (isLocked ? '<div class="locked-overlay"><i class="fas fa-lock lock-icon"></i></div>' : '') +
+                '<img src="' + (item.posterURL || 'https://via.placeholder.com/300x450') + '" onerror="this.src=\'https://via.placeholder.com/300x450\'">' +
+                '<div class="content-overlay"><div class="content-title">' + (item.name || item.title || 'Untitled') + '</div></div>' +
+                '</div>';
         }
 
         function handleClick(type, id, locked) {
-            if(locked) { showToast('Usajili wako umeisha'); return; }
-            const item = type==='channel' ? allData.channels.find(x=>x.id===id) : allData.movies.find(x=>x.id===id);
-            if(!item) return;
-            document.getElementById('dImg').src = item.posterURL || 'https://via.placeholder.com/300x180';
-            document.getElementById('dTitle').textContent = item.name||item.title||'Untitled';
-            document.getElementById('dDesc').textContent = item.description || 'Hakuna maelezo';
+            if (locked) {
+                showToast(currentLang === 'sw' ? 'Usajili wako umeisha' : 'Subscription expired');
+                return;
+            }
+            const item = type === 'channel' ? allData.channels.find(x => x.id === id) : allData.movies.find(x => x.id === id);
+            if (!item) return;
+            
+            document.getElementById('dImg').src = item.posterURL || 'https://via.placeholder.com/500x300';
+            document.getElementById('dTitle').textContent = item.name || item.title || 'Untitled';
+            document.getElementById('dDesc').textContent = item.description || (currentLang === 'sw' ? 'Hakuna maelezo' : 'No description');
             document.getElementById('dBtn').onclick = () => {
                 closeDetailModal();
                 playContent(item);
             };
-            document.getElementById('detailModal').style.display='flex';
+            document.getElementById('detailModal').style.display = 'flex';
         }
 
         function playContent(item) {
             const url = item.m3u8Link || item.movieURL;
-            if(!url) { showToast('Hakuna link ya kutazama'); return; }
-            document.getElementById('playerModal').style.display='flex';
-            if(!player) {
-                player = videojs('videoJS', {fluid: true, autoplay: true});
+            if (!url) {
+                showToast(currentLang === 'sw' ? 'Hakuna link ya kutazama' : 'No stream URL available');
+                return;
             }
-            player.src({src:url, type: url.includes('.m3u8')?'application/x-mpegURL':'video/mp4'});
+            document.getElementById('playerModal').style.display = 'flex';
+            
+            if (!player) {
+                player = videojs('videoJS', {
+                    fluid: true,
+                    autoplay: true,
+                    preload: 'auto',
+                    controls: true,
+                    responsive: true,
+                    controlBar: {
+                        volumePanel: {
+                            inline: false
+                        }
+                    }
+                });
+            }
+            
+            player.src({
+                src: url,
+                type: url.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4'
+            });
             player.play();
         }
 
         function filterHome(category, el) {
             document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            
+
             const mg = document.getElementById('movGrid');
             const cg = document.getElementById('chanGrid');
-            
-            if(category === 'all') {
+
+            if (category === 'all') {
                 mg.innerHTML = allData.movies.map(m => createCard(m)).join('');
                 cg.innerHTML = allData.channels.map(c => createCard(c)).join('');
             } else {
@@ -1177,13 +1801,18 @@
 
         function shareApp(platform) {
             const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent('Tazama STANY MIN TV - Vitanzi, Filamu na zaidi!');
+            const title = encodeURIComponent('STANY MIN TV - Premium Entertainment');
+            const text = encodeURIComponent(currentLang === 'sw' ? 
+                'Tazama STANY MIN TV - Vitanzi, Filamu na zaidi!' : 
+                'Watch STANY MIN TV - Live TV, Movies and more!');
+            
             let shareUrl = '';
-            if(platform === 'whatsapp') shareUrl = 'https://wa.me/?text='+text+' '+url;
-            else if(platform === 'facebook') shareUrl = 'https://facebook.com/sharer.php?u='+url;
-            else if(platform === 'twitter') shareUrl = 'https://twitter.com/intent/tweet?url='+url+'&text='+text;
-            else if(platform === 'telegram') shareUrl = 'https://t.me/share/url?url='+url+'&text='+text;
-            window.open(shareUrl, '_blank');
+            if (platform === 'whatsapp') shareUrl = 'https://wa.me/?text=' + text + '%20' + url;
+            else if (platform === 'facebook') shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
+            else if (platform === 'twitter') shareUrl = 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url;
+            else if (platform === 'telegram') shareUrl = 'https://t.me/share/url?url=' + url + '&text=' + text;
+            
+            window.open(shareUrl, '_blank', 'width=600,height=400');
         }
 
         function shareContent(platform) {
@@ -1192,7 +1821,7 @@
 
         function copyLink() {
             navigator.clipboard.writeText(window.location.href);
-            showToast('Link imenakiliwa');
+            showToast(currentLang === 'sw' ? 'Link imenakiliwa' : 'Link copied');
         }
 
         function copyContentLink() {
@@ -1200,16 +1829,23 @@
         }
 
         function toggleSearch() {
-            const container = document.getElementById('searchContainer');
-            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            const bar = document.getElementById('searchBar');
+            bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
+            if (bar.style.display === 'block') {
+                document.getElementById('searchInput').focus();
+            }
         }
 
         function globalSearch() {
-            const query = document.querySelector('.search-input').value.toLowerCase();
-            if(!query) { loadEssentialData(); return; }
-            
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) {
+                loadEssentialData();
+                return;
+            }
+
             const mg = document.getElementById('movGrid');
             const cg = document.getElementById('chanGrid');
+            
             mg.innerHTML = allData.movies.filter(m => m.title && m.title.toLowerCase().includes(query)).map(m => createCard(m)).join('');
             cg.innerHTML = allData.channels.filter(c => c.name && c.name.toLowerCase().includes(query)).map(c => createCard(c)).join('');
         }
@@ -1217,18 +1853,20 @@
         function sendChat() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
-            if(!text) return;
-            
-            db.ref('stanyBotMessages/'+currentUser.uid).push({
+            if (!text || !currentUser) return;
+
+            db.ref('stanyBotMessages/' + currentUser.uid).push({
                 text: text,
                 sender: 'user',
                 timestamp: Date.now()
             });
             input.value = '';
-            
+
             setTimeout(() => {
-                db.ref('stanyBotMessages/'+currentUser.uid).push({
-                    text: 'Tumepokea ujumbe wako. Tutakujibu hivi karibuni.',
+                db.ref('stanyBotMessages/' + currentUser.uid).push({
+                    text: currentLang === 'sw' ? 
+                        'Tumepokea ujumbe wako. Tutakujibu hivi karibuni.' : 
+                        'We received your message. We will reply soon.',
                     sender: 'admin',
                     timestamp: Date.now()
                 });
@@ -1243,47 +1881,54 @@
         }
 
         function showLogoutConfirm() {
-            document.getElementById('logoutModal').style.display='flex';
+            document.getElementById('logoutModal').style.display = 'flex';
         }
 
         function cancelLogout() {
-            document.getElementById('logoutModal').style.display='none';
+            document.getElementById('logoutModal').style.display = 'none';
         }
 
         function confirmLogout() {
             auth.signOut();
-            document.getElementById('logoutModal').style.display='none';
-            showToast('Umetoka kwa mafanikio');
+            document.getElementById('logoutModal').style.display = 'none';
+            showToast(currentLang === 'sw' ? 'Umetoka kwa mafanikio' : 'Logged out successfully');
         }
 
         function closeDetailModal() {
-            document.getElementById('detailModal').style.display='none';
+            document.getElementById('detailModal').style.display = 'none';
         }
 
         function closePlayer() {
-            document.getElementById('playerModal').style.display='none';
-            if(player) { player.pause(); }
+            document.getElementById('playerModal').style.display = 'none';
+            if (player) {
+                player.pause();
+            }
         }
 
         function quickRefresh() {
-            showToast('Imeoneshwa upya');
+            showToast(currentLang === 'sw' ? 'Imeoneshwa upya' : 'Refreshed');
         }
 
         function showNotifications() {
-            showToast('Hakuna arifa mpya');
+            showToast(currentLang === 'sw' ? 'Hakuna arifa mpya' : 'No new notifications');
+        }
+
+        function showLanguageSettings() {
+            document.querySelector('.language-selector').scrollIntoView({ behavior: 'smooth' });
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            toast.textContent = msg;
+            document.getElementById('toastMessage').textContent = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Setup chat listener
-        db.ref('stanyBotMessages').on('child_added', s => {
-            // Chat handling
-        });
+        // Initialize
+        window.onload = () => {
+            initI18n();
+        };
     </script>
 </body>
 </html>
+
