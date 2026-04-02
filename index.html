@@ -1,212 +1,1975 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STANY Movie Stream System</title>
-
-<style>
-body {
-  background: #0b0b0b;
-  color: #fff;
-  font-family: Arial;
-  padding: 15px;
-}
-
-h2 {
-  text-align: center;
-}
-
-.section {
-  margin-top: 25px;
-}
-
-.movies {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-}
-
-.movie {
-  min-width: 140px;
-  background: #1a1a1a;
-  border-radius: 10px;
-  padding: 8px;
-  cursor: pointer;
-}
-
-.movie img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.movie p {
-  font-size: 12px;
-  text-align: center;
-}
-
-input {
-  width: 70%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-}
-
-button {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: #00ff99;
-  cursor: pointer;
-}
-
-.links {
-  margin-top: 20px;
-}
-
-.link-box {
-  background: #1c1c1c;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 10px;
-  word-break: break-all;
-}
-
-iframe {
-  width: 100%;
-  height: 400px;
-  margin-top: 15px;
-  border-radius: 10px;
-  border: none;
-}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>STANY BOT HOSTING | Premium Bot Deployment Platform</title>
+    
+    <!-- Meta Tags for SEO & Social Sharing -->
+    <meta name="description" content="Deploy your WhatsApp bots instantly with STANY BOT HOSTING. Free first deployment, SQ tokens system, 24/7 uptime, referral rewards. Tanzania's #1 bot hosting platform."/>
+    <meta name="keywords" content="bot hosting, whatsapp bot, deployment, SQ tokens, stany bot, tanzania, firebase, vercel"/>
+    <meta name="author" content="Stany"/>
+    <meta name="robots" content="index, follow"/>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://stanybot.hosting/"/>
+    <meta property="og:title" content="STANY BOT HOSTING | Deploy Bots in Seconds"/>
+    <meta property="og:description" content="Free first deployment • SQ Token System • 24/7 Uptime • Referral Rewards • Tanzania's Premium Bot Host"/>
+    <meta property="og:image" content="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/705D6C77-3C37-4294-A509-3C2B9C4A34D2.png"/>
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:url" content="https://stanybot.hosting/"/>
+    <meta property="twitter:title" content="STANY BOT HOSTING | Deploy Bots in Seconds"/>
+    <meta property="twitter:description" content="Free first deployment • SQ Token System • 24/7 Uptime • Referral Rewards"/>
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/705D6C77-3C37-4294-A509-3C2B9C4A34D2.png"/>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/705D6C77-3C37-4294-A509-3C2B9C4A34D2.png"/>
+    
+    <!-- Font Awesome ONLY (as requested) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --glass: rgba(15, 23, 42, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+            --gradient-dark: linear-gradient(135deg, #1e293b, #0f172a, #020617);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gradient-dark);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+        
+        /* Disable right click visual feedback */
+        body.no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%),
+                        radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+        
+        /* Header & Navigation */
+        header {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            object-fit: contain;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .sq-badge {
+            background: var(--gradient);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+        }
+        
+        /* SQ Balance Card */
+        .sq-balance {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .sq-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+            line-height: 1;
+        }
+        
+        .sq-info {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .sq-expiry {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Packages Grid */
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .package-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .package-card:hover, .package-card.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .package-sq {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            color: var(--primary);
+        }
+        
+        .package-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .package-duration {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .package-unlimited {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.2));
+            border-color: var(--warning);
+        }
+        
+        .package-unlimited .package-sq {
+            color: var(--warning);
+        }
+        
+        /* Deployment Form */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            color: var(--light);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        .env-vars-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+        
+        .env-var-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+        
+        .env-var-key {
+            flex: 1;
+        }
+        
+        .env-var-value {
+            flex: 2;
+        }
+        
+        .btn-remove-env {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-remove-env:hover {
+            background: #dc2626;
+        }
+        
+        .btn-add-env {
+            background: transparent;
+            border: 1px dashed var(--primary);
+            color: var(--primary);
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-env:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Bot List */
+        .bot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .bot-item {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--success);
+            transition: all 0.3s ease;
+        }
+        
+        .bot-item.stopped {
+            border-left-color: var(--danger);
+        }
+        
+        .bot-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateX(5px);
+        }
+        
+        .bot-info h4 {
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .bot-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .bot-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-running {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+        
+        .status-stopped {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+        
+        .bot-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-icon:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .btn-icon.danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Referral Section */
+        .referral-card {
+            text-align: center;
+        }
+        
+        .referral-code {
+            background: rgba(99, 102, 241, 0.15);
+            border: 2px dashed var(--primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .referral-code:hover {
+            background: rgba(99, 102, 241, 0.25);
+            transform: scale(1.02);
+        }
+        
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .ref-stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+        }
+        
+        .ref-stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .ref-stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .referral-link {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid var(--border);
+        }
+        
+        .referral-link input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            font-size: 0.95rem;
+        }
+        
+        .referral-link input:focus {
+            outline: none;
+        }
+        
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-copy:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Session Section */
+        .session-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .session-card {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .session-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .session-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .session-card h4 {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .session-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* WhatsApp Payment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: relative;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 1.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+        }
+        
+        .payment-instructions {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .copyright {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .referral-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Auth Pages */
+        .auth-container {
+            max-width: 500px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-github {
+            background: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-github:hover {
+            background: #24292e;
+            transform: translateY(-2px);
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+        }
+        
+        .auth-toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .profile-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .profile-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            color: var(--light);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            border-left: 4px solid var(--success);
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastSlide 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+        
+        @keyframes toastSlide {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn.loading {
+            position: relative;
+            color: transparent !important;
+        }
+        
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
-
-<body>
-
-<h2>🎬 STANY MOVIE SYSTEM</h2>
-
-<div style="text-align:center;">
-  <input type="text" id="search" placeholder="Search movie...">
-  <button onclick="searchMovie()">Search</button>
-</div>
-
-<div class="section">
-  <h3>🔥 Trending</h3>
-  <div class="movies" id="trending"></div>
-</div>
-
-<div class="section">
-  <h3>🆕 New Releases</h3>
-  <div class="movies" id="new"></div>
-</div>
-
-<div class="section">
-  <h3>🔍 Search Results</h3>
-  <div class="movies" id="results"></div>
-</div>
-
-<div class="links" id="links"></div>
-
-<iframe id="player"></iframe>
-
-<script>
-const API_KEY = "2e211dfda888f7cc55ce433d743f9bc3";
-
-// LOAD TRENDING
-async function loadTrending() {
-  const res = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`);
-  const data = await res.json();
-  showMovies(data.results, "trending");
-}
-
-// LOAD NEW MOVIES
-async function loadNew() {
-  const res = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`);
-  const data = await res.json();
-  showMovies(data.results, "new");
-}
-
-// SEARCH
-async function searchMovie() {
-  const q = document.getElementById("search").value;
-  if (!q) return;
-
-  const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
-  const data = await res.json();
-
-  showMovies(data.results, "results");
-}
-
-// DISPLAY MOVIES
-function showMovies(movies, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  movies.forEach(movie => {
-    if (!movie.poster_path) return;
-
-    const div = document.createElement("div");
-    div.className = "movie";
-
-    div.innerHTML = `
-      <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
-      <p>${movie.title}</p>
-    `;
-
-    div.onclick = () => generateLinks(movie.id, movie.title);
-
-    container.appendChild(div);
-  });
-}
-
-// GENERATE STREAM LINKS
-function generateLinks(id, title) {
-  const vidsrc = `https://vidsrc.to/embed/movie/${id}`;
-  const embed2 = `https://www.2embed.cc/embed/${id}`;
-  const multi = `https://multiembed.mov/?video_id=${id}&tmdb=1`;
-
-  document.getElementById("links").innerHTML = `
-    <h3>${title}</h3>
-
-    <div class="link-box">
-      <b>vidsrc (HD):</b><br>${vidsrc}
-      <br>
-      <button onclick="play('${vidsrc}')">Play</button>
-      <button onclick="copy('${vidsrc}')">Copy</button>
-    </div>
-
-    <div class="link-box">
-      <b>2embed:</b><br>${embed2}
-      <br>
-      <button onclick="play('${embed2}')">Play</button>
-      <button onclick="copy('${embed2}')">Copy</button>
-    </div>
-
-    <div class="link-box">
-      <b>multiembed:</b><br>${multi}
-      <br>
-      <button onclick="play('${multi}')">Play</button>
-      <button onclick="copy('${multi}')">Copy</button>
-    </div>
-  `;
-}
-
-// PLAYER
-function play(url) {
-  document.getElementById("player").src = url;
-}
-
-// COPY
-function copy(text) {
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
-}
-
-// INIT
-loadTrending();
-loadNew();
-</script>
-
+<body class="no-select">
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">
+            <img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/705D6C77-3C37-4294-A509-3C2B9C4A34D2.png" alt="STANY BOT HOSTING Logo"/>
+            STANY BOT HOSTING
+        </a>
+        
+        <div class="nav-actions">
+            <div id="authSection">
+                <button class="btn btn-outline" onclick="showAuth('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="btn btn-primary" onclick="showAuth('register')">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+            </div>
+            
+            <div id="userSection" class="user-menu hidden">
+                <div class="sq-badge">
+                    <i class="fas fa-coins"></i>
+                    <span id="userSQ">10</span> SQ
+                </div>
+                <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile" class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"/>
+                <div id="userDropdown" class="hidden" style="position: absolute; top: 60px; right: 20px; background: var(--card-bg); border-radius: 16px; padding: 1rem; min-width: 200px; border: 1px solid var(--border); box-shadow: var(--shadow); z-index: 101;">
+                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
+                        <strong id="userName">User</strong>
+                        <div style="color: var(--gray); font-size: 0.9rem;" id="userEmail">user@example.com</div>
+                    </div>
+                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;" onclick="navigateTo('profile')">
+                        <i class="fas fa-user"></i> My Profile
+                    </button>
+                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;" onclick="navigateTo('referral')">
+                        <i class="fas fa-users"></i> Referrals
+                    </button>
+                    <button class="btn btn-danger" style="width: 100%;" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1><i class="fas fa-robot"></i> Deploy Bots in Seconds</h1>
+            <p>Premium WhatsApp bot hosting with SQ token system. Free first deployment • 24/7 uptime • Instant scaling • Tanzania's most reliable bot platform</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalUsers">1,247</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalBots">3,891</div>
+                    <div class="stat-label">Bots Deployed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dashboard (shown after login) -->
+        <div id="dashboard" class="hidden">
+            <div class="dashboard-grid">
+                <!-- SQ Balance Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-coins"></i> Your SQ Balance</h3>
+                        <span class="sq-badge"><i class="fas fa-clock"></i> <span id="sqExpiry">29 days left</span></span>
+                    </div>
+                    <div class="sq-balance">
+                        <div class="sq-amount" id="dashboardSQ">10</div>
+                        <p class="sq-info">SQ tokens expire after 30 days. Use them to deploy and manage your bots.</p>
+                        <button class="btn btn-primary" onclick="showPackages()">
+                            <i class="fas fa-plus"></i> Buy More SQ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Deploy New Bot -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-rocket"></i> Deploy New Bot</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Bot Repository URL</label>
+                        <input type="url" class="form-input" id="botRepo" placeholder="https://github.com/username/repo" value="https://github.com/stanytz378/iamlegendv2.1"/>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">App Name</label>
+                        <input type="text" class="form-input" id="appName" placeholder="my-awesome-bot"/>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Environment Variables (app.json)</label>
+                        <div class="env-vars-container" id="envVars">
+                            <div class="env-var-item">
+                                <input type="text" class="form-input env-var-key" placeholder="KEY" value="SESSION_ID"/>
+                                <input type="text" class="form-input env-var-value" placeholder="VALUE" value=""/>
+                                <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="env-var-item">
+                                <input type="text" class="form-input env-var-key" placeholder="KEY" value="PREFIX"/>
+                                <input type="text" class="form-input env-var-value" placeholder="VALUE" value="."/>
+                                <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <button class="btn-add-env" onclick="addEnvVar()">
+                            <i class="fas fa-plus"></i> Add Environment Variable
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Deployment Cost: <strong>5 SQ</strong></label>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="deployBot()">
+                            <i class="fas fa-rocket"></i> Deploy Bot (5 SQ)
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Deploy Section -->
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                        <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.95rem;">
+                            <i class="fas fa-bolt"></i> <strong>Quick Deploy:</strong> Our official bot - FREE first deployment!
+                        </p>
+                        <button class="btn btn-outline" style="width: 100%;" onclick="quickDeploy()">
+                            <i class="fas fa-magic"></i> Deploy iamlegendv2.1 (FREE)
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Bots -->
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list"></i> Your Active Bots</h3>
+                        <button class="btn btn-sm btn-outline" onclick="refreshBots()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="bot-list" id="botList">
+                        <!-- Bot items will be inserted here dynamically -->
+                        <div class="bot-item">
+                            <div class="bot-info">
+                                <h4><i class="fas fa-check-circle" style="color: var(--success);"></i> my-whatsapp-bot</h4>
+                                <p>github.com/stanytz378/iamlegendv2.1 • Deployed 2h ago</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span class="bot-status status-running"><i class="fas fa-circle"></i> Running</span>
+                                <div class="bot-actions">
+                                    <button class="btn-icon" title="Restart" onclick="restartBot('bot1')"><i class="fas fa-redo"></i></button>
+                                    <button class="btn-icon" title="Stop" onclick="stopBot('bot1')"><i class="fas fa-stop"></i></button>
+                                    <button class="btn-icon danger" title="Delete" onclick="deleteBot('bot1')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Get Session -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-qrcode"></i> Get Session</h3>
+                    </div>
+                    <p style="color: var(--gray); margin-bottom: 1rem;">Connect your WhatsApp to deploy bots</p>
+                    
+                    <div class="session-section">
+                        <div class="session-card">
+                            <i class="fas fa-qrcode"></i>
+                            <h4>Scan QR Code</h4>
+                            <p>Quick & secure session generation</p>
+                            <a href="https://session-id-generator-4xuy.onrender.com/qrpage" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fas fa-external-link-alt"></i> Open QR
+                            </a>
+                        </div>
+                        <div class="session-card">
+                            <i class="fas fa-key"></i>
+                            <h4>Pair Code</h4>
+                            <p>Get session via pairing code</p>
+                            <a href="https://session-id-generator-4xuy.onrender.com/pair" target="_blank" class="btn btn-outline btn-sm">
+                                <i class="fas fa-external-link-alt"></i> Get Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Referral Program -->
+                <div class="card referral-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-gift"></i> Referral Program</h3>
+                    </div>
+                    <p style="color: var(--gray);">Invite friends & earn <strong>3 SQ</strong> per signup!</p>
+                    
+                    <div class="referral-code" id="referralCode" onclick="copyReferral()">STANY-XXXXXX</div>
+                    <p style="color: var(--gray); font-size: 0.9rem; cursor: pointer;" onclick="copyReferral()">
+                        <i class="fas fa-copy"></i> Click to copy your code
+                    </p>
+                    
+                    <div class="referral-stats">
+                        <div class="ref-stat">
+                            <div class="ref-stat-value" id="refCount">0</div>
+                            <div class="ref-stat-label">Signups</div>
+                        </div>
+                        <div class="ref-stat">
+                            <div class="ref-stat-value" id="refEarned">0</div>
+                            <div class="ref-stat-label">SQ Earned</div>
+                        </div>
+                        <div class="ref-stat">
+                            <div class="ref-stat-value" id="refBonus">0</div>
+                            <div class="ref-stat-label">Total Bonus</div>
+                        </div>
+                    </div>
+                    
+                    <div class="referral-link">
+                        <input type="text" id="referralLink" value="https://stanybot.hosting/?ref=STANY-XXXXXX" readonly/>
+                        <button class="btn-copy" onclick="copyReferralLink()">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Auth Sections -->
+        <div id="loginSection" class="auth-container hidden">
+            <div class="auth-header">
+                <h2><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+                <p style="color: var(--gray);">Login to manage your bots</p>
+            </div>
+            
+            <form class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email or Username</label>
+                    <input type="text" class="form-input" required placeholder="your@email.com"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" required placeholder="••••••••"/>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div class="auth-options">
+                <button class="btn-github" onclick="signInWithGitHub()">
+                    <i class="fab fa-github"></i> Continue with GitHub
+                </button>
+            </div>
+            
+            <div class="auth-toggle">
+                Don't have an account? <a href="#" onclick="showAuth('register')">Sign up</a>
+            </div>
+        </div>
+        
+        <div id="registerSection" class="auth-container hidden">
+            <div class="auth-header">
+                <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                <p style="color: var(--gray);">Get 10 FREE SQ to start deploying!</p>
+            </div>
+            
+            <form class="auth-form" onsubmit="handleRegister(event)">
+                <div class="profile-upload">
+                    <img src="https://ui-avatars.com/api/?name=New+User&background=6366f1&color=fff" alt="Profile Preview" class="profile-preview" id="profilePreview"/>
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-upload"></i> Upload Photo
+                        </button>
+                        <input type="file" id="profileInput" accept="image/*" onchange="previewProfile(event)"/>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="regUsername" required placeholder="stany_dev"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="regEmail" required placeholder="you@example.com"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="regPassword" required placeholder="••••••••" minlength="6"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Referral Code (Optional)</label>
+                    <input type="text" class="form-input" id="regReferral" placeholder="Enter friend's code"/>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-user-plus"></i> Create Account + Get 10 SQ
+                </button>
+            </form>
+            
+            <div class="auth-options">
+                <button class="btn-github" onclick="signInWithGitHub()">
+                    <i class="fab fa-github"></i> Sign up with GitHub
+                </button>
+            </div>
+            
+            <div class="auth-toggle">
+                Already have an account? <a href="#" onclick="showAuth('login')">Login</a>
+            </div>
+        </div>
+        
+        <!-- Packages Modal -->
+        <div class="modal" id="packagesModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal('packagesModal')">&times;</button>
+                <h3 style="text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                    <i class="fas fa-coins"></i> Buy SQ Tokens
+                </h3>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 1.5rem;">
+                    Manual payment via WhatsApp • Tanzania Only
+                </p>
+                
+                <div class="packages-grid">
+                    <div class="package-card" onclick="selectPackage(15, 1000, '30 days')">
+                        <div class="package-sq">15 SQ</div>
+                        <div class="package-price">1,000/=</div>
+                        <div class="package-duration">Valid 30 days</div>
+                    </div>
+                    <div class="package-card" onclick="selectPackage(35, 2000, '30 days')">
+                        <div class="package-sq">35 SQ</div>
+                        <div class="package-price">2,000/=</div>
+                        <div class="package-duration">Valid 30 days</div>
+                    </div>
+                    <div class="package-card" onclick="selectPackage(60, 3000, '30 days')">
+                        <div class="package-sq">60 SQ</div>
+                        <div class="package-price">3,000/=</div>
+                        <div class="package-duration">Valid 30 days</div>
+                    </div>
+                    <div class="package-card" onclick="selectPackage(80, 4000, '30 days')">
+                        <div class="package-sq">80 SQ</div>
+                        <div class="package-price">4,000/=</div>
+                        <div class="package-duration">Valid 30 days</div>
+                    </div>
+                    <div class="package-card" onclick="selectPackage(150, 5000, '30 days')">
+                        <div class="package-sq">150 SQ</div>
+                        <div class="package-price">5,000/=</div>
+                        <div class="package-duration">Valid 30 days</div>
+                    </div>
+                    <div class="package-card package-unlimited" onclick="selectPackage(999, 2000, 'Unlimited')">
+                        <div class="package-sq">∞ SQ</div>
+                        <div class="package-price">2,000/=</div>
+                        <div class="package-duration">Unlimited • Premium</div>
+                    </div>
+                </div>
+                
+                <div class="payment-instructions">
+                    <strong><i class="fas fa-info-circle"></i> How to Pay:</strong><br/>
+                    1. Select your package above<br/>
+                    2. Click "Pay via WhatsApp"<br/>
+                    3. Send payment details to our WhatsApp<br/>
+                    4. Admin will add SQ to your account within 1 hour
+                </div>
+                
+                <button class="whatsapp-btn" id="whatsappPayBtn" onclick="payViaWhatsApp()" disabled>
+                    <i class="fab fa-whatsapp"></i> Pay via WhatsApp
+                </button>
+                
+                <p style="text-align: center; color: var(--gray); font-size: 0.9rem; margin-top: 1rem;">
+                    <i class="fas fa-shield-alt"></i> All payments are manual & secure. SQ added after confirmation.
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <p>© <span id="year"></span> STANY BOT HOSTING. All rights reserved.</p>
+        <p class="copyright">
+            <i class="fas fa-code"></i> Crafted with <i class="fas fa-heart" style="color: var(--danger);"></i> by Stany • 
+            <a href="https://github.com/stanytz378" target="_blank">GitHub</a> • 
+            <a href="#" onclick="showPackages()">Buy SQ</a>
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--gray);">
+            <i class="fas fa-lock"></i> Secure • <i class="fas fa-bolt"></i> Fast • <i class="fas fa-headset"></i> 24/7 Support
+        </p>
+    </footer>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+    
+    <!-- Firebase Config (KEEP SECRET - This is your config) -->
+    <script>
+        // ⚠️ IMPORTANT: In production, use environment variables or secure backend
+        // This is frontend-only demo - real app should validate on server
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGQqAiYCnWR7X8XkxEXCGu19PU45qXDnc",
+            authDomain: "stanyappstore.firebaseapp.com",
+            projectId: "stanyappstore",
+            storageBucket: "stanyappstore.firebasestorage.app",
+            messagingSenderId: "735017831251",
+            appId: "1:735017831251:web:9fa4184ef141349fb9afa6",
+            measurementId: "G-EM3RTMBKTN"
+        };
+        
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+    </script>
+    
+    <!-- Main Application Logic -->
+    <script>
+        // ===== GLOBAL STATE =====
+        let currentUser = null;
+        let selectedPackage = null;
+        let userSQ = 10; // Default for new users
+        let bots = [];
+        
+        // ===== DOM ELEMENTS =====
+        const authSection = document.getElementById('authSection');
+        const userSection = document.getElementById('userSection');
+        const dashboard = document.getElementById('dashboard');
+        const loginSection = document.getElementById('loginSection');
+        const registerSection = document.getElementById('registerSection');
+        
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current year
+            document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Generate particles
+            createParticles();
+            
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    loadUserData(user);
+                } else {
+                    // User is signed out
+                    showAuth('login');
+                }
+            });
+            
+            // Check for referral code in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode) {
+                document.getElementById('regReferral').value = refCode;
+                showToast(`Referral code ${refCode} applied!`, 'success');
+            }
+            
+            // Disable right click (as requested)
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Generate referral code for demo
+            if (!document.getElementById('referralCode').textContent.includes('XXXX')) {
+                document.getElementById('referralCode').textContent = 'STANY-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                document.getElementById('referralLink').value = `https://stanybot.hosting/?ref=${document.getElementById('referralCode').textContent}`;
+            }
+        });
+        
+        // ===== AUTH FUNCTIONS =====
+        function showAuth(type) {
+            authSection.classList.add('hidden');
+            userSection.classList.add('hidden');
+            dashboard.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            registerSection.classList.add('hidden');
+            
+            if (type === 'login') {
+                loginSection.classList.remove('hidden');
+            } else {
+                registerSection.classList.remove('hidden');
+            }
+        }
+        
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="text"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+            
+            // Demo login - in production, use Firebase Auth
+            showToast('Logging in...', 'info');
+            setTimeout(() => {
+                // Simulate successful login
+                currentUser = {
+                    uid: 'demo-user-' + Date.now(),
+                    email: email,
+                    displayName: email.split('@')[0],
+                    photoURL: 'https://ui-avatars.com/api/?name=' + email.split('@')[0] + '&background=6366f1&color=fff',
+                    sqBalance: 10,
+                    referralCode: 'STANY-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+                };
+                
+                // Update UI
+                document.getElementById('userAvatar').src = currentUser.photoURL;
+                document.getElementById('userName').textContent = currentUser.displayName;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userSQ').textContent = currentUser.sqBalance;
+                document.getElementById('dashboardSQ').textContent = currentUser.sqBalance;
+                document.getElementById('referralCode').textContent = currentUser.referralCode;
+                document.getElementById('referralLink').value = `https://stanybot.hosting/?ref=${currentUser.referralCode}`;
+                
+                // Show dashboard
+                authSection.classList.add('hidden');
+                loginSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+                dashboard.classList.remove('hidden');
+                
+                showToast(`Welcome back, ${currentUser.displayName}! 🎉`, 'success');
+            }, 1500);
+        }
+        
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const referral = document.getElementById('regReferral').value;
+            
+            showToast('Creating account...', 'info');
+            setTimeout(() => {
+                // Simulate registration
+                currentUser = {
+                    uid: 'demo-user-' + Date.now(),
+                    email: email,
+                    displayName: username,
+                    photoURL: document.getElementById('profilePreview').src,
+                    sqBalance: 10, // Free 10 SQ for new users
+                    referralCode: 'STANY-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    referredBy: referral || null
+                };
+                
+                // If referred, give bonus to referrer (demo logic)
+                if (referral) {
+                    showToast(`Referral applied! You got 10 SQ + friend gets 3 SQ bonus 🎁`, 'success');
+                } else {
+                    showToast(`Account created! You received 10 FREE SQ to start 🚀`, 'success');
+                }
+                
+                // Update UI
+                document.getElementById('userAvatar').src = currentUser.photoURL;
+                document.getElementById('userName').textContent = currentUser.displayName;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userSQ').textContent = currentUser.sqBalance;
+                document.getElementById('dashboardSQ').textContent = currentUser.sqBalance;
+                document.getElementById('referralCode').textContent = currentUser.referralCode;
+                document.getElementById('referralLink').value = `https://stanybot.hosting/?ref=${currentUser.referralCode}`;
+                
+                // Show dashboard
+                authSection.classList.add('hidden');
+                registerSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+                dashboard.classList.remove('hidden');
+            }, 2000);
+        }
+        
+        function signInWithGitHub() {
+            showToast('Connecting to GitHub...', 'info');
+            setTimeout(() => {
+                currentUser = {
+                    uid: 'github-user-' + Date.now(),
+                    email: 'user@github.com',
+                    displayName: 'GitHubUser',
+                    photoURL: 'https://avatars.githubusercontent.com/u/1?v=4',
+                    sqBalance: 10,
+                    referralCode: 'STANY-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+                    provider: 'github'
+                };
+                
+                // Update UI
+                document.getElementById('userAvatar').src = currentUser.photoURL;
+                document.getElementById('userName').textContent = currentUser.displayName;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userSQ').textContent = currentUser.sqBalance;
+                document.getElementById('dashboardSQ').textContent = currentUser.sqBalance;
+                document.getElementById('referralCode').textContent = currentUser.referralCode;
+                document.getElementById('referralLink').value = `https://stanybot.hosting/?ref=${currentUser.referralCode}`;
+                
+                authSection.classList.add('hidden');
+                loginSection.classList.add('hidden');
+                registerSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+                dashboard.classList.remove('hidden');
+                
+                showToast(`Welcome, ${currentUser.displayName}! Connected via GitHub 🔗`, 'success');
+            }, 1500);
+        }
+        
+        function logout() {
+            currentUser = null;
+            userSection.classList.add('hidden');
+            dashboard.classList.add('hidden');
+            authSection.classList.remove('hidden');
+            showToast('Logged out successfully 👋', 'success');
+        }
+        
+        function loadUserData(user) {
+            // In production: fetch from Firestore
+            currentUser = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName || user.email.split('@')[0],
+                photoURL: user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'User'}&background=6366f1&color=fff`,
+                sqBalance: 10, // Demo value
+                referralCode: 'STANY-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+            };
+            
+            // Update UI
+            document.getElementById('userAvatar').src = currentUser.photoURL;
+            document.getElementById('userName').textContent = currentUser.displayName;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userSQ').textContent = currentUser.sqBalance;
+            document.getElementById('dashboardSQ').textContent = currentUser.sqBalance;
+            document.getElementById('referralCode').textContent = currentUser.referralCode;
+            document.getElementById('referralLink').value = `https://stanybot.hosting/?ref=${currentUser.referralCode}`;
+            
+            authSection.classList.add('hidden');
+            userSection.classList.remove('hidden');
+            dashboard.classList.remove('hidden');
+        }
+        
+        // ===== DASHBOARD FUNCTIONS =====
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+        
+        function navigateTo(section) {
+            // Close dropdown
+            document.getElementById('userDropdown').classList.add('hidden');
+            
+            if (section === 'profile') {
+                showToast('Profile settings coming soon! 👤', 'info');
+            } else if (section === 'referral') {
+                showToast('Referral dashboard - Track your invites! 🎁', 'success');
+            }
+        }
+        
+        function addEnvVar() {
+            const container = document.getElementById('envVars');
+            const item = document.createElement('div');
+            item.className = 'env-var-item';
+            item.innerHTML = `
+                <input type="text" class="form-input env-var-key" placeholder="KEY"/>
+                <input type="text" class="form-input env-var-value" placeholder="VALUE"/>
+                <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(item);
+        }
+        
+        function removeEnvVar(btn) {
+            btn.parentElement.remove();
+        }
+        
+        function deployBot() {
+            if (userSQ < 5) {
+                showToast('❌ Insufficient SQ! You need 5 SQ to deploy. Buy more tokens.', 'error');
+                showPackages();
+                return;
+            }
+            
+            const repo = document.getElementById('botRepo').value;
+            const appName = document.getElementById('appName').value || 'bot-' + Date.now();
+            
+            if (!repo) {
+                showToast('Please enter a valid repository URL', 'error');
+                return;
+            }
+            
+            showToast('🚀 Deploying bot...', 'info');
+            
+            // Simulate deployment
+            setTimeout(() => {
+                userSQ -= 5;
+                document.getElementById('userSQ').textContent = userSQ;
+                document.getElementById('dashboardSQ').textContent = userSQ;
+                
+                // Add to bot list
+                const botList = document.getElementById('botList');
+                const botId = 'bot-' + Date.now();
+                const botItem = document.createElement('div');
+                botItem.className = 'bot-item';
+                botItem.id = botId;
+                botItem.innerHTML = `
+                    <div class="bot-info">
+                        <h4><i class="fas fa-check-circle" style="color: var(--success);"></i> ${appName}</h4>
+                        <p>${repo} • Deployed just now</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="bot-status status-running"><i class="fas fa-circle"></i> Running</span>
+                        <div class="bot-actions">
+                            <button class="btn-icon" title="Restart" onclick="restartBot('${botId}')"><i class="fas fa-redo"></i></button>
+                            <button class="btn-icon" title="Stop" onclick="stopBot('${botId}')"><i class="fas fa-stop"></i></button>
+                            <button class="btn-icon danger" title="Delete" onclick="deleteBot('${botId}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+                botList.insertBefore(botItem, botList.firstChild);
+                
+                showToast(`✅ ${appName} deployed successfully! (5 SQ used)`, 'success');
+            }, 2500);
+        }
+        
+        function quickDeploy() {
+            // Free first deployment for iamlegendv2.1
+            showToast('🎁 FREE deployment! Setting up iamlegendv2.1...', 'success');
+            
+            setTimeout(() => {
+                document.getElementById('botRepo').value = 'https://github.com/stanytz378/iamlegendv2.1';
+                document.getElementById('appName').value = 'iamlegendv2.1';
+                
+                // Auto-fill environment variables
+                document.getElementById('envVars').innerHTML = `
+                    <div class="env-var-item">
+                        <input type="text" class="form-input env-var-key" value="SESSION_ID"/>
+                        <input type="text" class="form-input env-var-value" placeholder="Paste your session here"/>
+                        <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="env-var-item">
+                        <input type="text" class="form-input env-var-key" value="PREFIX"/>
+                        <input type="text" class="form-input env-var-value" value="."/>
+                        <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="env-var-item">
+                        <input type="text" class="form-input env-var-key" value="OWNER_NUMBER"/>
+                        <input type="text" class="form-input env-var-value" placeholder="+255..."/>
+                        <button class="btn-remove-env" onclick="removeEnvVar(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+                
+                showToast('✅ Form filled! Click "Deploy Bot" to launch (FREE for first time) 🚀', 'success');
+            }, 1000);
+        }
+        
+        function restartBot(botId) {
+            const bot = document.getElementById(botId);
+            showToast('🔄 Restarting bot...', 'info');
+            setTimeout(() => {
+                showToast('✅ Bot restarted successfully!', 'success');
+            }, 1500);
+        }
+        
+        function stopBot(botId) {
+            const bot = document.getElementById(botId);
+            bot.classList.add('stopped');
+            bot.querySelector('.bot-status').className = 'bot-status status-stopped';
+            bot.querySelector('.bot-status').innerHTML = '<i class="fas fa-circle"></i> Stopped';
+            showToast('⏹️ Bot stopped', 'warning');
+        }
+        
+        function deleteBot(botId) {
+            if (confirm('Are you sure you want to delete this bot? This action cannot be undone.')) {
+                document.getElementById(botId).remove();
+                showToast('🗑️ Bot deleted successfully', 'success');
+            }
+        }
+        
+        function refreshBots() {
+            showToast('🔄 Refreshing bot list...', 'info');
+            setTimeout(() => {
+                showToast('✅ Bot list updated!', 'success');
+            }, 1000);
+        }
+        
+        // ===== SQ & PACKAGES =====
+        function showPackages() {
+            document.getElementById('packagesModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            selectedPackage = null;
+            document.getElementById('whatsappPayBtn').disabled = true;
+        }
+        
+        function selectPackage(sq, price, duration) {
+            selectedPackage = { sq, price, duration };
+            document.getElementById('whatsappPayBtn').disabled = false;
+            showToast(`Selected: ${sq} SQ for ${price}/= (${duration})`, 'success');
+            
+            // Highlight selected
+            document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+        
+        function payViaWhatsApp() {
+            if (!selectedPackage) return;
+            
+            const message = `*STANY BOT HOSTING - SQ ORDER*%0A%0A` +
+                          `👤 Username: ${currentUser?.displayName || 'New User'}%0A` +
+                          `📦 Package: ${selectedPackage.sq} SQ%0A` +
+                          `💰 Price: ${selectedPackage.price}/=%0A` +
+                          `⏱️ Duration: ${selectedPackage.duration}%0A%0A` +
+                          `✅ I have completed payment. Please add SQ to my account.`;
+            
+            const whatsappUrl = `https://wa.me/255787069580?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showToast('📱 WhatsApp opened! Complete your payment & admin will add SQ soon 🎁', 'success');
+            closeModal('packagesModal');
+        }
+        
+        // ===== REFERRAL SYSTEM =====
+        function copyReferral() {
+            const code = document.getElementById('referralCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast(`📋 Referral code copied: ${code}`, 'success');
+            });
+        }
+        
+        function copyReferralLink() {
+            const link = document.getElementById('referralLink').value;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast('🔗 Referral link copied! Share it with friends 🎁', 'success');
+            });
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        function previewProfile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.style.animation = 'toastSlide 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+        
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('userDropdown');
+            const avatar = document.getElementById('userAvatar');
+            if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    selectedPackage = null;
+                    document.getElementById('whatsappPayBtn').disabled = true;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+
