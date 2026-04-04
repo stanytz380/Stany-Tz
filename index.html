@@ -2,213 +2,128 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>STANY NETFLIX PRO</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Movie Stream Finder</title>
 <style>
-body { background:#0f0f0f; color:white; font-family:Arial; }
-h1,h2 { margin-left:10px; }
-
-.section { display:flex; overflow-x:auto; padding:10px; }
-
+body {
+  font-family: Arial;
+  background: #0d0d0d;
+  color: white;
+  padding: 20px;
+}
+input, select, button {
+  padding: 10px;
+  margin: 5px;
+}
 .movie {
-  min-width:150px;
-  margin-right:10px;
-  cursor:pointer;
+  border: 1px solid #333;
+  padding: 10px;
+  margin-top: 10px;
 }
-
-.movie img { width:100%; border-radius:10px; }
-
-#player iframe {
-  width:100%;
-  height:300px;
-  border:none;
-  border-radius:10px;
+img {
+  width: 150px;
 }
-
-select, button, input {
-  padding:10px;
-  margin:5px;
-  border-radius:8px;
-  border:none;
+.links a {
+  display: block;
+  color: cyan;
+  margin: 3px 0;
 }
-
 </style>
 </head>
-
 <body>
 
-<h1>🎬 STANY NETFLIX PRO</h1>
+<h1>🎬 Movie Stream Finder</h1>
 
-<input id="search" placeholder="Search movie or series...">
-<button onclick="search()">Search</button>
-<button onclick="showFavorites()">❤️ Favorites</button>
+<input type="text" id="search" placeholder="Enter movie name">
+<button onclick="searchMovie()">Search</button>
 
-<div id="content"></div>
-<div id="player"></div>
+<select onchange="loadCategory(this.value)">
+  <option value="">-- Select Category --</option>
+  <option value="popular">Popular</option>
+  <option value="top_rated">Top Rated</option>
+  <option value="now_playing">Now Playing</option>
+  <option value="upcoming">Upcoming</option>
+  <option value="trending">Trending</option>
+</select>
+
+<div id="results"></div>
 
 <script>
-
 const API_KEY = "2e211dfda888f7cc55ce433d743f9bc3";
-const IMG = "https://image.tmdb.org/t/p/w500";
+const BASE = "https://api.themoviedb.org/3";
 
-function saveFav(item){
-  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
-  favs.push(item);
-  localStorage.setItem("favs", JSON.stringify(favs));
-  alert("Saved ❤️");
+async function searchMovie() {
+  let query = document.getElementById("search").value;
+  let res = await fetch(`${BASE}/search/movie?api_key=${API_KEY}&query=${query}`);
+  let data = await res.json();
+  showMovies(data.results);
 }
 
-function showFavorites(){
-  const favs = JSON.parse(localStorage.getItem("favs") || "[]");
-  document.getElementById("content").innerHTML = "<h2>❤️ Favorites</h2>";
+async function loadCategory(type) {
+  let url = "";
 
-  favs.forEach(item=>{
-    createCard(item, item.type);
-  });
+  if(type === "trending"){
+    url = `${BASE}/trending/movie/week?api_key=${API_KEY}`;
+  } else {
+    url = `${BASE}/movie/${type}?api_key=${API_KEY}`;
+  }
+
+  let res = await fetch(url);
+  let data = await res.json();
+  showMovies(data.results);
 }
 
-function createCard(item, type){
-  const div = document.createElement("div");
-  div.className="movie";
+function showMovies(movies) {
+  let html = "";
 
-  div.innerHTML=`
-    <img src="${IMG + item.poster}">
-    <p>${item.title}</p>
-  `;
+  movies.forEach(m => {
+    let poster = m.poster_path 
+      ? `https://image.tmdb.org/t/p/w500${m.poster_path}` 
+      : "";
 
-  div.onclick = ()=> play(item.id, type);
-  document.getElementById("content").appendChild(div);
-}
+    html += `
+    <div class="movie">
+      <h3>${m.title}</h3>
+      <img src="${poster}">
+      <p>⭐ Rating: ${m.vote_average}</p>
+      <p>${m.overview}</p>
 
-async function fetchCategory(title, url, type="movie"){
-  const res = await fetch(url);
-  const data = await res.json();
+      <button onclick="getLinks(${m.id})">Get Stream Links</button>
 
-  const section = document.createElement("div");
-  section.innerHTML = `<h2>${title}</h2><div class="section"></div>`;
-  const container = section.querySelector(".section");
-
-  data.results.forEach(item=>{
-    const div = document.createElement("div");
-    div.className="movie";
-
-    div.innerHTML=`
-      <img src="${IMG + item.poster_path}">
-      <p>${item.title || item.name}</p>
+      <div id="links-${m.id}" class="links"></div>
+    </div>
     `;
-
-    div.onclick = ()=>{
-      play(item.id, item.media_type || type);
-      saveFav({
-        id:item.id,
-        title:item.title||item.name,
-        poster:item.poster_path,
-        type:item.media_type||type
-      });
-    };
-
-    container.appendChild(div);
   });
 
-  document.getElementById("content").appendChild(section);
+  document.getElementById("results").innerHTML = html;
 }
 
-function play(id, type){
-  if(type==="tv"){
-    loadSeries(id);
-  }else{
-    document.getElementById("player").innerHTML = `
-      <h2>Now Playing</h2>
-      <iframe src="https://vidsrc.to/embed/movie/${id}" allowfullscreen></iframe>
-    `;
-  }
-}
+async function getLinks(id) {
 
-async function loadSeries(id){
-  const res = await fetch(
-    `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`
-  );
-  const data = await res.json();
+  // Hizi ni SOURCES za streaming (no ads direct)
+  let sources = [
+    `https://vidsrc.to/embed/movie/${id}`,
+    `https://vidsrc.me/embed/movie?tmdb=${id}`,
+    `https://multiembed.mov/?video_id=${id}&tmdb=1`
+  ];
 
-  let seasons = data.seasons.map(s =>
-    `<option value="${s.season_number}">Season ${s.season_number}</option>`
-  ).join("");
+  let qualities = ["480p", "720p", "1080p"];
 
-  document.getElementById("player").innerHTML = `
-    <h2>${data.name}</h2>
+  let html = "<h4>🎥 Stream Links:</h4>";
 
-    <select id="season">${seasons}</select>
-    <select id="episode"></select>
+  sources.forEach((src, i) => {
+    html += `<a href="${src}" target="_blank">${qualities[i] || "HD"} - Open Player</a>`;
+  });
 
-    <button onclick="playEpisode(${id})">▶️ Play</button>
+  // Example "direct style links" (fake structure but useful for API expansion)
+  html += `<hr><b>Direct Style (Use in player):</b>`;
 
-    <iframe id="frame"></iframe>
+  html += `
+    <a href="https://vidsrc.to/embed/movie/${id}">Embed Link</a>
+    <a href="https://vidsrc.me/embed/movie?tmdb=${id}">Alt Embed</a>
   `;
 
-  loadEpisodes(id);
+  document.getElementById(`links-${id}`).innerHTML = html;
 }
-
-async function loadEpisodes(id){
-  const season = document.getElementById("season").value;
-
-  const res = await fetch(
-    `https://api.themoviedb.org/3/tv/${id}/season/${season}?api_key=${API_KEY}`
-  );
-
-  const data = await res.json();
-
-  let eps = data.episodes.map(e =>
-    `<option value="${e.episode_number}">Ep ${e.episode_number}</option>`
-  ).join("");
-
-  document.getElementById("episode").innerHTML = eps;
-}
-
-function playEpisode(id){
-  const s = document.getElementById("season").value;
-  const e = document.getElementById("episode").value;
-
-  document.getElementById("frame").src =
-    `https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
-}
-
-document.addEventListener("change", e=>{
-  if(e.target.id==="season"){
-    loadEpisodes();
-  }
-});
-
-async function loadHome(){
-  document.getElementById("content").innerHTML="";
-
-  fetchCategory("🔥 Trending",
-    `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}`);
-
-  fetchCategory("⭐ Popular Movies",
-    `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
-
-  fetchCategory("🆕 Now Playing",
-    `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`);
-
-  fetchCategory("🏆 Top Rated",
-    `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`);
-
-  fetchCategory("📺 TV Series",
-    `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`, "tv");
-}
-
-async function search(){
-  const q = document.getElementById("search").value;
-
-  document.getElementById("content").innerHTML="";
-
-  fetchCategory("🔍 Results",
-    `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`);
-}
-
-loadHome();
-
 </script>
 
 </body>
