@@ -1,842 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0a0a12">
-  <meta name="description" content="STANY BOT HOSTING Dashboard - Manage your bots">
-  <title>Dashboard • STANY BOT HOSTING</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  
-  <style>
-    :root {
-      --bg: #0a0a12; --surface: rgba(255,255,255,0.05); --surface-hover: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.08); --neon: #00ff88; --neon2: #00cfff; --accent: #a259ff;
-      --text: #fff; --text-muted: rgba(255,255,255,0.5); --glass: blur(20px) saturate(180%);
-      --shadow: 0 8px 32px rgba(0,0,0,0.4); --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; overflow-x: hidden; }
-    body::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse at top, rgba(10,10,18,0.7), rgba(10,10,18,0.95)); z-index:0; }
-    .orb { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:1; opacity:0.5; }
-    .orb-1 { width:400px; height:400px; background:radial-gradient(circle, rgba(0,255,136,0.15), transparent 70%); top:-100px; left:-100px; animation:drift 20s infinite alternate; }
-    .orb-2 { width:350px; height:350px; background:radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%); bottom:-100px; right:-80px; animation:drift 24s infinite alternate-reverse; }
-    @keyframes drift { to { transform:translate(50px,50px); } }
-    #particles { position:fixed; inset:0; z-index:2; pointer-events:none; }
+<meta charset="UTF-8">
+<title>STANY NETFLIX PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    /* Header */
-    header { position:sticky; top:0; z-index:50; background:rgba(10,10,18,0.9); backdrop-filter:var(--glass); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
-    .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.2rem; }
-    .logo img { width:36px; height:36px; border-radius:10px; border:2px solid var(--neon); }
-    .user-bar { display:flex; align-items:center; gap:12px; }
-    .sq-badge { background:rgba(0,255,136,0.15); border:1px solid rgba(0,255,136,0.3); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; color:var(--neon); display:flex; align-items:center; gap:5px; }
-    .user-avatar { width:36px; height:36px; border-radius:50%; border:2px solid var(--accent); object-fit:cover; }
-    .btn { padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.3s; border:none; display:inline-flex; align-items:center; gap:6px; font-size:13px; text-decoration:none; }
-    .btn-primary { background:linear-gradient(135deg, var(--neon), var(--neon2)); color:#000; }
-    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,255,136,0.4); }
-    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
-    .btn-outline:hover { border-color:var(--neon); color:var(--neon); }
-    .btn-danger { background:var(--danger); color:#fff; }
-    .btn-sm { padding:6px 12px; font-size:12px; }
+<style>
+body { background:#0f0f0f; color:white; font-family:Arial; }
+h1,h2 { margin-left:10px; }
 
-    /* Main Layout */
-    .dashboard { display:grid; grid-template-columns:220px 1fr; min-height:calc(100vh-60px); }
-    @media(max-width:900px) { .dashboard { grid-template-columns:1fr; } .sidebar { position:fixed; left:-220px; width:220px; height:100vh; z-index:40; transition:left 0.3s; background:var(--bg); border-right:1px solid var(--border); } .sidebar.open { left:0; } .menu-toggle { display:block !important; } }
-    .menu-toggle { display:none; background:none; border:none; color:var(--text); font-size:1.3rem; cursor:pointer; margin-right:10px; }
+.section { display:flex; overflow-x:auto; padding:10px; }
 
-    /* Sidebar */
-    .sidebar { background:rgba(10,10,18,0.95); border-right:1px solid var(--border); padding:20px 10px; position:sticky; top:60px; height:calc(100vh-60px); overflow-y:auto; }
-    .nav-item { padding:10px 16px; border-radius:12px; cursor:pointer; display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text-muted); transition:all 0.2s; margin-bottom:4px; }
-    .nav-item:hover, .nav-item.active { background:var(--surface-hover); color:var(--text); }
-    .nav-item i { width:20px; text-align:center; }
-    .nav-section { margin:20px 0 10px; padding-top:15px; border-top:1px solid var(--border); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding-left:16px; }
+.movie {
+  min-width:150px;
+  margin-right:10px;
+  cursor:pointer;
+}
 
-    /* Content */
-    .content { padding:24px; overflow-y:auto; }
-    .page { display:none; }
-    .page.active { display:block; animation:fadeUp 0.4s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.movie img { width:100%; border-radius:10px; }
 
-    .page-header { margin-bottom:24px; }
-    .page-title { font-size:1.6rem; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
-    .page-subtitle { color:var(--text-muted); font-size:14px; }
+#player iframe {
+  width:100%;
+  height:300px;
+  border:none;
+  border-radius:10px;
+}
 
-    /* Stats Cards */
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
-    .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; text-align:center; }
-    .stat-value { font-size:1.8rem; font-weight:800; margin:8px 0; background:linear-gradient(135deg, var(--neon), var(--neon2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .stat-label { font-size:12px; color:var(--text-muted); }
+select, button, input {
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+  border:none;
+}
 
-    /* Cards */
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; margin-bottom:20px; }
-    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
-    .card-title { font-size:1.2rem; font-weight:700; display:flex; align-items:center; gap:8px; }
-
-    /* Forms */
-    .form-group { margin-bottom:16px; }
-    .form-label { display:block; margin-bottom:6px; font-size:13px; color:var(--text-muted); }
-    .form-input, .form-textarea { width:100%; padding:12px 14px; border-radius:12px; background:rgba(15,23,42,0.6); border:1px solid var(--border); color:var(--text); font-size:14px; }
-    .form-input:focus, .form-textarea:focus { outline:none; border-color:var(--neon); }
-    .form-textarea { min-height:100px; font-family:monospace; resize:vertical; }
-
-    /* Env Vars */
-    .env-list { display:flex; flex-direction:column; gap:10px; max-height:200px; overflow-y:auto; }
-    .env-item { display:flex; gap:8px; align-items:center; }
-    .env-key { flex:1; }
-    .env-val { flex:2; }
-    .btn-remove { width:32px; height:32px; border-radius:8px; background:var(--danger); color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .btn-add-env { width:100%; padding:10px; border-radius:12px; background:transparent; border:1px dashed var(--border); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
-    .btn-add-env:hover { border-color:var(--neon); color:var(--neon); }
-
-    /* Bot List */
-    .bot-list { display:flex; flex-direction:column; gap:12px; }
-    .bot-item { background:rgba(30,41,59,0.4); border-radius:16px; padding:16px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--success); }
-    .bot-item.stopped { border-left-color:var(--danger); }
-    .bot-info h4 { font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
-    .bot-info p { color:var(--text-muted); font-size:13px; }
-    .bot-url { font-size:12px; color:var(--neon2); word-break:break-all; margin-top:4px; }
-    .bot-url:hover { text-decoration:underline; cursor:pointer; }
-    .status-badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:4px; }
-    .status-running { background:rgba(16,185,129,0.15); color:var(--success); }
-    .status-stopped { background:rgba(239,68,68,0.15); color:var(--danger); }
-    .bot-actions { display:flex; gap:6px; }
-    .btn-icon { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(99,102,241,0.15); color:var(--accent); border:none; cursor:pointer; transition:all 0.2s; }
-    .btn-icon:hover { background:var(--accent); color:#fff; transform:scale(1.1); }
-    .btn-icon.danger:hover { background:var(--danger); }
-
-    /* Logs Terminal */
-    .logs-terminal { background:#0d1117; border:1px solid var(--border); border-radius:16px; padding:16px; font-family:monospace; font-size:12px; max-height:400px; overflow-y:auto; }
-    .log-line { padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; gap:10px; }
-    .log-time { color:var(--text-muted); min-width:70px; }
-    .log-msg { color:var(--text); }
-    .log-msg.error { color:var(--danger); }
-    .log-msg.success { color:var(--success); }
-    .log-msg.info { color:var(--neon2); }
-
-    /* Session Cards */
-    .session-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; }
-    .session-card { background:rgba(30,41,59,0.4); border-radius:16px; padding:20px; text-align:center; border:1px solid var(--border); transition:all 0.3s; }
-    .session-card:hover { border-color:var(--neon); transform:translateY(-3px); }
-    .session-card i { font-size:2rem; margin-bottom:10px; background:linear-gradient(135deg, var(--neon), var(--neon2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .session-card h4 { margin:8px 0; font-weight:600; }
-    .session-card p { color:var(--text-muted); font-size:13px; margin-bottom:12px; }
-
-    /* Referral */
-    .referral-box { text-align:center; padding:20px; }
-    .ref-code { background:rgba(0,255,136,0.1); border:2px dashed rgba(0,255,136,0.3); border-radius:16px; padding:16px; font-family:monospace; font-size:1.2rem; font-weight:700; letter-spacing:2px; margin:12px 0; cursor:pointer; }
-    .ref-code:hover { background:rgba(0,255,136,0.15); }
-    .ref-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0; }
-    .ref-stat { background:rgba(30,41,59,0.4); border-radius:12px; padding:12px; text-align:center; }
-    .ref-stat-value { font-size:1.4rem; font-weight:800; color:var(--neon); }
-    .ref-stat-label { font-size:11px; color:var(--text-muted); }
-    .ref-link { display:flex; gap:8px; margin-top:12px; }
-    .ref-link input { flex:1; padding:10px 14px; border-radius:12px; background:rgba(15,23,42,0.6); border:1px solid var(--border); color:var(--text); font-size:13px; }
-    .btn-copy { padding:10px 16px; border-radius:12px; background:var(--neon); color:#000; font-weight:600; border:none; cursor:pointer; }
-
-    /* Footer */
-    footer { text-align:center; padding:20px; border-top:1px solid var(--border); color:var(--text-muted); font-size:12px; }
-
-    /* Responsive */
-    @media(max-width:600px) {
-      .stats-grid { grid-template-columns:repeat(2,1fr); }
-      .ref-stats { grid-template-columns:1fr; }
-      .content { padding:16px; }
-    }
-
-    .hidden { display:none !important; }
-    body.no-select { -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
-    ::-webkit-scrollbar { width:6px; }
-    ::-webkit-scrollbar-track { background:transparent; }
-    ::-webkit-scrollbar-thumb { background:rgba(0,207,255,0.3); border-radius:3px; }
-  </style>
+</style>
 </head>
-<body class="no-select">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <canvas id="particles"></canvas>
 
-  <!-- Header -->
-  <header>
-    <div style="display:flex;align-items:center">
-      <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-      <div class="logo">
-        <img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/705D6C77-3C37-4294-A509-3C2B9C4A34D2.png" alt="STANY">
-        STANY BOT
-      </div>
-    </div>
-    <div class="user-bar">
-      <div class="sq-badge"><i class="fa-solid fa-coins"></i><span id="dashSQ">10</span> SQ</div>
-      <img src="" class="user-avatar" id="dashAvatar">
-      <span id="dashName" style="font-weight:600;font-size:14px"></span>
-      <button class="btn btn-outline btn-sm" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i></button>
-    </div>
-  </header>
+<body>
 
-  <!-- Dashboard -->
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="nav-item active" onclick="showPage('overview')"><i class="fa-solid fa-home"></i> Overview</div>
-      <div class="nav-item" onclick="showPage('deploy')"><i class="fa-solid fa-rocket"></i> Deploy Bot</div>
-      <div class="nav-item" onclick="showPage('bots')"><i class="fa-solid fa-list"></i> My Bots</div>
-      <div class="nav-item" onclick="showPage('session')"><i class="fa-solid fa-qrcode"></i> Get Session</div>
-      <div class="nav-item" onclick="showPage('referral')"><i class="fa-solid fa-gift"></i> Referrals</div>
-      
-      <div class="nav-section">Account</div>
-      <div class="nav-item" onclick="showPage('packages')"><i class="fa-solid fa-coins"></i> Buy SQ</div>
-      <div class="nav-item" onclick="showPage('settings')"><i class="fa-solid fa-cog"></i> Settings</div>
-      
-      <div class="nav-section" style="margin-top:30px">
-        <a href="index.html" style="color:var(--danger);text-decoration:none;display:flex;align-items:center;gap:10px">
-          <i class="fa-solid fa-arrow-left"></i> Back to Home
-        </a>
-      </div>
-    </aside>
+<h1>🎬 STANY NETFLIX PRO</h1>
 
-    <!-- Content -->
-    <main class="content">
-      <!-- Overview Page -->
-      <div id="page-overview" class="page active">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-chart-simple"></i> Dashboard Overview</h1>
-          <p class="page-subtitle">Manage your bots and SQ tokens</p>
-        </div>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <i class="fa-solid fa-coins" style="color:var(--neon);font-size:1.5rem"></i>
-            <div class="stat-value" id="statSQ">10</div>
-            <div class="stat-label">SQ Balance</div>
-          </div>
-          <div class="stat-card">
-            <i class="fa-solid fa-robot" style="color:var(--accent);font-size:1.5rem"></i>
-            <div class="stat-value" id="statBots">0</div>
-            <div class="stat-label">Active Bots</div>
-          </div>
-          <div class="stat-card">
-            <i class="fa-solid fa-bolt" style="color:var(--neon2);font-size:1.5rem"></i>
-            <div class="stat-value">99.9%</div>
-            <div class="stat-label">Uptime</div>
-          </div>
-          <div class="stat-card">
-            <i class="fa-solid fa-gift" style="color:var(--warning);font-size:1.5rem"></i>
-            <div class="stat-value" id="statRef">0</div>
-            <div class="stat-label">Referrals</div>
-          </div>
-        </div>
+<input id="search" placeholder="Search movie or series...">
+<button onclick="search()">Search</button>
+<button onclick="showFavorites()">❤️ Favorites</button>
 
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-rocket"></i> Quick Deploy</h3>
-          </div>
-          <p style="color:var(--text-muted);margin-bottom:16px">Deploy our official bot for FREE on your first time!</p>
-          <button class="btn btn-primary" onclick="quickDeploy()"><i class="fa-solid fa-magic"></i> Deploy iamlegendv2.1 (FREE)</button>
-        </div>
+<div id="content"></div>
+<div id="player"></div>
 
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-list"></i> Recent Activity</h3>
-          </div>
-          <div id="activityLog" style="color:var(--text-muted);font-size:14px">
-            <p><i class="fa-solid fa-circle-info"></i> No recent activity yet</p>
-          </div>
-        </div>
-      </div>
+<script>
 
-      <!-- Deploy Page -->
-      <div id="page-deploy" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-rocket"></i> Deploy New Bot</h1>
-          <p class="page-subtitle">Enter repo URL and configure your bot</p>
-        </div>
+const API_KEY = "2e211dfda888f7cc55ce433d743f9bc3";
+const IMG = "https://image.tmdb.org/t/p/w500";
 
-        <div class="card">
-          <div class="form-group">
-            <label class="form-label">GitHub Repository URL</label>
-            <input type="url" class="form-input" id="repoUrl" placeholder="https://github.com/username/repo" value="https://github.com/stanytz378/iamlegendv2.1">
-          </div>
-          <button class="btn btn-outline" onclick="fetchAppJson()"><i class="fa-solid fa-download"></i> Load app.json Config</button>
-        </div>
+function saveFav(item){
+  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
+  favs.push(item);
+  localStorage.setItem("favs", JSON.stringify(favs));
+  alert("Saved ❤️");
+}
 
-        <div class="card" id="configSection" style="display:none">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-sliders"></i> Configuration (app.json)</h3>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">App Name</label>
-            <input type="text" class="form-input" id="appName" placeholder="my-awesome-bot">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Environment Variables</label>
-            <div class="env-list" id="envVars"></div>
-            <button class="btn-add-env" onclick="addEnvVar()"><i class="fa-solid fa-plus"></i> Add Variable</button>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Deployment Cost: <strong style="color:var(--neon)">5 SQ</strong></label>
-            <button class="btn btn-primary" style="width:100%" onclick="deployBot()"><i class="fa-solid fa-rocket"></i> Deploy Bot (5 SQ)</button>
-          </div>
-        </div>
+function showFavorites(){
+  const favs = JSON.parse(localStorage.getItem("favs") || "[]");
+  document.getElementById("content").innerHTML = "<h2>❤️ Favorites</h2>";
 
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-info-circle"></i> How It Works</h3>
-          </div>
-          <ol style="color:var(--text-muted);font-size:14px;padding-left:20px;line-height:1.8">
-            <li>Enter your bot's GitHub repository URL</li>
-            <li>Click "Load app.json" to auto-fetch configuration</li>
-            <li>Edit environment variables as needed</li>
-            <li>Click Deploy - 5 SQ will be deducted</li>
-            <li>Your bot starts running instantly with a unique URL</li>
-          </ol>
-        </div>
-      </div>
+  favs.forEach(item=>{
+    createCard(item, item.type);
+  });
+}
 
-      <!-- My Bots Page -->
-      <div id="page-bots" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-list"></i> My Bots</h1>
-          <p class="page-subtitle">Manage your deployed bots</p>
-        </div>
+function createCard(item, type){
+  const div = document.createElement("div");
+  div.className="movie";
 
-        <div class="card">
-          <div class="bot-list" id="botList">
-            <!-- Bots will be inserted here -->
-            <div style="text-align:center;color:var(--text-muted);padding:40px">
-              <i class="fa-solid fa-robot" style="font-size:3rem;opacity:0.3;margin-bottom:16px"></i>
-              <p>No bots deployed yet</p>
-              <button class="btn btn-primary btn-sm" onclick="showPage('deploy')" style="margin-top:12px">Deploy Your First Bot</button>
-            </div>
-          </div>
-        </div>
-      </div>
+  div.innerHTML=`
+    <img src="${IMG + item.poster}">
+    <p>${item.title}</p>
+  `;
 
-      <!-- Session Page -->
-      <div id="page-session" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-qrcode"></i> Get WhatsApp Session</h1>
-          <p class="page-subtitle">Connect your WhatsApp to deploy bots</p>
-        </div>
+  div.onclick = ()=> play(item.id, type);
+  document.getElementById("content").appendChild(div);
+}
 
-        <div class="session-grid">
-          <a href="https://session-id-generator-4xuy.onrender.com/qrpage" target="_blank" class="session-card">
-            <i class="fa-solid fa-qrcode"></i>
-            <h4>Scan QR Code</h4>
-            <p>Quick & secure pairing</p>
-            <span class="btn btn-outline btn-sm"><i class="fa-solid fa-external-link-alt"></i> Open QR</span>
-          </a>
-          <a href="https://session-id-generator-4xuy.onrender.com/pair" target="_blank" class="session-card">
-            <i class="fa-solid fa-key"></i>
-            <h4>Pair Code</h4>
-            <p>Link via phone number</p>
-            <span class="btn btn-outline btn-sm"><i class="fa-solid fa-external-link-alt"></i> Get Code</span>
-          </a>
-        </div>
+async function fetchCategory(title, url, type="movie"){
+  const res = await fetch(url);
+  const data = await res.json();
 
-        <div class="card" style="margin-top:20px">
-          <div class="card-header">
-            <h3 class="card-title"><i class="fa-solid fa-shield"></i> Session Security</h3>
-          </div>
-          <ul style="color:var(--text-muted);font-size:14px;padding-left:20px;line-height:1.8">
-            <li>Sessions are encrypted end-to-end</li>
-            <li>Never share your session ID with anyone</li>
-            <li>Use environment variables to store sessions securely</li>
-            <li>Regenerate sessions if compromised</li>
-          </ul>
-        </div>
-      </div>
+  const section = document.createElement("div");
+  section.innerHTML = `<h2>${title}</h2><div class="section"></div>`;
+  const container = section.querySelector(".section");
 
-      <!-- Referral Page -->
-      <div id="page-referral" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-gift"></i> Referral Program</h1>
-          <p class="page-subtitle">Invite friends & earn 3 SQ per signup</p>
-        </div>
+  data.results.forEach(item=>{
+    const div = document.createElement("div");
+    div.className="movie";
 
-        <div class="card referral-box">
-          <p style="color:var(--text-muted)">Your Referral Code</p>
-          <div class="ref-code" id="refCode" onclick="copyRef()">STANY-XXXX</div>
-          <p style="color:var(--text-muted);font-size:13px;cursor:pointer" onclick="copyRef()"><i class="fa-solid fa-copy"></i> Click to copy</p>
-          
-          <div class="ref-stats">
-            <div class="ref-stat">
-              <div class="ref-stat-value" id="refCount">0</div>
-              <div class="ref-stat-label">Signups</div>
-            </div>
-            <div class="ref-stat">
-              <div class="ref-stat-value" id="refEarned">0</div>
-              <div class="ref-stat-label">SQ Earned</div>
-            </div>
-            <div class="ref-stat">
-              <div class="ref-stat-value" id="refTotal">0</div>
-              <div class="ref-stat-label">Total Bonus</div>
-            </div>
-          </div>
-          
-          <div class="ref-link">
-            <input type="text" id="refLink" value="https://stanybot.hosting/?ref=STANY-XXXX" readonly>
-            <button class="btn-copy" onclick="copyRefLink()">Copy</button>
-          </div>
-        </div>
+    div.innerHTML=`
+      <img src="${IMG + item.poster_path}">
+      <p>${item.title || item.name}</p>
+    `;
 
-        <div class="card">
-          <h3 class="card-title" style="margin-bottom:12px"><i class="fa-solid fa-info-circle"></i> How Referrals Work</h3>
-          <ol style="color:var(--text-muted);font-size:14px;padding-left:20px;line-height:1.8">
-            <li>Share your referral link or code with friends</li>
-            <li>When they sign up using your code, you get 3 SQ</li>
-            <li>Your friend also gets 10 SQ signup bonus</li>
-            <li>Track your referrals and earnings in real-time</li>
-          </ol>
-        </div>
-      </div>
-
-      <!-- Packages Page -->
-      <div id="page-packages" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-coins"></i> Buy SQ Tokens</h1>
-          <p class="page-subtitle">Manual payment via WhatsApp • Tanzania Only</p>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-          <div class="card" style="text-align:center;cursor:pointer" onclick="selectPkgDash(15,1000)">
-            <div style="font-size:2rem;font-weight:800;color:var(--neon)">15 SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">1,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Valid 30 days</div>
-          </div>
-          <div class="card" style="text-align:center;cursor:pointer" onclick="selectPkgDash(35,2000)">
-            <div style="font-size:2rem;font-weight:800;color:var(--neon)">35 SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">2,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Valid 30 days</div>
-          </div>
-          <div class="card" style="text-align:center;cursor:pointer" onclick="selectPkgDash(60,3000)">
-            <div style="font-size:2rem;font-weight:800;color:var(--neon)">60 SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">3,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Valid 30 days</div>
-          </div>
-          <div class="card" style="text-align:center;cursor:pointer" onclick="selectPkgDash(80,4000)">
-            <div style="font-size:2rem;font-weight:800;color:var(--neon)">80 SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">4,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Valid 30 days</div>
-          </div>
-          <div class="card" style="text-align:center;cursor:pointer" onclick="selectPkgDash(150,5000)">
-            <div style="font-size:2rem;font-weight:800;color:var(--neon)">150 SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">5,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Valid 30 days</div>
-          </div>
-          <div class="card" style="text-align:center;cursor:pointer;background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3)" onclick="selectPkgDash(999,2000,'unlimited')">
-            <div style="font-size:2rem;font-weight:800;color:var(--warning)">∞ SQ</div>
-            <div style="font-size:1.3rem;font-weight:700;margin:8px 0">2,000/=</div>
-            <div style="color:var(--text-muted);font-size:12px">Unlimited • Premium</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:20px">
-          <button id="whatsappBtnDash" class="btn" style="width:100%;background:#25D366;color:#fff;font-weight:700" onclick="payWhatsAppDash()" disabled>
-            <i class="fa-brands fa-whatsapp"></i> Pay via WhatsApp
-          </button>
-          <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:12px">
-            <i class="fa-solid fa-info-circle"></i> After payment, message will open with your order details. Admin adds SQ within 1 hour.
-          </p>
-        </div>
-      </div>
-
-      <!-- Settings Page -->
-      <div id="page-settings" class="page">
-        <div class="page-header">
-          <h1 class="page-title"><i class="fa-solid fa-cog"></i> Account Settings</h1>
-          <p class="page-subtitle">Manage your profile and preferences</p>
-        </div>
-
-        <div class="card">
-          <div class="form-group">
-            <label class="form-label">Username</label>
-            <input type="text" class="form-input" id="settingUsername" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-input" id="settingEmail" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Referral Code</label>
-            <input type="text" class="form-input" id="settingRef" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">SQ Expiry</label>
-            <input type="text" class="form-input" value="30 days (SQ tokens expire monthly)" readonly>
-          </div>
-          <button class="btn btn-outline" onclick="logout()" style="margin-top:10px"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <footer>
-    <div>&copy; <span id="year"></span> STANY BOT HOSTING</div>
-    <div style="margin-top:4px"><i class="fa-solid fa-code"></i> Crafted by Stany • <i class="fa-solid fa-bolt"></i> Premium Hosting</div>
-  </footer>
-
-  <script>
-    // Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyAGQqAiYCnWR7X8XkxEXCGu19PU45qXDnc",
-      authDomain: "stanyappstore.firebaseapp.com",
-      projectId: "stanyappstore",
-      storageBucket: "stanyappstore.firebasestorage.app",
-      messagingSenderId: "735017831251",
-      appId: "1:735017831251:web:9fa4184ef141349fb9afa6",
-      measurementId: "G-EM3RTMBKTN"
+    div.onclick = ()=>{
+      play(item.id, item.media_type || type);
+      saveFav({
+        id:item.id,
+        title:item.title||item.name,
+        poster:item.poster_path,
+        type:item.media_type||type
+      });
     };
-    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
 
-    // User Data
-    const urlParams = new URLSearchParams(window.location.search);
-    const userParam = urlParams.get('user');
-    let currentUser = userParam ? JSON.parse(decodeURIComponent(userParam)) : null;
-    let selectedPkg = null, bots = [], userSQ = currentUser?.sqBalance || 10;
+    container.appendChild(div);
+  });
 
-    // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    
-    if(!currentUser) { window.location.href = 'index.html'; }
-    else {
-      document.getElementById('dashName').textContent = currentUser.username;
-      document.getElementById('dashAvatar').src = currentUser.photoURL;
-      document.getElementById('dashSQ').textContent = userSQ;
-      document.getElementById('statSQ').textContent = userSQ;
-      document.getElementById('settingUsername').value = currentUser.username;
-      document.getElementById('settingEmail').value = currentUser.email;
-      document.getElementById('settingRef').value = currentUser.referralCode || 'STANY-'+Math.random().toString(36).substr(2,6).toUpperCase();
-      document.getElementById('refCode').textContent = currentUser.referralCode || 'STANY-XXXX';
-      document.getElementById('refLink').value = `https://stanybot.hosting/?ref=${currentUser.referralCode || 'STANY-XXXX'}`;
-    }
+  document.getElementById("content").appendChild(section);
+}
 
-    // Particles
-    const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
-    let width, height, particles = [];
-    function initParticles() {
-      width = window.innerWidth; height = window.innerHeight;
-      canvas.width = width; canvas.height = height;
-      particles = [];
-      for(let i=0;i<40;i++) particles.push({
-        x: Math.random()*width, y: Math.random()*height,
-        vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4,
-        size: Math.random()*2+1, opacity: Math.random()*0.4+0.1
-      });
-    }
-    function drawParticles() {
-      ctx.clearRect(0,0,width,height);
-      ctx.strokeStyle = 'rgba(0,207,255,0.08)'; ctx.lineWidth = 0.5;
-      for(let i=0;i<particles.length;i++) {
-        for(let j=i+1;j<particles.length;j++) {
-          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx*dx+dy*dy);
-          if(dist < 150) {
-            ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0,207,255,${0.08*(1-dist/150)})`; ctx.stroke();
-          }
-        }
-      }
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x<0||p.x>width) p.vx*=-1; if(p.y<0||p.y>height) p.vy*=-1;
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-        ctx.fillStyle = `rgba(0,207,255,${p.opacity})`; ctx.fill();
-      });
-      requestAnimationFrame(drawParticles);
-    }
-    initParticles(); drawParticles();
-    window.addEventListener('resize', initParticles);
+function play(id, type){
+  if(type==="tv"){
+    loadSeries(id);
+  }else{
+    document.getElementById("player").innerHTML = `
+      <h2>Now Playing</h2>
+      <iframe src="https://vidsrc.to/embed/movie/${id}" allowfullscreen></iframe>
+    `;
+  }
+}
 
-    // Navigation
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-    function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-'+pageId).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      event.currentTarget?.classList.add('active');
-      if(window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
-    }
+async function loadSeries(id){
+  const res = await fetch(
+    `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`
+  );
+  const data = await res.json();
 
-    // Fetch app.json from GitHub
-    async function fetchAppJson() {
-      const repo = document.getElementById('repoUrl').value.trim();
-      if(!repo) { showToast('Please enter a repository URL', 'error'); return; }
-      
-      showToast('📦 Fetching app.json...', 'info');
-      
-      // Parse GitHub URL to raw content URL
-      let rawUrl = repo.replace('github.com', 'raw.githubusercontent.com').replace('/tree/main', '').replace('/tree/master', '') + '/main/app.json';
-      
-      try {
-        const response = await fetch(rawUrl);
-        if(!response.ok) throw new Error('Not found');
-        const config = await response.json();
-        
-        // Populate form
-        document.getElementById('appName').value = config.name || 'my-bot';
-        const envVars = config.env || {};
-        const envContainer = document.getElementById('envVars');
-        envContainer.innerHTML = '';
-        
-        Object.entries(envVars).forEach(([key, value]) => {
-          const val = typeof value === 'object' ? value.value || '' : value;
-          addEnvVar(key, val);
-        });
-        
-        document.getElementById('configSection').style.display = 'block';
-        showToast('✅ app.json loaded successfully!', 'success');
-        addActivity(`Loaded config from ${repo.split('/').slice(-1)[0]}`);
-        
-      } catch(e) {
-        // Fallback: show default env vars for known repos
-        if(repo.includes('iamlegendv2.1')) {
-          document.getElementById('appName').value = 'iamlegendv2.1';
-          document.getElementById('envVars').innerHTML = `
-            <div class="env-item"><input type="text" class="form-input env-key" value="SESSION_ID"><input type="text" class="form-input env-val" placeholder="Paste your session here"><button class="btn-remove" onclick="this.parentElement.remove()">×</button></div>
-            <div class="env-item"><input type="text" class="form-input env-key" value="PREFIX"><input type="text" class="form-input env-val" value="."><button class="btn-remove" onclick="this.parentElement.remove()">×</button></div>
-            <div class="env-item"><input type="text" class="form-input env-key" value="OWNER_NUMBER"><input type="text" class="form-input env-val" placeholder="+255..."><button class="btn-remove" onclick="this.parentElement.remove()">×</button></div>
-          `;
-          document.getElementById('configSection').style.display = 'block';
-          showToast('✅ Default config loaded for iamlegendv2.1', 'success');
-        } else {
-          showToast('⚠️ Could not fetch app.json. Using default template.', 'warning');
-          document.getElementById('configSection').style.display = 'block';
-        }
-      }
-    }
+  let seasons = data.seasons.map(s =>
+    `<option value="${s.season_number}">Season ${s.season_number}</option>`
+  ).join("");
 
-    function addEnvVar(key='', val='') {
-      const container = document.getElementById('envVars');
-      const item = document.createElement('div');
-      item.className = 'env-item';
-      item.innerHTML = `
-        <input type="text" class="form-input env-key" placeholder="KEY" value="${key}">
-        <input type="text" class="form-input env-val" placeholder="VALUE" value="${val}">
-        <button class="btn-remove" onclick="this.parentElement.remove()">×</button>
-      `;
-      container.appendChild(item);
-    }
+  document.getElementById("player").innerHTML = `
+    <h2>${data.name}</h2>
 
-    // Deploy Bot
-    async function deployBot() {
-      if(userSQ < 5) { showToast('❌ Insufficient SQ! Need 5 SQ to deploy', 'error'); showPage('packages'); return; }
-      
-      const repo = document.getElementById('repoUrl').value;
-      const appName = document.getElementById('appName').value || 'bot-'+Date.now();
-      
-      // Collect env vars
-      const envVars = {};
-      document.querySelectorAll('.env-item').forEach(item => {
-        const key = item.querySelector('.env-key').value.trim();
-        const val = item.querySelector('.env-val').value;
-        if(key) envVars[key] = val;
-      });
-      
-      showToast('🚀 Deploying bot...', 'info');
-      
-      // Simulate deployment (in production: call backend API)
-      await new Promise(r => setTimeout(r, 2500));
-      
-      // Deduct SQ
-      userSQ -= 5;
-      document.getElementById('dashSQ').textContent = userSQ;
-      document.getElementById('statSQ').textContent = userSQ;
-      
-      // Generate hosting URL (simulated)
-      const hostUrl = `https://${appName.toLowerCase().replace(/[^a-z0-9-]/g,'')}.stanybot.app`;
-      
-      // Add to bots list
-      const bot = {
-        id: 'bot-'+Date.now(), name: appName, repo, url: hostUrl,
-        status: 'running', deployedAt: new Date().toISOString(), env: envVars
-      };
-      bots.unshift(bot);
-      renderBots();
-      document.getElementById('statBots').textContent = bots.filter(b=>b.status==='running').length;
-      
-      // Show logs
-      showLogs(appName, [
-        {time:'00:00:01', msg:'✓ Repository cloned', type:'success'},
-        {time:'00:00:03', msg:'✓ app.json parsed', type:'success'},
-        {time:'00:00:05', msg:'✓ Environment variables configured', type:'info'},
-        {time:'00:00:08', msg:'✓ Dependencies installed', type:'success'},
-        {time:'00:00:12', msg:'✓ Bot started successfully', type:'success'},
-        {time:'00:00:13', msg:`🌐 Bot running at ${hostUrl}`, type:'info'}
-      ]);
-      
-      showToast(`✅ ${appName} deployed! URL: ${hostUrl}`, 'success');
-      addActivity(`Deployed ${appName} • 5 SQ used`);
-      
-      // Reset form
-      document.getElementById('repoUrl').value = '';
-      document.getElementById('configSection').style.display = 'none';
-    }
+    <select id="season">${seasons}</select>
+    <select id="episode"></select>
 
-    function quickDeploy() {
-      document.getElementById('repoUrl').value = 'https://github.com/stanytz378/iamlegendv2.1';
-      fetchAppJson();
-      showPage('deploy');
-      showToast('🎁 FREE deployment! Form pre-filled for iamlegendv2.1', 'success');
-    }
+    <button onclick="playEpisode(${id})">▶️ Play</button>
 
-    // Render Bots
-    function renderBots() {
-      const container = document.getElementById('botList');
-      if(bots.length === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px"><i class="fa-solid fa-robot" style="font-size:3rem;opacity:0.3;margin-bottom:16px"></i><p>No bots deployed yet</p><button class="btn btn-primary btn-sm" onclick="showPage('deploy')" style="margin-top:12px">Deploy Your First Bot</button></div>`;
-        return;
-      }
-      
-      container.innerHTML = bots.map(bot => `
-        <div class="bot-item ${bot.status==='stopped'?'stopped':''}" id="${bot.id}">
-          <div class="bot-info">
-            <h4><i class="fa-solid fa-${bot.status==='running'?'check-circle':'circle'}" style="color:${bot.status==='running'?'var(--success)':'var(--danger)'}"></i> ${bot.name}</h4>
-            <p>${bot.repo.split('/').slice(-2).join('/')} • Deployed ${new Date(bot.deployedAt).toLocaleDateString()}</p>
-            <a href="${bot.url}" target="_blank" class="bot-url"><i class="fa-solid fa-external-link-alt"></i> ${bot.url}</a>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <span class="status-badge ${bot.status==='running'?'status-running':'status-stopped'}">
-              <i class="fa-solid fa-circle"></i> ${bot.status==='running'?'Running':'Stopped'}
-            </span>
-            <div class="bot-actions">
-              <button class="btn-icon" title="View Logs" onclick="showBotLogs('${bot.id}')"><i class="fa-solid fa-terminal"></i></button>
-              <button class="btn-icon" title="${bot.status==='running'?'Stop':'Start'}" onclick="toggleBot('${bot.id}')"><i class="fa-solid fa-${bot.status==='running'?'stop':'play'}"></i></button>
-              <button class="btn-icon" title="Restart" onclick="restartBot('${bot.id}')"><i class="fa-solid fa-redo"></i></button>
-              <button class="btn-icon danger" title="Delete" onclick="deleteBot('${bot.id}')"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
+    <iframe id="frame"></iframe>
+  `;
 
-    function toggleBot(botId) {
-      const bot = bots.find(b=>b.id===botId);
-      if(!bot) return;
-      bot.status = bot.status === 'running' ? 'stopped' : 'running';
-      renderBots();
-      document.getElementById('statBots').textContent = bots.filter(b=>b.status==='running').length;
-      showToast(`${bot.name} ${bot.status==='running'?'started':'stopped'}`, bot.status==='running'?'success':'warning');
-      addActivity(`${bot.status==='running'?'Started':'Stopped'} ${bot.name}`);
-    }
+  loadEpisodes(id);
+}
 
-    function restartBot(botId) {
-      const bot = bots.find(b=>b.id===botId);
-      showToast(`🔄 Restarting ${bot?.name}...`, 'info');
-      setTimeout(()=>{ showToast(`✅ ${bot?.name} restarted`, 'success'); addActivity(`Restarted ${bot?.name}`); }, 1500);
-    }
+async function loadEpisodes(id){
+  const season = document.getElementById("season").value;
 
-    function deleteBot(botId) {
-      if(confirm('Delete this bot? This cannot be undone.')) {
-        const bot = bots.find(b=>b.id===botId);
-        bots = bots.filter(b=>b.id!==botId);
-        renderBots();
-        document.getElementById('statBots').textContent = bots.filter(b=>b.status==='running').length;
-        showToast(`🗑️ ${bot?.name} deleted`, 'success');
-        addActivity(`Deleted ${bot?.name}`);
-      }
-    }
+  const res = await fetch(
+    `https://api.themoviedb.org/3/tv/${id}/season/${season}?api_key=${API_KEY}`
+  );
 
-    function showBotLogs(botId) {
-      const bot = bots.find(b=>b.id===botId);
-      if(!bot) return;
-      showPage('bots');
-      showLogs(bot.name, [
-        {time:'00:00:01', msg:`Starting ${bot.name}...`, type:'info'},
-        {time:'00:00:02', msg:'Loading environment variables', type:'info'},
-        {time:'00:00:03', msg:'Connecting to WhatsApp...', type:'info'},
-        {time:'00:00:05', msg:'✓ Session authenticated', type:'success'},
-        {time:'00:00:06', msg:'Bot is ready to receive commands', type:'success'},
-        {time:'00:00:10', msg:'[INFO] Message received: !help', type:'info'},
-        {time:'00:00:11', msg:'[RESPONSE] Sending help menu...', type:'info'},
-        {time:'00:00:15', msg:'✓ Message delivered', type:'success'}
-      ]);
-    }
+  const data = await res.json();
 
-    function showLogs(botName, logs) {
-      // Create logs modal/section
-      const logsSection = document.createElement('div');
-      logsSection.className = 'card';
-      logsSection.style.marginTop = '20px';
-      logsSection.innerHTML = `
-        <div class="card-header">
-          <h3 class="card-title"><i class="fa-solid fa-terminal"></i> Logs: ${botName}</h3>
-          <button class="btn btn-outline btn-sm" onclick="this.closest('.card').remove()"><i class="fa-solid fa-times"></i></button>
-        </div>
-        <div class="logs-terminal" id="logsContent"></div>
-      `;
-      
-      // Insert after bot list or in current page
-      const page = document.querySelector('.page.active');
-      page.appendChild(logsSection);
-      
-      // Render logs with typing effect
-      const container = document.getElementById('logsContent');
-      let i = 0;
-      function typeLog() {
-        if(i < logs.length) {
-          const log = logs[i];
-          const line = document.createElement('div');
-          line.className = 'log-line';
-          line.innerHTML = `<span class="log-time">${log.time}</span><span class="log-msg ${log.type||''}">${log.msg}</span>`;
-          container.appendChild(line);
-          container.scrollTop = container.scrollHeight;
-          i++;
-          setTimeout(typeLog, 300);
-        }
-      }
-      container.innerHTML = '';
-      typeLog();
-    }
+  let eps = data.episodes.map(e =>
+    `<option value="${e.episode_number}">Ep ${e.episode_number}</option>`
+  ).join("");
 
-    // Referral
-    function copyRef() {
-      const code = document.getElementById('refCode').textContent;
-      navigator.clipboard.writeText(code).then(()=> showToast('📋 Referral code copied!', 'success'));
-    }
-    function copyRefLink() {
-      const link = document.getElementById('refLink').value;
-      navigator.clipboard.writeText(link).then(()=> showToast('🔗 Referral link copied!', 'success'));
-    }
+  document.getElementById("episode").innerHTML = eps;
+}
 
-    // Packages in Dashboard
-    function selectPkgDash(sq, price, duration='30 days') {
-      selectedPkg = {sq, price, duration};
-      document.getElementById('whatsappBtnDash').disabled = false;
-      showToast(`Selected: ${sq} SQ for ${price}/=`, 'success');
-    }
-    function payWhatsAppDash() {
-      if(!selectedPkg || !currentUser) return;
-      const msg = `*STANY BOT HOSTING - SQ ORDER*%0A%0A👤 User: ${currentUser.username}%0A📦 Package: ${selectedPkg.sq} SQ%0A💰 Price: ${selectedPkg.price}/=%0A⏱️ Duration: ${selectedPkg.duration}%0A%0A✅ Payment completed. Please add SQ.`;
-      window.open(`https://wa.me/255787069580?text=${msg}`, '_blank');
-      showToast('📱 WhatsApp opened! Admin will add SQ soon');
-    }
+function playEpisode(id){
+  const s = document.getElementById("season").value;
+  const e = document.getElementById("episode").value;
 
-    // Activity & Utils
-    function addActivity(msg) {
-      const log = document.getElementById('activityLog');
-      const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-      log.innerHTML = `<p style="margin-bottom:8px"><i class="fa-solid fa-circle" style="font-size:8px;color:var(--neon);margin-right:8px"></i>${time} - ${msg}</p>` + log.innerHTML;
-    }
-    function showToast(msg, type='success') {
-      const toast = document.createElement('div');
-      toast.style.cssText = `position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid ${type==='error'?'var(--danger)':type==='warning'?'var(--warning)':'var(--neon)'};border-radius:16px;padding:12px 20px;z-index:2000;display:flex;align-items:center;gap:10px;animation:slideIn 0.3s ease`;
-      toast.innerHTML = `<i class="fa-solid fa-${type==='error'?'exclamation-circle':type==='warning'?'triangle-exclamation':'check-circle'}" style="color:${type==='error'?'var(--danger)':type==='warning'?'var(--warning)':'var(--neon)'}"></i><span>${msg}</span>`;
-      document.body.appendChild(toast);
-      setTimeout(()=>{toast.style.animation='slideIn 0.3s ease reverse';setTimeout(()=>toast.remove(),300)},4000);
-    }
-    if(!document.querySelector('style#toastAnim')) {
-      const s=document.createElement('style');s.id='toastAnim';s.textContent='@keyframes slideIn{from{opacity:0;transform:translateX(100px)}to{opacity:1;transform:translateX(0)}}';
-      document.head.appendChild(s);
-    }
-    function logout() { window.location.href = 'index.html'; }
-  </script>
+  document.getElementById("frame").src =
+    `https://vidsrc.to/embed/tv/${id}/${s}/${e}`;
+}
+
+document.addEventListener("change", e=>{
+  if(e.target.id==="season"){
+    loadEpisodes();
+  }
+});
+
+async function loadHome(){
+  document.getElementById("content").innerHTML="";
+
+  fetchCategory("🔥 Trending",
+    `https://api.themoviedb.org/3/trending/all/day?api_key=${API_KEY}`);
+
+  fetchCategory("⭐ Popular Movies",
+    `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+
+  fetchCategory("🆕 Now Playing",
+    `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`);
+
+  fetchCategory("🏆 Top Rated",
+    `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`);
+
+  fetchCategory("📺 TV Series",
+    `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`, "tv");
+}
+
+async function search(){
+  const q = document.getElementById("search").value;
+
+  document.getElementById("content").innerHTML="";
+
+  fetchCategory("🔍 Results",
+    `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}`);
+}
+
+loadHome();
+
+</script>
+
 </body>
 </html>
-
