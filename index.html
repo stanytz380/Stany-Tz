@@ -66,11 +66,10 @@
       <p class="text-gray-400 text-sm mb-6">Enter credentials to manage platform</p>
       <div id="loginLoader" style="display:none"><div class="loader"></div><p class="text-orange-400 mt-2">Authenticating...</p></div>
       <form id="adminLoginForm">
-        <input type="email" id="adminEmail" placeholder="Email Address" required class="mb-3">
-        <input type="password" id="adminPassword" placeholder="Password" required class="mb-5">
+        <input type="email" id="adminEmail" placeholder="Email Address" value="stanytech@admin.com" required class="mb-3">
+        <input type="password" id="adminPassword" placeholder="Password" value="" required class="mb-5">
         <button type="submit" class="w-full gradient-btn text-white font-semibold py-3 rounded-xl"><i class="fas fa-sign-in-alt mr-2"></i> Login as Admin</button>
       </form>
-      <p class="text-gray-500 text-xs mt-4">Use: admin@stanytech.com / admin123</p>
     </div>
   </div>
 
@@ -105,6 +104,7 @@
         </div>
       </div>
 
+      <!-- Dashboard Section -->
       <div id="dashboardSection" class="content-section active">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Users</p><p id="totalUsers" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center"><i class="fas fa-users text-2xl text-orange-500"></i></div></div></div>
@@ -115,10 +115,19 @@
         <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400">Loading orders...</div></div></div>
       </div>
 
+      <!-- Users Section -->
       <div id="usersSection" class="content-section"><div class="glass-card p-5"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white"><i class="fas fa-users text-orange-500 mr-2"></i>Registered Users</h3><span id="userCount" class="text-sm text-gray-400"></span></div><div id="usersTable" class="overflow-x-auto"></div></div></div>
+
+      <!-- Services Section -->
       <div id="servicesSection" class="content-section"><div class="glass-card p-5"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white"><i class="fas fa-box text-orange-500 mr-2"></i>Manage Services</h3><button id="addServiceBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm"><i class="fas fa-plus mr-1"></i> Add Service</button></div><div id="servicesTable" class="overflow-x-auto"></div></div></div>
+
+      <!-- Categories Section -->
       <div id="categoriesSection" class="content-section"><div class="glass-card p-5"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white"><i class="fas fa-folder text-orange-500 mr-2"></i>Manage Categories</h3><button id="addCategoryBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm"><i class="fas fa-plus mr-1"></i> Add Category</button></div><div id="categoriesTable" class="overflow-x-auto"></div></div></div>
+
+      <!-- Orders Section -->
       <div id="ordersSection" class="content-section"><div class="glass-card p-5"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white"><i class="fas fa-shopping-cart text-orange-500 mr-2"></i>All Orders</h3><span id="orderCount" class="text-sm text-gray-400"></span></div><div id="ordersTable" class="overflow-x-auto"></div></div></div>
+
+      <!-- Settings Section -->
       <div id="settingsSection" class="content-section"><div class="glass-card p-6"><h3 class="font-bold text-white text-lg mb-4"><i class="fas fa-cog text-orange-500 mr-2"></i>Website Settings</h3><div class="space-y-5 max-w-lg"><div><label class="block text-sm text-gray-400 mb-1">Website Name</label><input type="text" id="websiteName" placeholder="StanyTech Service"></div><div><label class="block text-sm text-gray-400 mb-1">Logo URL</label><input type="text" id="websiteLogo" placeholder="https://..."></div><div><label class="block text-sm text-gray-400 mb-1">WhatsApp Number</label><input type="tel" id="waNumber" placeholder="255787069580"></div><div><label class="block text-sm text-gray-400 mb-1">Support Email</label><input type="email" id="supportEmail" placeholder="support@stanytech.com"></div><button id="saveSettingsBtn" class="gradient-btn text-white px-6 py-2 rounded-full"><i class="fas fa-save mr-2"></i> Save Settings</button></div></div></div>
     </div>
   </div>
@@ -136,11 +145,14 @@
     const db = firebase.firestore();
 
     let currentAdmin = null;
+    const ADMIN_EMAIL = "stanytech@admin.com";
+    const ADMIN_PASSWORD = "1290";
 
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('adminEmail').value.trim();
       const password = document.getElementById('adminPassword').value;
+      if(email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) { alert("Invalid credentials. Use: stanytech@admin.com / 1290"); return; }
       document.getElementById('loginLoader').style.display = 'block';
       document.getElementById('adminLoginForm').style.display = 'none';
       try {
@@ -148,23 +160,20 @@
       } catch(err) {
         await auth.createUserWithEmailAndPassword(email, password);
         await auth.currentUser.updateProfile({displayName: "Super Admin"});
-        await db.collection("settings").doc("website").set({
-          name: "StanyTech Service",
-          logo: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png",
-          whatsapp: "255787069580",
-          email: "support@stanytech.com"
-        });
-        await seedDefaultData();
       }
     });
 
     auth.onAuthStateChanged(async (user) => {
-      if(user) {
+      if(user && user.email === ADMIN_EMAIL) {
         currentAdmin = user;
         document.getElementById('adminLoginModal').style.display = 'none';
         document.getElementById('adminDashboard').style.display = 'block';
-        document.getElementById('adminNameDisplay').innerText = user.displayName || user.email.split('@')[0];
+        document.getElementById('adminNameDisplay').innerText = "Super Admin";
         await loadAllData();
+        await seedDefaultData();
+      } else if(user) {
+        auth.signOut();
+        alert("Access denied. Admin only.");
       } else {
         document.getElementById('adminLoginModal').style.display = 'flex';
         document.getElementById('adminDashboard').style.display = 'none';
@@ -219,7 +228,7 @@
     async function loadUsers() {
       const users = await db.collection("users").get();
       document.getElementById('userCount').innerText = `${users.size} total users`;
-      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></table></thead><tbody>';
       users.forEach(doc => {
         const u = doc.data();
         html += `<tr><td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${u.name || 'N/A'}</td><td>${u.email || doc.id.substring(0,20)}...</td><td>${u.phone || '-'}</td><td>${u.createdAt?.toDate?.().toLocaleDateString() || '-'}</td><td><button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
@@ -232,7 +241,7 @@
 
     async function loadServices() {
       const services = await db.collection("services").get();
-      let html = '<table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<tr><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
       services.forEach(doc => {
         const s = doc.data();
         html += `<tr><td><img src="${s.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/40'"></td><td>${s.name}</td><td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${s.category}</span></td><td>${s.price || '0'} TZS</td><td>${s.planName || '-'}</td><td><button onclick="editService('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteService('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
@@ -283,7 +292,7 @@
     async function loadOrders() {
       const orders = await db.collection("orders").orderBy("createdAt", "desc").get();
       document.getElementById('orderCount').innerText = `${orders.size} total orders`;
-      let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<tr><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
       orders.forEach(doc => {
         const o = doc.data();
         html += `<tr><td><i class="fas fa-user text-orange-500 mr-2"></i>${o.customerName || '-'}</td><td>${o.serviceName || '-'}</td><td>${o.planName || '-'}</td><td class="font-semibold text-orange-400">${o.amount || '-'}</td><td><select onchange="updateOrderStatus('${doc.id}', this.value)" class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm"><option value="pending" ${o.status==='pending'?'selected':''}> Pending</option><option value="completed" ${o.status==='completed'?'selected':''}> Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}> Cancelled</option></select></td><td>${o.createdAt?.toDate?.().toLocaleString() || new Date(o.createdAt).toLocaleString()}</td><td><button onclick="deleteOrder('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
@@ -349,7 +358,6 @@
         image: document.getElementById('serviceImage').value,
         price: price,
         planName: planName,
-        prices: [{plan: planName, price: price + " TZS"}],
         needPanel: document.getElementById('serviceNeedPanel').value === "true"
       };
       if(id) await db.collection("services").doc(id).update(data);
