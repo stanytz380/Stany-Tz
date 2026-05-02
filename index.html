@@ -233,7 +233,6 @@
           <div><label>Logo URL</label><input type="url" id="set-logo" placeholder="https://..."></div>
           <div><label>WhatsApp</label><input type="tel" id="set-wa" placeholder="255787069580"></div>
           <div><label>Email</label><input type="email" id="set-email" placeholder="support@..."></div>
-          <div><label>Currency</label><select id="set-currency"><option value="TZS">TZS</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="KES">KES</option></select></div>
           <button onclick="Settings.save()" class="btn-gradient text-white px-4 py-2 rounded-lg text-sm"><i class="fas fa-save mr-1"></i>Save</button>
           <p id="set-msg" class="text-xs hidden"></p>
         </div>
@@ -277,7 +276,7 @@
         <div><label>Name *</label><input type="text" id="svc-name" required></div>
         <div class="grid grid-cols-2 gap-2">
           <div><label>Category *</label><select id="svc-cat" required></select></div>
-          <div><label>Price *</label><input type="number" id="svc-price" required min="0"></div>
+          <div><label>Price *</label><input type="text" id="svc-price" required placeholder="5000"></div>
         </div>
         <div><label>Plan *</label><input type="text" id="svc-plan" required placeholder="Unlimited"></div>
         <div><label>Description</label><textarea id="svc-desc" rows="2"></textarea></div>
@@ -307,7 +306,6 @@
     const db = firebase.firestore();
     
     const ADMIN = { email: "stanytech@admin.com", pass: "1290" };
-    let currency = "TZS";
 
     // ===== UTILS =====
     const U = {
@@ -316,7 +314,6 @@
       hide: id => U.$(id)?.classList.add('hidden'),
       page: name => { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); U.$(`page-${name}`)?.classList.add('active'); },
       nav: name => { document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); event?.target?.closest('.nav-item')?.classList.add('active'); },
-      money: n => new Intl.NumberFormat('sw-TZ',{style:'currency',currency}).format(n||0),
       date: ts => ts?.toDate?.()?.toLocaleDateString('sw-TZ') || new Date(ts).toLocaleDateString('sw-TZ'),
       datetime: ts => ts?.toDate?.()?.toLocaleString('sw-TZ') || new Date(ts).toLocaleString('sw-TZ'),
       msg: (id,text,type='info') => { const el=U.$(id); if(el){ el.textContent=text; el.className=`text-xs mt-2 ${type==='error'?'text-red-400':type==='success'?'text-green-400':'text-gray-400'}`; el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'),3000); }},
@@ -380,7 +377,7 @@
           snap.forEach(d=>{
             const o=d.data(); 
             const cls={completed:'badge-completed',cancelled:'badge-cancelled'}[o.status]||'badge-pending'; 
-            h+=`<tr><td>${o.customerName||'-'}</td><td>${o.serviceName||'-'}</td><td class="text-orange font-semibold">${U.money(o.amount)}</td><td><span class="badge ${cls}">${o.status||'pending'}</span></td><td>${U.date(o.createdAt)}</td></tr>`;
+            h+=`<tr><td>${o.customerName||'-'}</td><td>${o.serviceName||'-'}</td><td class="text-orange font-semibold">${o.amount || '-'}</td><td><span class="badge ${cls}">${o.status||'pending'}</span></td><td>${U.date(o.createdAt)}</td></tr>`;
           });
           h+='</tbody></table>'; c.innerHTML=h;
         } catch(err){ c.innerHTML='<div class="text-center py-4 text-red-400 text-xs">Failed</div>'; }
@@ -446,7 +443,7 @@
           const cmap={}; cats.forEach(x=>cmap[x.data().key]=x.data().name);
           if(snap.empty){ c.innerHTML='<div class="text-center py-4 text-gray-400 text-xs">No services</div>'; return; }
           let h='<table><thead><tr><th>Img</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
-          snap.forEach(d=>{const s=d.data(); h+=`<tr><td><img src="${s.image||'https://placehold.co/40'}" class="w-9 h-9 rounded-lg object-cover"></td><td>${s.name}</td><td><span class="badge badge-pending">${cmap[s.category]||s.category}</span></td><td class="text-orange font-semibold">${U.money(s.price)}</td><td>${s.planName||'-'}</td><td><button onclick="Services.edit('${d.id}')" class="text-blue-400 mr-2"><i class="fas fa-edit"></i></button><button onclick="Services.del('${d.id}')" class="text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;});
+          snap.forEach(d=>{const s=d.data(); h+=`<tr><td><img src="${s.image||'https://placehold.co/40'}" class="w-9 h-9 rounded-lg object-cover"></td><td>${s.name}</td><td><span class="badge badge-pending">${cmap[s.category]||s.category}</span></td><td class="text-orange font-semibold">${s.price || '0'}</td><td>${s.planName||'-'}</td><td><button onclick="Services.edit('${d.id}')" class="text-blue-400 mr-2"><i class="fas fa-edit"></i></button><button onclick="Services.del('${d.id}')" class="text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;});
           h+='</tbody></table>'; c.innerHTML=h;
         } catch(err){ c.innerHTML='<div class="text-center py-4 text-red-400 text-xs">Failed</div>'; }
       },
@@ -470,7 +467,7 @@
       save: async e => {
         e.preventDefault();
         const id=U.$('svc-id').value;
-        const data={name:U.$('svc-name').value.trim(),category:U.$('svc-cat').value,description:U.$('svc-desc').value.trim(),image:U.$('svc-image').value.trim(),price:parseFloat(U.$('svc-price').value)||0,planName:U.$('svc-plan').value.trim(),needPanel:U.$('svc-panel').value==='true'};
+        const data={name:U.$('svc-name').value.trim(),category:U.$('svc-cat').value,description:U.$('svc-desc').value.trim(),image:U.$('svc-image').value.trim(),price:U.$('svc-price').value,planName:U.$('svc-plan').value.trim(),needPanel:U.$('svc-panel').value==='true'};
         try {
           if(id) await db.collection('services').doc(id).update(data);
           else await db.collection('services').add(data);
@@ -493,7 +490,7 @@
           snap.forEach(d=>{
             const o=d.data(); 
             const cls={completed:'badge-completed',cancelled:'badge-cancelled'}[o.status]||'badge-pending'; 
-            h+=`<tr><td>${o.customerName||'-'}</td><td>${o.serviceName||'-'}</td><td>${o.planName||'-'}</td><td class="text-orange font-semibold">${U.money(o.amount)}</td>
+            h+=`<tr><td>${o.customerName||'-'}</td><td>${o.serviceName||'-'}</td><td>${o.planName||'-'}</td><td class="text-orange font-semibold">${o.amount || '-'}</td>
             <td><select onchange="Orders.status('${d.id}',this.value)" class="bg-transparent border border-gray-600 rounded px-1.5 py-0.5 text-xs ${o.status==='completed'?'text-green-400':o.status==='cancelled'?'text-red-400':'text-yellow-400'}">
               <option value="pending" ${o.status==='pending'?'selected':''}>🟡 Pending</option>
               <option value="completed" ${o.status==='completed'?'selected':''}>✅ Completed</option>
@@ -514,14 +511,13 @@
       load: async () => {
         try {
           const d=await db.collection('settings').doc('website').get();
-          if(d.exists){const s=d.data(); U.$('set-name').value=s.name||'StanyTech'; U.$('set-logo').value=s.logo||''; U.$('set-wa').value=s.whatsapp||'255787069580'; U.$('set-email').value=s.email||''; U.$('set-currency').value=s.currency||'TZS'; currency=s.currency||'TZS';}
+          if(d.exists){const s=d.data(); U.$('set-name').value=s.name||'StanyTech'; U.$('set-logo').value=s.logo||''; U.$('set-wa').value=s.whatsapp||'255787069580'; U.$('set-email').value=s.email||'';}
         } catch(e){}
       },
       save: async () => {
         const btn=event.target; const orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
         try {
-          await db.collection('settings').doc('website').set({name:U.$('set-name').value.trim(),logo:U.$('set-logo').value.trim(),whatsapp:U.$('set-wa').value.trim(),email:U.$('set-email').value.trim(),currency:U.$('set-currency').value},{merge:true});
-          currency=U.$('set-currency').value;
+          await db.collection('settings').doc('website').set({name:U.$('set-name').value.trim(),logo:U.$('set-logo').value.trim(),whatsapp:U.$('set-wa').value.trim(),email:U.$('set-email').value.trim(),updatedAt:new Date()},{merge:true});
           U.msg('set-msg','✅ Saved!','success');
         } catch(err){ U.msg('set-msg','❌ '+err.message,'error'); }
         finally{ btn.disabled=false; btn.innerHTML=orig; }
