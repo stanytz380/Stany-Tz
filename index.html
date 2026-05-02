@@ -57,11 +57,12 @@
       <h2 class="text-2xl font-bold text-white mb-2">Admin Access</h2>
       <p class="text-gray-400 text-sm mb-6">Enter credentials to manage platform</p>
       <div id="loginLoader" style="display:none"><div class="loader"></div><p class="text-orange-400 mt-2">Authenticating...</p></div>
-      <form id="adminLoginForm">
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
         <input type="email" id="adminEmail" placeholder="Email Address" value="stanytech@admin.com" required class="mb-3">
-        <input type="password" id="adminPassword" placeholder="Password" value="1290" required class="mb-5">
+        <input type="password" id="adminPassword" placeholder="Password" value="" required class="mb-5">
         <button type="submit" class="w-full gradient-btn text-white font-semibold py-3 rounded-xl"><i class="fas fa-sign-in-alt mr-2"></i> Login as Admin</button>
       </form>
+      <p class="text-gray-500 text-xs mt-4">Demo: stanytech@admin.com / 1290</p>
     </div>
   </div>
 
@@ -115,32 +116,24 @@
   </div>
 
   <!-- Category Modal -->
-  <div id="categoryModal" class="modal"><div class="glass-card p-6 max-w-md w-full"><div class="flex justify-between items-center mb-5"><h3 id="categoryModalTitle" class="text-xl font-bold text-white">Add Category</h3><button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="categoryForm"><input type="hidden" id="categoryId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Name</label><input type="text" id="categoryName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Key (unique)</label><input type="text" id="categoryKey" required placeholder="panels, bots, azam, documents, vpn"></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Category Image URL</label><input type="text" id="categoryImage" placeholder="https://..."></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Category</button><button type="button" onclick="closeCategoryModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
+  <div id="categoryModal" class="modal"><div class="glass-card p-6 max-w-md w-full"><div class="flex justify-between items-center mb-5"><h3 id="categoryModalTitle" class="text-xl font-bold text-white">Add Category</h3><button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="categoryForm" onsubmit="saveCategory(event)"><input type="hidden" id="categoryId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Name</label><input type="text" id="categoryName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Key (unique)</label><input type="text" id="categoryKey" required placeholder="panels, bots, azam, documents, vpn"></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Category Image URL</label><input type="text" id="categoryImage" placeholder="https://..."></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Category</button><button type="button" onclick="closeCategoryModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
 
   <!-- Service Modal -->
-  <div id="serviceModal" class="modal"><div class="glass-card p-6 max-w-lg w-full"><div class="flex justify-between items-center mb-5"><h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3><button onclick="closeServiceModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="serviceForm"><input type="hidden" id="serviceId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Service Name</label><input type="text" id="serviceName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category</label><select id="serviceCategory" required></select></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Description</label><textarea id="serviceDesc" rows="2"></textarea></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Image URL</label><input type="text" id="serviceImage" placeholder="https://..."></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Price (TZS)</label><input type="text" id="servicePrice" placeholder="5000" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Plan Name</label><input type="text" id="servicePlan" placeholder="Unlimited Access" required></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Requires Panel Credentials?</label><select id="serviceNeedPanel"><option value="false">No</option><option value="true">Yes</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button><button type="button" onclick="closeServiceModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
+  <div id="serviceModal" class="modal"><div class="glass-card p-6 max-w-lg w-full"><div class="flex justify-between items-center mb-5"><h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3><button onclick="closeServiceModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="serviceForm" onsubmit="saveService(event)"><input type="hidden" id="serviceId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Service Name</label><input type="text" id="serviceName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category</label><select id="serviceCategory" required></select></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Description</label><textarea id="serviceDesc" rows="2"></textarea></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Image URL</label><input type="text" id="serviceImage" placeholder="https://..."></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Price (TZS)</label><input type="text" id="servicePrice" placeholder="5000" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Plan Name</label><input type="text" id="servicePlan" placeholder="Unlimited Access" required></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Requires Panel Credentials?</label><select id="serviceNeedPanel"><option value="false">No</option><option value="true">Yes</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button><button type="button" onclick="closeServiceModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
 
   <script>
+    // Firebase Config
     const firebaseConfig = { apiKey: "AIzaSyBhF_jesV0dMhy3cEgehrWlT_mZOtKXySE", authDomain: "stanytechzone.firebaseapp.com", projectId: "stanytechzone", storageBucket: "stanytechzone.firebasestorage.app", messagingSenderId: "182249230489", appId: "1:182249230489:web:c87d89de113b6714c46808" };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentAdmin = null;
+    let isLoggedIn = false;
     const ADMIN_EMAIL = "stanytech@admin.com";
     const ADMIN_PASSWORD = "1290";
 
-    // Helper function to show/hide dashboard after login
-    function showDashboard() {
-      document.getElementById('adminLoginModal').style.display = 'none';
-      document.getElementById('adminDashboard').style.display = 'block';
-      document.getElementById('adminNameDisplay').innerText = "Super Admin";
-      loadAllData();
-      seedDefaultData();
-    }
-
-    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Simple admin login - no Firebase Auth to avoid issues
+    function handleAdminLogin(event) {
+      event.preventDefault();
       const email = document.getElementById('adminEmail').value.trim();
       const password = document.getElementById('adminPassword').value;
       
@@ -149,41 +142,28 @@
         return; 
       }
       
+      // Show loader
       document.getElementById('loginLoader').style.display = 'block';
       document.getElementById('adminLoginForm').style.display = 'none';
       
-      try {
-        // Try to sign in
-        await auth.signInWithEmailAndPassword(email, password);
-        showDashboard();
-      } catch(err) {
-        // If account doesn't exist, create it
-        try {
-          await auth.createUserWithEmailAndPassword(email, password);
-          await auth.currentUser.updateProfile({displayName: "Super Admin"});
-          showDashboard();
-        } catch(createErr) {
-          document.getElementById('loginLoader').style.display = 'none';
-          document.getElementById('adminLoginForm').style.display = 'block';
-          alert("Error creating admin account: " + createErr.message);
-        }
-      }
-    });
+      // Simulate login delay then show dashboard
+      setTimeout(() => {
+        isLoggedIn = true;
+        document.getElementById('adminLoginModal').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        document.getElementById('adminNameDisplay').innerText = "Super Admin";
+        loadAllData();
+        seedDefaultData();
+      }, 800);
+    }
 
-    // Auto-login if already authenticated with correct email
-    auth.onAuthStateChanged(async (user) => {
-      if(user && user.email === ADMIN_EMAIL) {
-        showDashboard();
-      } else if(user) {
-        await auth.signOut();
-        document.getElementById('adminLoginModal').style.display = 'flex';
-        document.getElementById('adminDashboard').style.display = 'none';
-        document.getElementById('loginLoader').style.display = 'none';
-        document.getElementById('adminLoginForm').style.display = 'block';
-      }
+    document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+      isLoggedIn = false;
+      document.getElementById('adminDashboard').style.display = 'none';
+      document.getElementById('adminLoginModal').style.display = 'flex';
+      document.getElementById('loginLoader').style.display = 'none';
+      document.getElementById('adminLoginForm').style.display = 'block';
     });
-
-    document.getElementById('adminLogoutBtn').addEventListener('click', () => auth.signOut());
 
     // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -230,7 +210,7 @@
     async function loadUsers() {
       const users = await db.collection("users").get();
       document.getElementById('userCount').innerText = `${users.size} total users`;
-      let html = '<tr><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
       users.forEach(doc => {
         const u = doc.data();
         html += `<tr><td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${u.name || 'N/A'}</td><td>${u.email || doc.id.substring(0,20)}...</td><td>${u.phone || '-'}</td><td>${u.createdAt?.toDate?.().toLocaleDateString() || '-'}</td><td><button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
@@ -243,7 +223,7 @@
 
     async function loadServices() {
       const services = await db.collection("services").get();
-      let html = '<table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<td><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
       services.forEach(doc => {
         const s = doc.data();
         html += `<tr><td><img src="${s.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td>${s.name}</td><td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${s.category}</span></td><td>${s.price || '0'} TZS</td><td>${s.planName || '-'}</td><td><button onclick="editService('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteService('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
@@ -270,7 +250,7 @@
 
     async function loadCategories() {
       const categories = await db.collection("categories").get();
-      let html = '<td><thead></table><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
       categories.forEach(doc => {
         const c = doc.data();
         html += `<tr><td><img src="${c.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td><i class="fas fa-folder text-orange-500 mr-2"></i>${c.name}</td><td><code class="text-xs bg-gray-800 px-2 py-1 rounded">${c.key}</code></td><td><button onclick="editCategory('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteCategory('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
@@ -348,7 +328,7 @@
       document.getElementById('categoryModal').style.display = 'flex';
     });
 
-    document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+    async function saveService(e) {
       e.preventDefault();
       const id = document.getElementById('serviceId').value;
       const data = {
@@ -365,9 +345,9 @@
       closeServiceModal();
       loadServices();
       loadStats();
-    });
+    }
 
-    document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    async function saveCategory(e) {
       e.preventDefault();
       const id = document.getElementById('categoryId').value;
       const key = document.getElementById('categoryKey').value.toLowerCase();
@@ -380,7 +360,7 @@
       else await db.collection("categories").doc(key).set(data);
       closeCategoryModal();
       loadCategories();
-    });
+    }
 
     async function seedDefaultData() {
       const cats = await db.collection("categories").get();
@@ -398,18 +378,21 @@
       const services = await db.collection("services").get();
       if(services.empty) {
         const defaultServices = [
-          { name: "Unlimited Panel", category: "panels", description: "Full premium access, no limits", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "5000", planName: "Unlimited Access", needPanel: true },
-          { name: "2GB Panel", category: "panels", description: "2GB premium data package", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "3000", planName: "2GB Data", needPanel: true },
-          { name: "Bug Bot", category: "bots", description: "Advanced WhatsApp bot with bug detection", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "5000", planName: "Bug Bot", needPanel: false },
-          { name: "Azam TV 1 Month", category: "azam", description: "30 days unlimited channels access", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "3000", planName: "1 Month", needPanel: false },
-          { name: "NIDA Soft Copy", category: "documents", description: "Digital NIDA registration document", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg", price: "10000", planName: "Soft Copy", needPanel: false },
-          { name: "Birthday Certificate", category: "documents", description: "RITA Certificate - TOTAL 35000 TZS (RITA 20000 + Service 15000)", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/9b3ff475-89d9-424d-80a9-e94ed3f177d6.jpeg", price: "35000", planName: "Certificate Package", needPanel: false },
-          { name: "Halotel VPN 1 Month", category: "vpn", description: "Secure VPN for Halotel users", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "4500", planName: "1 Month", needPanel: false }
+          { name: "Unlimited Panel", category: "panels", description: "Full premium access", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "5000", planName: "Unlimited Access", needPanel: true },
+          { name: "2GB Panel", category: "panels", description: "2GB premium data", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "3000", planName: "2GB Data", needPanel: true },
+          { name: "Bug Bot", category: "bots", description: "Advanced WhatsApp bot", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "5000", planName: "Bug Bot", needPanel: false },
+          { name: "Azam TV 1 Month", category: "azam", description: "30 days unlimited", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "3000", planName: "1 Month", needPanel: false },
+          { name: "NIDA Soft Copy", category: "documents", description: "Digital NIDA document", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg", price: "10000", planName: "Soft Copy", needPanel: false },
+          { name: "Birthday Certificate", category: "documents", description: "RITA Certificate - TOTAL 35000 TZS", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/9b3ff475-89d9-424d-80a9-e94ed3f177d6.jpeg", price: "35000", planName: "Certificate Package", needPanel: false },
+          { name: "Halotel VPN 1 Month", category: "vpn", description: "Secure VPN", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "4500", planName: "1 Month", needPanel: false }
         ];
         for(const s of defaultServices) await db.collection("services").add(s);
         loadServices();
       }
     }
+    
+    // Auto login if already logged in via session? No, just show login.
+    // Make sure login form shows by default
   </script>
 </body>
 </html>
