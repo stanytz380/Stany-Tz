@@ -1,417 +1,1152 @@
-<!DOCTYPE html>
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body {
+                  background-color: white; /* Ensure the iframe has a white background */
+                }
+
+                
+              </style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  
   <title>StanyTech Admin | Premium Dashboard</title>
   <meta name="description" content="Admin dashboard for StanyTech Service">
   <meta name="theme-color" content="#f97316">
-  
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <style>
+    /* ===== BASE STYLES ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0a0c15; color: #e2e8f0; }
+    body { font-family: 'Inter', sans-serif; background: #0a0c15; color: #e2e8f0; min-height: 100vh; }
+    
+    /* ===== GLASSMORPHISM ===== */
     .glass-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; }
     .glass-card-sm { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; }
+    
+    /* ===== BUTTONS & INTERACTION ===== */
     .gradient-btn { background: linear-gradient(135deg, #f97316, #8b5cf6); transition: all 0.3s ease; }
     .gradient-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(249,115,22,0.4); }
+    .gradient-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    
+    /* ===== STAT CARDS ===== */
     .stat-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 24px; transition: all 0.3s ease; cursor: pointer; }
     .stat-card:hover { transform: translateY(-5px); border-color: #f97316; background: rgba(249,115,22,0.1); }
+    
+    /* ===== STATUS BADGES ===== */
     .status-badge { padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
     .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
     .status-completed { background: rgba(16,185,129,0.2); color: #10b981; }
     .status-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #1a1a2e; }
-    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+    
+    /* ===== FORMS ===== */
+    input, select, textarea { 
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 14px; padding: 12px 16px; color: white; width: 100%; 
+      outline: none; transition: all 0.2s; font-size: 0.9rem; 
+    }
+    input:focus, select:focus, textarea:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.2); }
+    input:invalid { border-color: #ef4444; }
+    
+    /* ===== TABLES ===== */
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
     th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    input, select, textarea { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 16px; color: white; width: 100%; outline: none; transition: all 0.2s; font-size: 0.9rem; }
-    input:focus, select:focus, textarea:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.2); }
-    .loader { width: 50px; height: 50px; border: 3px solid rgba(249,115,22,0.3); border-top: 3px solid #f97316; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+    tr:hover { background: rgba(255,255,255,0.03); }
+    
+    /* ===== MODALS ===== */
+    .modal { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.96); 
+      backdrop-filter: blur(12px); z-index: 1000; 
+      display: none; align-items: center; justify-content: center; 
+      padding: 20px; animation: fadeIn 0.2s ease;
+    }
+    .modal.active { display: flex; }
+    
+    /* ===== LOADER ===== */
+    .loader { 
+      width: 50px; height: 50px; border: 3px solid rgba(249,115,22,0.3); 
+      border-top: 3px solid #f97316; border-radius: 50%; 
+      animation: spin 1s linear infinite; margin: 20px auto; 
+    }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* ===== PAGE TRANSITIONS ===== */
     .page { display: none; animation: fadeIn 0.3s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* ===== NAVIGATION ===== */
     .nav-link { transition: all 0.2s ease; cursor: pointer; padding: 10px 20px; border-radius: 12px; }
     .nav-link:hover, .nav-link.active { background: rgba(249,115,22,0.15); color: #f97316; }
-    .btn-back { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; padding: 10px 20px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    
+    /* ===== UTILITIES ===== */
+    .btn-back { 
+      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 40px; padding: 10px 20px; transition: all 0.2s; 
+      cursor: pointer; display: inline-flex; align-items: center; gap: 8px; 
+    }
     .btn-back:hover { background: rgba(249,115,22,0.2); border-color: #f97316; color: #f97316; }
-    .order-status-select { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; color: white; font-size: 0.75rem; cursor: pointer; }
+    
+    .order-status-select { 
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 8px; padding: 6px 10px; color: white; 
+      font-size: 0.75rem; cursor: pointer; min-width: 120px;
+    }
     .order-status-select.pending { border-color: #f59e0b; color: #f59e0b; }
     .order-status-select.completed { border-color: #10b981; color: #10b981; }
     .order-status-select.cancelled { border-color: #ef4444; color: #ef4444; }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a2e; }
+    ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
+    
+    /* ===== MOBILE OPTIMIZATION ===== */
+    @media (max-width: 768px) {
+      .glass-card { border-radius: 20px; }
+      th, td { padding: 10px 8px; font-size: 0.85rem; }
+      .stat-card { padding: 16px; }
+      .nav-link span { display: none; }
+      .nav-link i { margin: 0; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Admin Login Modal -->
-  <div id="adminLoginModal" class="modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.96); backdrop-filter:blur(12px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px;">
+  <!-- ===== ADMIN LOGIN MODAL ===== -->
+  <div id="adminLoginModal" class="modal active">
     <div class="glass-card p-8 max-w-md w-full text-center">
-      <div class="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden"><img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png" class="w-full h-full object-cover"></div>
+      <div class="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden border-2 border-orange-500">
+        <img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png" class="w-full h-full object-cover" alt="Logo">
+      </div>
       <h2 class="text-2xl font-bold text-white mb-2">Admin Access</h2>
       <p class="text-gray-400 text-sm mb-6">Enter credentials to manage platform</p>
-      <div id="loginLoader" style="display:none"><div class="loader"></div><p class="text-orange-400 mt-2">Authenticating...</p></div>
-      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
-        <input type="email" id="adminEmail" placeholder="Email Address" value="stanytech@admin.com" required class="mb-3">
-        <input type="password" id="adminPassword" placeholder="Password" value="" required class="mb-5">
-        <button type="submit" class="w-full gradient-btn text-white font-semibold py-3 rounded-xl"><i class="fas fa-sign-in-alt mr-2"></i> Login as Admin</button>
+      
+      <div id="loginLoader" class="hidden">
+        <div class="loader"></div>
+        <p class="text-orange-400 mt-2">Authenticating...</p>
+      </div>
+      
+      <form id="adminLoginForm" onsubmit="Auth.handleLogin(event)">
+        <input type="email" id="adminEmail" placeholder="Email Address" value="stanytech@admin.com" required class="mb-3" autocomplete="username">
+        <input type="password" id="adminPassword" placeholder="Password" value="" required class="mb-5" autocomplete="current-password">
+        <button type="submit" class="w-full gradient-btn text-white font-semibold py-3 rounded-xl">
+          <i class="fas fa-sign-in-alt mr-2"></i> Login as Admin
+        </button>
       </form>
       <p class="text-gray-500 text-xs mt-4">Demo: stanytech@admin.com / 1290</p>
+      <p id="loginError" class="text-red-400 text-sm mt-3 hidden"></p>
     </div>
   </div>
 
-  <!-- Admin Dashboard -->
-  <div id="adminDashboard" style="display:none">
-    <!-- Top Navigation Bar -->
+  <!-- ===== ADMIN DASHBOARD ===== -->
+  <div id="adminDashboard" class="hidden">
+    <!-- Top Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-40 glass-card" style="border-radius:0; border-bottom:1px solid rgba(255,255,255,0.08);">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-3 cursor-pointer" onclick="showPage('dashboard')">
-            <img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png" class="w-10 h-10 rounded-xl object-cover border-2 border-orange-500">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="Router.navigate('dashboard')">
+            <img src="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png" class="w-10 h-10 rounded-xl object-cover border-2 border-orange-500" alt="Logo">
             <span class="text-xl font-bold"><span class="text-white">STANY</span><span class="text-orange-500">TECH</span></span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="nav-link" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</div>
-            <div class="nav-link" onclick="showPage('users')"><i class="fas fa-users mr-2"></i> Users</div>
-            <div class="nav-link" onclick="showPage('services')"><i class="fas fa-box mr-2"></i> Services</div>
-            <div class="nav-link" onclick="showPage('categories')"><i class="fas fa-folder mr-2"></i> Categories</div>
-            <div class="nav-link" onclick="showPage('orders')"><i class="fas fa-shopping-cart mr-2"></i> Orders</div>
-            <div class="nav-link" onclick="showPage('settings')"><i class="fas fa-cog mr-2"></i> Settings</div>
-            <button id="adminLogoutBtn" class="ml-4 px-4 py-2 rounded-xl border border-red-500/50 text-red-400 hover:bg-red-500/10 transition"><i class="fas fa-sign-out-alt mr-1"></i> Logout</button>
+          <div class="flex items-center gap-1 sm:gap-2 overflow-x-auto">
+            <div class="nav-link" onclick="Router.navigate('dashboard')"><i class="fas fa-tachometer-alt"></i><span class="hidden sm:inline ml-2">Dashboard</span></div>
+            <div class="nav-link" onclick="Router.navigate('users')"><i class="fas fa-users"></i><span class="hidden sm:inline ml-2">Users</span></div>
+            <div class="nav-link" onclick="Router.navigate('services')"><i class="fas fa-box"></i><span class="hidden sm:inline ml-2">Services</span></div>
+            <div class="nav-link" onclick="Router.navigate('categories')"><i class="fas fa-folder"></i><span class="hidden sm:inline ml-2">Categories</span></div>
+            <div class="nav-link" onclick="Router.navigate('orders')"><i class="fas fa-shopping-cart"></i><span class="hidden sm:inline ml-2">Orders</span></div>
+            <div class="nav-link" onclick="Router.navigate('settings')"><i class="fas fa-cog"></i><span class="hidden sm:inline ml-2">Settings</span></div>
+            <button id="adminLogoutBtn" class="ml-2 px-3 py-2 rounded-xl border border-red-500/50 text-red-400 hover:bg-red-500/10 transition text-sm">
+              <i class="fas fa-sign-out-alt"></i><span class="hidden sm:inline ml-1">Logout</span>
+            </button>
           </div>
         </div>
       </div>
     </nav>
 
+    <!-- Main Content -->
     <div class="pt-20 pb-10 px-4 max-w-7xl mx-auto">
       
-      <!-- ========== DASHBOARD PAGE ========== -->
+      <!-- ===== DASHBOARD PAGE ===== -->
       <div id="dashboardPage" class="page active">
         <h1 class="text-2xl font-bold text-white mb-6">Dashboard Overview</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <div class="stat-card" onclick="showPage('users')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Users</p><p id="totalUsers" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center"><i class="fas fa-users text-2xl text-orange-500"></i></div></div></div>
-          <div class="stat-card" onclick="showPage('services')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Services</p><p id="totalServices" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center"><i class="fas fa-box text-2xl text-purple-500"></i></div></div></div>
-          <div class="stat-card" onclick="showPage('orders')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Orders</p><p id="totalOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center"><i class="fas fa-shopping-cart text-2xl text-teal-500"></i></div></div></div>
-          <div class="stat-card" onclick="showPage('orders')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Pending Orders</p><p id="pendingOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center"><i class="fas fa-clock text-2xl text-yellow-500"></i></div></div></div>
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
+          <div class="stat-card" onclick="Router.navigate('users')">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-400 text-sm">Total Users</p>
+                <p id="totalUsers" class="text-2xl sm:text-3xl font-bold text-white mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-users text-2xl text-orange-500"></i>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card" onclick="Router.navigate('services')">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-400 text-sm">Total Services</p>
+                <p id="totalServices" class="text-2xl sm:text-3xl font-bold text-white mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-box text-2xl text-purple-500"></i>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card" onclick="Router.navigate('orders')">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-400 text-sm">Total Orders</p>
+                <p id="totalOrders" class="text-2xl sm:text-3xl font-bold text-white mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-shopping-cart text-2xl text-teal-500"></i>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card" onclick="Router.navigate('orders')">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-400 text-sm">Pending Orders</p>
+                <p id="pendingOrders" class="text-2xl sm:text-3xl font-bold text-white mt-1">0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-clock text-2xl text-yellow-500"></i>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading orders...</div></div></div>
+        
+        <!-- Recent Orders -->
+        <div class="glass-card p-4 sm:p-5">
+          <h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3>
+          <div id="recentOrdersTable" class="overflow-x-auto">
+            <div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading orders...</div>
+          </div>
+        </div>
       </div>
 
-      <!-- ========== USERS PAGE ========== -->
+      <!-- ===== USERS PAGE ===== -->
       <div id="usersPage" class="page">
-        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Users</h1><span id="userCount" class="text-sm text-gray-400 ml-auto"></span></div>
-        <div class="glass-card p-5 overflow-x-auto"><div id="usersTable"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap">
+          <button onclick="Router.navigate('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <h1 class="text-2xl font-bold text-white">Manage Users</h1>
+          <span id="userCount" class="text-sm text-gray-400 ml-auto"></span>
+        </div>
+        <div class="glass-card p-4 sm:p-5 overflow-x-auto">
+          <div id="usersTable" class="min-w-[600px]"></div>
+        </div>
       </div>
 
-      <!-- ========== SERVICES PAGE ========== -->
+      <!-- ===== SERVICES PAGE ===== -->
       <div id="servicesPage" class="page">
-        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Services</h1><button id="addServiceBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Service</button></div>
-        <div class="glass-card p-5 overflow-x-auto"><div id="servicesTable"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap">
+          <button onclick="Router.navigate('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <h1 class="text-2xl font-bold text-white">Manage Services</h1>
+          <button id="addServiceBtn" class="gradient-btn text-white px-4 sm:px-5 py-2 rounded-full text-sm ml-auto">
+            <i class="fas fa-plus mr-1"></i> Add Service
+          </button>
+        </div>
+        <div class="glass-card p-4 sm:p-5 overflow-x-auto">
+          <div id="servicesTable" class="min-w-[700px]"></div>
+        </div>
       </div>
 
-      <!-- ========== CATEGORIES PAGE ========== -->
+      <!-- ===== CATEGORIES PAGE ===== -->
       <div id="categoriesPage" class="page">
-        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Categories</h1><button id="addCategoryBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Category</button></div>
-        <div class="glass-card p-5 overflow-x-auto"><div id="categoriesTable"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap">
+          <button onclick="Router.navigate('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <h1 class="text-2xl font-bold text-white">Manage Categories</h1>
+          <button id="addCategoryBtn" class="gradient-btn text-white px-4 sm:px-5 py-2 rounded-full text-sm ml-auto">
+            <i class="fas fa-plus mr-1"></i> Add Category
+          </button>
+        </div>
+        <div class="glass-card p-4 sm:p-5 overflow-x-auto">
+          <div id="categoriesTable" class="min-w-[500px]"></div>
+        </div>
       </div>
 
-      <!-- ========== ORDERS PAGE ========== -->
+      <!-- ===== ORDERS PAGE ===== -->
       <div id="ordersPage" class="page">
-        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Orders</h1><span id="orderCount" class="text-sm text-gray-400 ml-auto"></span></div>
-        <div class="glass-card p-5 overflow-x-auto"><div id="ordersTable"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap">
+          <button onclick="Router.navigate('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <h1 class="text-2xl font-bold text-white">Manage Orders</h1>
+          <span id="orderCount" class="text-sm text-gray-400 ml-auto"></span>
+        </div>
+        <div class="glass-card p-4 sm:p-5 overflow-x-auto">
+          <div id="ordersTable" class="min-w-[800px]"></div>
+        </div>
       </div>
 
-      <!-- ========== SETTINGS PAGE ========== -->
+      <!-- ===== SETTINGS PAGE ===== -->
       <div id="settingsPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Website Settings</h1></div>
-        <div class="glass-card p-6 max-w-2xl"><div class="space-y-5"><div><label class="block text-sm text-gray-400 mb-1">Website Name</label><input type="text" id="websiteName" placeholder="StanyTech Service"></div><div><label class="block text-sm text-gray-400 mb-1">Logo URL</label><input type="text" id="websiteLogo" placeholder="https://..."></div><div><label class="block text-sm text-gray-400 mb-1">WhatsApp Number</label><input type="tel" id="waNumber" placeholder="255787069580"></div><div><label class="block text-sm text-gray-400 mb-1">Support Email</label><input type="email" id="supportEmail" placeholder="support@stanytech.com"></div><button id="saveSettingsBtn" class="gradient-btn text-white px-6 py-2 rounded-full"><i class="fas fa-save mr-2"></i> Save Settings</button></div></div>
+        <div class="flex items-center gap-4 mb-6">
+          <button onclick="Router.navigate('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back</button>
+          <h1 class="text-2xl font-bold text-white">Website Settings</h1>
+        </div>
+        <div class="glass-card p-6 max-w-2xl">
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Website Name</label>
+              <input type="text" id="websiteName" placeholder="StanyTech Service">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Logo URL</label>
+              <input type="url" id="websiteLogo" placeholder="https://...">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">WhatsApp Number</label>
+              <input type="tel" id="waNumber" placeholder="255787069580" pattern="^\+?[0-9]{10,15}$">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Support Email</label>
+              <input type="email" id="supportEmail" placeholder="support@stanytech.com">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">Default Currency</label>
+              <select id="defaultCurrency">
+                <option value="TZS">TZS - Tanzanian Shilling</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="KES">KES - Kenyan Shilling</option>
+              </select>
+            </div>
+            <button id="saveSettingsBtn" class="gradient-btn text-white px-6 py-2 rounded-full">
+              <i class="fas fa-save mr-2"></i> Save Settings
+            </button>
+            <p id="settingsMsg" class="text-sm hidden"></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modals -->
-  <div id="categoryModal" class="modal"><div class="glass-card p-6 max-w-md w-full"><div class="flex justify-between items-center mb-5"><h3 id="categoryModalTitle" class="text-xl font-bold text-white">Add Category</h3><button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="categoryForm" onsubmit="saveCategory(event)"><input type="hidden" id="categoryId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Name</label><input type="text" id="categoryName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Key (unique)</label><input type="text" id="categoryKey" required placeholder="panels, bots, azam, documents, vpn"></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Category Image URL</label><input type="text" id="categoryImage" placeholder="https://..."></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Category</button><button type="button" onclick="closeCategoryModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
+  <!-- ===== MODALS (Hidden by Default) ===== -->
+  <div id="categoryModal" class="modal">
+    <div class="glass-card p-6 max-w-md w-full">
+      <div class="flex justify-between items-center mb-5">
+        <h3 id="categoryModalTitle" class="text-xl font-bold text-white">Add Category</h3>
+        <button onclick="Modals.close('category')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      <form id="categoryForm" onsubmit="Category.save(event)">
+        <input type="hidden" id="categoryId">
+        <div class="mb-3">
+          <label class="text-sm text-gray-400 mb-1 block">Category Name *</label>
+          <input type="text" id="categoryName" required maxlength="50">
+        </div>
+        <div class="mb-3">
+          <label class="text-sm text-gray-400 mb-1 block">Category Key (unique) *</label>
+          <input type="text" id="categoryKey" required placeholder="panels, bots, azam" pattern="^[a-z0-9\-]+$" maxlength="30">
+          <p class="text-xs text-gray-500 mt-1">Use lowercase letters, numbers, and hyphens only</p>
+        </div>
+        <div class="mb-4">
+          <label class="text-sm text-gray-400 mb-1 block">Image URL</label>
+          <input type="url" id="categoryImage" placeholder="https://...">
+        </div>
+        <div class="flex gap-3">
+          <button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save</button>
+          <button type="button" onclick="Modals.close('category')" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl hover:bg-gray-800">Cancel</button>
+        </div>
+      </form>
+      <p id="categoryMsg" class="text-sm mt-3 hidden"></p>
+    </div>
+  </div>
 
-  <div id="serviceModal" class="modal"><div class="glass-card p-6 max-w-lg w-full"><div class="flex justify-between items-center mb-5"><h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3><button onclick="closeServiceModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="serviceForm" onsubmit="saveService(event)"><input type="hidden" id="serviceId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Service Name</label><input type="text" id="serviceName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category</label><select id="serviceCategory" required></select></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Description</label><textarea id="serviceDesc" rows="2"></textarea></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Image URL</label><input type="text" id="serviceImage" placeholder="https://..."></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Price (TZS)</label><input type="text" id="servicePrice" placeholder="5000" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Plan Name</label><input type="text" id="servicePlan" placeholder="Unlimited Access" required></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Requires Panel Credentials?</label><select id="serviceNeedPanel"><option value="false">No</option><option value="true">Yes</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button><button type="button" onclick="closeServiceModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
-
-  <script>
-    const firebaseConfig = { apiKey: "AIzaSyBhF_jesV0dMhy3cEgehrWlT_mZOtKXySE", authDomain: "stanytechzone.firebaseapp.com", projectId: "stanytechzone", storageBucket: "stanytechzone.firebasestorage.app", messagingSenderId: "182249230489", appId: "1:182249230489:web:c87d89de113b6714c46808" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    const ADMIN_EMAIL = "stanytech@admin.com";
-    const ADMIN_PASSWORD = "1290";
-
-    function handleAdminLogin(event) {
-      event.preventDefault();
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPassword').value;
-      if(email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) { alert("Invalid credentials. Use: stanytech@admin.com / 1290"); return; }
-      document.getElementById('loginLoader').style.display = 'block';
-      document.getElementById('adminLoginForm').style.display = 'none';
-      setTimeout(() => {
-        document.getElementById('adminLoginModal').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
-        loadAllData();
-        seedDefaultData();
-      }, 800);
-    }
-
-    document.getElementById('adminLogoutBtn').addEventListener('click', () => {
-      document.getElementById('adminDashboard').style.display = 'none';
-      document.getElementById('adminLoginModal').style.display = 'flex';
-      document.getElementById('loginLoader').style.display = 'none';
-      document.getElementById('adminLoginForm').style.display = 'block';
-    });
-
-    function showPage(pageName) {
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      document.getElementById(`${pageName}Page`).classList.add('active');
-      if(pageName === 'users') loadUsers();
-      else if(pageName === 'services') loadServices();
-      else if(pageName === 'categories') loadCategories();
-      else if(pageName === 'orders') loadOrders();
-      else if(pageName === 'dashboard') loadStats();
-      else if(pageName === 'settings') loadSettings();
-    }
-
-    async function loadAllData() { await loadStats(); await loadUsers(); await loadServices(); await loadCategories(); await loadOrders(); await loadSettings(); }
-
-    async function loadStats() {
-      const users = await db.collection("users").get();
-      const services = await db.collection("services").get();
-      const orders = await db.collection("orders").get();
-      const pending = await db.collection("orders").where("status", "==", "pending").get();
-      document.getElementById('totalUsers').innerText = users.size;
-      document.getElementById('totalServices').innerText = services.size;
-      document.getElementById('totalOrders').innerText = orders.size;
-      document.getElementById('pendingOrders').innerText = pending.size;
-      
-      let recentHtml = '<tr><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>';
-      const recentOrders = [];
-      orders.forEach(doc => recentOrders.push({ id: doc.id, ...doc.data() }));
-      recentOrders.sort((a,b) => (b.createdAt?.toDate?.() || new Date(b.createdAt)) - (a.createdAt?.toDate?.() || new Date(a.createdAt)));
-      recentOrders.slice(0,6).forEach(o => {
-        let statusClass = o.status === 'completed' ? 'status-completed' : (o.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
-        recentHtml += `<tr><td>${o.customerName || 'N/A'}</td><td>${o.serviceName || '-'}</td><td class="font-semibold text-orange-400">${o.amount || '-'}</td><td><span class="status-badge ${statusClass}">${o.status || 'pending'}</span></td><td>${o.createdAt?.toDate?.().toLocaleDateString() || new Date(o.createdAt).toLocaleDateString()}</td></tr>`;
-      });
-      recentHtml += '</tbody></table>';
-      document.getElementById('recentOrdersTable').innerHTML = recentOrders.length ? recentHtml : '<div class="text-center py-8 text-gray-400">No orders yet</div>';
-    }
-
-    async function loadUsers() {
-      const users = await db.collection("users").get();
-      document.getElementById('userCount').innerText = `${users.size} total users`;
-      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
-      users.forEach(doc => {
-        const u = doc.data();
-        html += `<tr><td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${u.name || 'N/A'}</td><td>${u.email || doc.id.substring(0,20)}...</td><td>${u.phone || '-'}</td><td>${u.createdAt?.toDate?.().toLocaleDateString() || '-'}</td><td><button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('usersTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No users found</div>';
-    }
-
-    window.deleteUser = async (userId) => { if(confirm("Delete this user?")) { await db.collection("users").doc(userId).delete(); loadUsers(); loadStats(); } };
-
-    async function loadServices() {
-      const services = await db.collection("services").get();
-      let html = '<tr><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price (TZS)</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
-      services.forEach(doc => {
-        const s = doc.data();
-        html += `<tr><td class="p-2"><img src="${s.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td class="font-medium">${s.name}</td><td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${s.category}</span></td><td class="font-semibold text-orange-400">${s.price || '0'}</td><td>${s.planName || '-'}</td><td><button onclick="editService('${doc.id}')" class="text-blue-500 mr-3 hover:text-blue-400"><i class="fas fa-edit"></i></button><button onclick="deleteService('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;
-      });
-      html += '</tbody><table>';
-      document.getElementById('servicesTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No services. Click Add Service to create one.</div>';
-    }
-
-    window.editService = async (id) => {
-      const doc = await db.collection("services").doc(id).get();
-      const s = doc.data();
-      document.getElementById('serviceId').value = id;
-      document.getElementById('serviceName').value = s.name;
-      document.getElementById('serviceCategory').value = s.category;
-      document.getElementById('serviceDesc').value = s.description || '';
-      document.getElementById('serviceImage').value = s.image || '';
-      document.getElementById('servicePrice').value = s.price || '';
-      document.getElementById('servicePlan').value = s.planName || '';
-      document.getElementById('serviceNeedPanel').value = s.needPanel ? "true" : "false";
-      document.getElementById('serviceModalTitle').innerText = "Edit Service";
-      document.getElementById('serviceModal').style.display = 'flex';
-    };
-    window.deleteService = async (id) => { if(confirm("Delete this service?")) { await db.collection("services").doc(id).delete(); loadServices(); loadStats(); } };
-
-    async function loadCategories() {
-      const categories = await db.collection("categories").get();
-      let html = '<table><thead><tr><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
-      categories.forEach(doc => {
-        const c = doc.data();
-        html += `<tr><td class="p-2"><img src="${c.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td><i class="fas fa-folder text-orange-500 mr-2"></i>${c.name}</td><td><code class="text-xs bg-gray-800 px-2 py-1 rounded">${c.key}</code></td><td><button onclick="editCategory('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteCategory('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('categoriesTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No categories. Click Add Category to create one.</div>';
-    }
-
-    window.editCategory = async (id) => {
-      const doc = await db.collection("categories").doc(id).get();
-      const c = doc.data();
-      document.getElementById('categoryId').value = id;
-      document.getElementById('categoryName').value = c.name;
-      document.getElementById('categoryKey').value = c.key;
-      document.getElementById('categoryImage').value = c.image || '';
-      document.getElementById('categoryModalTitle').innerText = "Edit Category";
-      document.getElementById('categoryModal').style.display = 'flex';
-    };
-    window.deleteCategory = async (id) => { if(confirm("Delete this category?")) { await db.collection("categories").doc(id).delete(); loadCategories(); } };
-
-    async function loadOrders() {
-      const orders = await db.collection("orders").orderBy("createdAt", "desc").get();
-      document.getElementById('orderCount').innerText = `${orders.size} total orders`;
-      let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount (TZS)</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
-      orders.forEach(doc => {
-        const o = doc.data();
-        let statusClass = o.status === 'completed' ? 'status-completed' : (o.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
-        html += `<tr class="hover:bg-white/5 transition">
-          <td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${o.customerName || '-'}</td>
-          <td class="font-medium">${o.serviceName || '-'}</td>
-          <td class="text-gray-400">${o.planName || '-'}</td>
-          <td class="font-semibold text-orange-400">${o.amount || '-'}</td>
-          <td>
-            <select onchange="updateOrderStatus('${doc.id}', this.value)" class="order-status-select ${o.status || 'pending'}" style="background:rgba(0,0,0,0.5); border-radius:20px; padding:6px 12px;">
-              <option value="pending" ${o.status==='pending'?'selected':''} style="color:#f59e0b;">🟡 Pending</option>
-              <option value="completed" ${o.status==='completed'?'selected':''} style="color:#10b981;">✅ Completed</option>
-              <option value="cancelled" ${o.status==='cancelled'?'selected':''} style="color:#ef4444;">❌ Cancelled</option>
+  <div id="serviceModal" class="modal">
+    <div class="glass-card p-6 max-w-lg w-full">
+      <div class="flex justify-between items-center mb-5">
+        <h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3>
+        <button onclick="Modals.close('service')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      <form id="serviceForm" onsubmit="Service.save(event)">
+        <input type="hidden" id="serviceId">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="text-sm text-gray-400 mb-1 block">Service Name *</label>
+            <input type="text" id="serviceName" required maxlength="100">
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-1 block">Category *</label>
+            <select id="serviceCategory" required></select>
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-1 block">Price (TZS) *</label>
+            <input type="number" id="servicePrice" placeholder="5000" required min="0">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-sm text-gray-400 mb-1 block">Description</label>
+            <textarea id="serviceDesc" rows="2" maxlength="200"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-sm text-gray-400 mb-1 block">Image URL</label>
+            <input type="url" id="serviceImage" placeholder="https://...">
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-1 block">Plan Name *</label>
+            <input type="text" id="servicePlan" placeholder="Unlimited Access" required maxlength="50">
+          </div>
+          <div>
+            <label class="text-sm text-gray-400 mb-1 block">Needs Panel?</label>
+            <select id="serviceNeedPanel">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
             </select>
-          </td>
-          <td class="text-gray-500 text-sm">${o.createdAt?.toDate?.().toLocaleString() || new Date(o.createdAt).toLocaleString()}</td>
-          <td><button onclick="deleteOrder('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
-      });
-      html += '</tbody></table>';
-      document.getElementById('ordersTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No orders found</div>';
-    }
+          </div>
+        </div>
+        <div class="flex gap-3 mt-4">
+          <button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button>
+          <button type="button" onclick="Modals.close('service')" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl hover:bg-gray-800">Cancel</button>
+        </div>
+      </form>
+      <p id="serviceMsg" class="text-sm mt-3 hidden"></p>
+    </div>
+  </div>
 
-    window.updateOrderStatus = async (orderId, status) => { 
-      await db.collection("orders").doc(orderId).update({ status: status, updatedAt: new Date() }); 
-      loadStats(); 
-      loadOrders(); 
-      alert(`✅ Order marked as ${status.toUpperCase()}!`);
+  <!-- ===== CORE JAVASCRIPT MODULES ===== -->
+  <script>
+    // ===== CONFIGURATION =====
+    const Config = {
+      firebase: {
+        apiKey: "AIzaSyBhF_jesV0dMhy3cEgehrWlT_mZOtKXySE",
+        authDomain: "stanytechzone.firebaseapp.com",
+        projectId: "stanytechzone",
+        storageBucket: "stanytechzone.firebasestorage.app",
+        messagingSenderId: "182249230489",
+        appId: "1:182249230489:web:c87d89de113b6714c46808"
+      },
+      admin: {
+        email: "stanytech@admin.com",
+        demoPassword: "1290" // ⚠️ In production, use Firebase Auth!
+      },
+      currency: "TZS",
+      timezone: "Africa/Dar_es_Salaam"
     };
-    window.deleteOrder = async (orderId) => { if(confirm("Delete this order?")) { await db.collection("orders").doc(orderId).delete(); loadStats(); loadOrders(); } };
 
-    async function loadSettings() {
-      const settings = await db.collection("settings").doc("website").get();
-      if(settings.exists) {
-        document.getElementById('websiteName').value = settings.data().name || 'StanyTech Service';
-        document.getElementById('websiteLogo').value = settings.data().logo || '';
-        document.getElementById('waNumber').value = settings.data().whatsapp || '255787069580';
-        document.getElementById('supportEmail').value = settings.data().email || '';
+    // ===== FIREBASE INIT =====
+    firebase.initializeApp(Config.firebase);
+    const db = firebase.firestore();
+    db.settings({ ignoreUndefinedProperties: true });
+
+    // ===== UTILITIES MODULE =====
+    const Utils = {
+      show: (id) => document.getElementById(id)?.classList.remove('hidden'),
+      hide: (id) => document.getElementById(id)?.classList.add('hidden'),
+      setActive: (id) => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id)?.classList.add('active');
+      },
+      formatCurrency: (amount, currency = 'TZS') => {
+        const num = parseFloat(amount) || 0;
+        return new Intl.NumberFormat('sw-TZ', { style: 'currency', currency }).format(num);
+      },
+      formatDate: (timestamp) => {
+        if (!timestamp) return '-';
+        const date = timestamp.toDate?.() || new Date(timestamp);
+        return date.toLocaleDateString('sw-TZ', { day: '2-digit', month: 'short', year: 'numeric' });
+      },
+      formatDateTime: (timestamp) => {
+        if (!timestamp) return '-';
+        const date = timestamp.toDate?.() || new Date(timestamp);
+        return date.toLocaleString('sw-TZ');
+      },
+      showMessage: (elementId, message, type = 'info') => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.textContent = message;
+          el.className = `text-sm mt-3 ${type === 'error' ? 'text-red-400' : type === 'success' ? 'text-green-400' : 'text-gray-400'}`;
+          el.classList.remove('hidden');
+          setTimeout(() => el.classList.add('hidden'), 4000);
+        }
+      },
+      validateForm: (formId, rules = {}) => {
+        const form = document.getElementById(formId);
+        if (!form) return false;
+        let valid = true;
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(field => {
+          if (!field.value.trim()) {
+            field.classList.add('border-red-500');
+            valid = false;
+          } else {
+            field.classList.remove('border-red-500');
+          }
+        });
+        return valid;
       }
-    }
+    };
 
-    document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-      await db.collection("settings").doc("website").set({
-        name: document.getElementById('websiteName').value,
-        logo: document.getElementById('websiteLogo').value,
-        whatsapp: document.getElementById('waNumber').value,
-        email: document.getElementById('supportEmail').value,
-        updatedAt: new Date()
-      });
-      alert("Settings saved successfully!");
+    // ===== AUTH MODULE =====
+    const Auth = {
+      handleLogin: async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('adminEmail').value.trim();
+        const password = document.getElementById('adminPassword').value;
+        
+        Utils.hide('loginError');
+        Utils.show('loginLoader');
+        Utils.hide('adminLoginForm');
+        
+        try {
+          // ⚠️ DEMO ONLY - Use Firebase Auth in production!
+          await new Promise(resolve => setTimeout(resolve, 800));
+          
+          if (email !== Config.admin.email || password !== Config.admin.demoPassword) {
+            throw new Error("Invalid credentials");
+          }
+          
+          localStorage.setItem('adminSession', JSON.stringify({ email, loginTime: Date.now() }));
+          Utils.hide('adminLoginModal');
+          Utils.show('adminDashboard');
+          await App.init();
+        } catch (error) {
+          document.getElementById('loginError').textContent = `❌ ${error.message}. Use: ${Config.admin.email} / ${Config.admin.demoPassword}`;
+          document.getElementById('loginError').classList.remove('hidden');
+          Utils.hide('loginLoader');
+          Utils.show('adminLoginForm');
+        }
+      },
+      
+      logout: () => {
+        localStorage.removeItem('adminSession');
+        Utils.hide('adminDashboard');
+        Utils.show('adminLoginModal');
+        document.getElementById('adminLoginForm').reset();
+        Utils.show('adminLoginForm');
+        Utils.hide('loginLoader');
+      },
+      
+      checkSession: () => {
+        const session = localStorage.getItem('adminSession');
+        if (session) {
+          try {
+            const { loginTime } = JSON.parse(session);
+            // Session expires after 24 hours
+            if (Date.now() - loginTime < 24 * 60 * 60 * 1000) {
+              Utils.hide('adminLoginModal');
+              Utils.show('adminDashboard');
+              App.init();
+              return true;
+            }
+          } catch (e) { console.error('Session parse error', e); }
+        }
+        return false;
+      }
+    };
+
+    // ===== ROUTER MODULE =====
+    const Router = {
+      navigate: (pageName) => {
+        // Update nav active state
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        event?.target?.closest('.nav-link')?.classList.add('active');
+        
+        // Show page
+        Utils.setActive(`${pageName}Page`);
+        
+        // Load data based on page
+        const loaders = {
+          'dashboard': Dashboard.load,
+          'users': User.load,
+          'services': Service.load,
+          'categories': Category.load,
+          'orders': Order.load,
+          'settings': Settings.load
+        };
+        if (loaders[pageName]) loaders[pageName]();
+      }
+    };
+
+    // ===== DASHBOARD MODULE =====
+    const Dashboard = {
+      load: async () => {
+        try {
+          const [usersSnap, servicesSnap, ordersSnap, pendingSnap] = await Promise.all([
+            db.collection("users").count().get(),
+            db.collection("services").count().get(),
+            db.collection("orders").count().get(),
+            db.collection("orders").where("status", "==", "pending").count().get()
+          ]);
+          
+          document.getElementById('totalUsers').textContent = usersSnap.data().count || 0;
+          document.getElementById('totalServices').textContent = servicesSnap.data().count || 0;
+          document.getElementById('totalOrders').textContent = ordersSnap.data().count || 0;
+          document.getElementById('pendingOrders').textContent = pendingSnap.data().count || 0;
+          
+          await Dashboard.loadRecentOrders();
+        } catch (error) {
+          console.error('Dashboard load error:', error);
+          document.getElementById('recentOrdersTable').innerHTML = 
+            '<div class="text-center py-8 text-red-400">Failed to load data</div>';
+        }
+      },
+      
+      loadRecentOrders: async () => {
+        const container = document.getElementById('recentOrdersTable');
+        container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading...</div>';
+        
+        try {
+          const snapshot = await db.collection("orders")
+            .orderBy("createdAt", "desc")
+            .limit(6)
+            .get();
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">No orders yet</div>';
+            return;
+          }
+          
+          let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+          snapshot.forEach(doc => {
+            const o = doc.data();
+            const statusClass = { completed: 'status-completed', cancelled: 'status-cancelled' }[o.status] || 'status-pending';
+            html += `<tr>
+              <td>${o.customerName || 'N/A'}</td>
+              <td>${o.serviceName || '-'}</td>
+              <td class="font-semibold text-orange-400">${Utils.formatCurrency(o.amount)}</td>
+              <td><span class="status-badge ${statusClass}">${o.status || 'pending'}</span></td>
+              <td>${Utils.formatDate(o.createdAt)}</td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        } catch (error) {
+          console.error('Recent orders error:', error);
+          container.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load orders</div>';
+        }
+      }
+    };
+
+    // ===== USER MODULE =====
+    const User = {
+      load: async () => {
+        const container = document.getElementById('usersTable');
+        container.innerHTML = '<div class="text-center py-8"><div class="loader"></div></div>';
+        
+        try {
+          const snapshot = await db.collection("users").orderBy("createdAt", "desc").get();
+          document.getElementById('userCount').textContent = `${snapshot.size} total users`;
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">No users found</div>';
+            return;
+          }
+          
+          let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead><tbody>';
+          snapshot.forEach(doc => {
+            const u = doc.data();
+            html += `<tr>
+              <td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${u.name || 'N/A'}</td>
+              <td>${u.email || doc.id.substring(0,20)}...</td>
+              <td>${u.phone || '-'}</td>
+              <td>${Utils.formatDate(u.createdAt)}</td>
+              <td>
+                <button onclick="User.delete('${doc.id}')" class="text-red-500 hover:text-red-400 transition">
+                  <i class="fas fa-trash"></i> <span class="hidden sm:inline">Delete</span>
+                </button>
+              </td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        } catch (error) {
+          console.error('Users load error:', error);
+          container.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load users</div>';
+        }
+      },
+      
+      delete: async (userId) => {
+        if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+        try {
+          // Delete user's orders first (cascade)
+          const orders = await db.collection("orders").where("userId", "==", userId).get();
+          const batch = db.batch();
+          orders.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          
+          // Delete user
+          await db.collection("users").doc(userId).delete();
+          Utils.showMessage('userCount', 'User deleted successfully', 'success');
+          User.load();
+          Dashboard.load();
+        } catch (error) {
+          console.error('Delete user error:', error);
+          Utils.showMessage('userCount', 'Failed to delete user', 'error');
+        }
+      }
+    };
+
+    // ===== CATEGORY MODULE =====
+    const Category = {
+      load: async () => {
+        const container = document.getElementById('categoriesTable');
+        container.innerHTML = '<div class="text-center py-8"><div class="loader"></div></div>';
+        
+        try {
+          const snapshot = await db.collection("categories").orderBy("name").get();
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">No categories. Click "Add Category" to create one.</div>';
+            return;
+          }
+          
+          let html = '<table><thead><tr><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
+          snapshot.forEach(doc => {
+            const c = doc.data();
+            html += `<tr>
+              <td class="p-2"><img src="${c.image || 'https://placehold.co/40?text=📁'}" class="w-10 h-10 rounded-lg object-cover bg-gray-800" onerror="this.src='https://placehold.co/40?text=📁'"></td>
+              <td><i class="fas fa-folder text-orange-500 mr-2"></i>${c.name}</td>
+              <td><code class="text-xs bg-gray-800 px-2 py-1 rounded">${c.key}</code></td>
+              <td>
+                <button onclick="Category.edit('${doc.id}')" class="text-blue-500 hover:text-blue-400 transition mr-3">
+                  <i class="fas fa-edit"></i> <span class="hidden sm:inline">Edit</span>
+                </button>
+                <button onclick="Category.delete('${doc.id}')" class="text-red-500 hover:text-red-400 transition">
+                  <i class="fas fa-trash"></i> <span class="hidden sm:inline">Delete</span>
+                </button>
+              </td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        } catch (error) {
+          console.error('Categories load error:', error);
+          container.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load categories</div>';
+        }
+      },
+      
+      openModal: (mode = 'add', data = null) => {
+        document.getElementById('categoryModalTitle').textContent = mode === 'add' ? 'Add Category' : 'Edit Category';
+        document.getElementById('categoryForm').reset();
+        document.getElementById('categoryId').value = '';
+        document.getElementById('categoryMsg')?.classList.add('hidden');
+        
+        if (data) {
+          document.getElementById('categoryId').value = data.id;
+          document.getElementById('categoryName').value = data.name || '';
+          document.getElementById('categoryKey').value = data.key || '';
+          document.getElementById('categoryImage').value = data.image || '';
+        }
+        document.getElementById('categoryModal').classList.add('active');
+      },
+      
+      close: () => {
+        document.getElementById('categoryModal').classList.remove('active');
+        document.getElementById('categoryForm').reset();
+        document.getElementById('categoryId').value = '';
+      },
+      
+      save: async (e) => {
+        e.preventDefault();
+        if (!Utils.validateForm('categoryForm')) return;
+        
+        const id = document.getElementById('categoryId').value;
+        const key = document.getElementById('categoryKey').value.toLowerCase().trim();
+        const data = {
+          name: document.getElementById('categoryName').value.trim(),
+          key: key,
+          image: document.getElementById('categoryImage').value.trim(),
+          updatedAt: new Date()
+        };
+        
+        try {
+          if (id) {
+            await db.collection("categories").doc(id).update(data);
+            Utils.showMessage('categoryMsg', 'Category updated!', 'success');
+          } else {
+            // Check if key exists
+            const existing = await db.collection("categories").doc(key).get();
+            if (existing.exists) throw new Error("Category key already exists");
+            await db.collection("categories").doc(key).set({ ...data, createdAt: new Date() });
+            Utils.showMessage('categoryMsg', 'Category created!', 'success');
+          }
+          setTimeout(() => { Category.close(); Category.load(); }, 1000);
+        } catch (error) {
+          console.error('Save category error:', error);
+          Utils.showMessage('categoryMsg', `Error: ${error.message}`, 'error');
+        }
+      },
+      
+      edit: async (id) => {
+        try {
+          const doc = await db.collection("categories").doc(id).get();
+          if (doc.exists) Category.openModal('edit', { id, ...doc.data() });
+        } catch (error) {
+          console.error('Edit category error:', error);
+          alert('Failed to load category');
+        }
+      },
+      
+      delete: async (id) => {
+        if (!confirm("Delete this category? Services in this category will lose their category reference.")) return;
+        try {
+          await db.collection("categories").doc(id).delete();
+          Utils.showMessage('categoriesTable', 'Category deleted', 'success');
+          Category.load();
+        } catch (error) {
+          console.error('Delete category error:', error);
+          Utils.showMessage('categoriesTable', 'Failed to delete', 'error');
+        }
+      }
+    };
+
+    // ===== SERVICE MODULE =====
+    const Service = {
+      load: async () => {
+        const container = document.getElementById('servicesTable');
+        container.innerHTML = '<div class="text-center py-8"><div class="loader"></div></div>';
+        
+        try {
+          const [servicesSnap, categoriesSnap] = await Promise.all([
+            db.collection("services").orderBy("name").get(),
+            db.collection("categories").get()
+          ]);
+          
+          // Build category map for display
+          const catMap = {};
+          categoriesSnap.forEach(c => { catMap[c.data().key] = c.data().name; });
+          
+          if (servicesSnap.empty) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">No services. Click "Add Service" to create one.</div>';
+            return;
+          }
+          
+          let html = '<table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
+          servicesSnap.forEach(doc => {
+            const s = doc.data();
+            html += `<tr>
+              <td class="p-2"><img src="${s.image || 'https://placehold.co/40?text=📦'}" class="w-10 h-10 rounded-lg object-cover bg-gray-800" onerror="this.src='https://placehold.co/40?text=📦'"></td>
+              <td class="font-medium">${s.name}</td>
+              <td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${catMap[s.category] || s.category}</span></td>
+              <td class="font-semibold text-orange-400">${Utils.formatCurrency(s.price)}</td>
+              <td>${s.planName || '-'}</td>
+              <td>
+                <button onclick="Service.edit('${doc.id}')" class="text-blue-500 hover:text-blue-400 transition mr-3">
+                  <i class="fas fa-edit"></i> <span class="hidden sm:inline">Edit</span>
+                </button>
+                <button onclick="Service.delete('${doc.id}')" class="text-red-500 hover:text-red-400 transition">
+                  <i class="fas fa-trash"></i> <span class="hidden sm:inline">Delete</span>
+                </button>
+              </td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        } catch (error) {
+          console.error('Services load error:', error);
+          container.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load services</div>';
+        }
+      },
+      
+      loadCategoriesForSelect: async () => {
+        const select = document.getElementById('serviceCategory');
+        select.innerHTML = '<option value="">Loading...</option>';
+        try {
+          const snapshot = await db.collection("categories").orderBy("name").get();
+          select.innerHTML = '<option value="">Select Category</option>';
+          snapshot.forEach(doc => {
+            const c = doc.data();
+            select.innerHTML += `<option value="${c.key}">${c.name}</option>`;
+          });
+        } catch (error) {
+          console.error('Load categories error:', error);
+          select.innerHTML = '<option value="">Failed to load</option>';
+        }
+      },
+      
+      openModal: async (mode = 'add', data = null) => {
+        await Service.loadCategoriesForSelect();
+        document.getElementById('serviceModalTitle').textContent = mode === 'add' ? 'Add Service' : 'Edit Service';
+        document.getElementById('serviceForm').reset();
+        document.getElementById('serviceId').value = '';
+        document.getElementById('serviceMsg')?.classList.add('hidden');
+        
+        if (data) {
+          document.getElementById('serviceId').value = data.id;
+          document.getElementById('serviceName').value = data.name || '';
+          document.getElementById('serviceCategory').value = data.category || '';
+          document.getElementById('serviceDesc').value = data.description || '';
+          document.getElementById('serviceImage').value = data.image || '';
+          document.getElementById('servicePrice').value = data.price || '';
+          document.getElementById('servicePlan').value = data.planName || '';
+          document.getElementById('serviceNeedPanel').value = data.needPanel ? "true" : "false";
+        }
+        document.getElementById('serviceModal').classList.add('active');
+      },
+      
+      close: () => {
+        document.getElementById('serviceModal').classList.remove('active');
+        document.getElementById('serviceForm').reset();
+        document.getElementById('serviceId').value = '';
+      },
+      
+      save: async (e) => {
+        e.preventDefault();
+        if (!Utils.validateForm('serviceForm')) return;
+        
+        const id = document.getElementById('serviceId').value;
+        const price = parseFloat(document.getElementById('servicePrice').value) || 0;
+        
+        const data = {
+          name: document.getElementById('serviceName').value.trim(),
+          category: document.getElementById('serviceCategory').value,
+          description: document.getElementById('serviceDesc').value.trim(),
+          image: document.getElementById('serviceImage').value.trim(),
+          price: price,
+          currency: Config.currency,
+          planName: document.getElementById('servicePlan').value.trim(),
+          needPanel: document.getElementById('serviceNeedPanel').value === "true",
+          updatedAt: new Date()
+        };
+        
+        try {
+          if (id) {
+            await db.collection("services").doc(id).update(data);
+            Utils.showMessage('serviceMsg', 'Service updated!', 'success');
+          } else {
+            await db.collection("services").add({ ...data, createdAt: new Date(), isActive: true });
+            Utils.showMessage('serviceMsg', 'Service created!', 'success');
+          }
+          setTimeout(() => { Service.close(); Service.load(); Dashboard.load(); }, 1000);
+        } catch (error) {
+          console.error('Save service error:', error);
+          Utils.showMessage('serviceMsg', `Error: ${error.message}`, 'error');
+        }
+      },
+      
+      edit: async (id) => {
+        try {
+          const doc = await db.collection("services").doc(id).get();
+          if (doc.exists) Service.openModal('edit', { id, ...doc.data() });
+        } catch (error) {
+          console.error('Edit service error:', error);
+          alert('Failed to load service');
+        }
+      },
+      
+      delete: async (id) => {
+        if (!confirm("Delete this service? This will not delete existing orders.")) return;
+        try {
+          await db.collection("services").doc(id).delete();
+          Utils.showMessage('servicesTable', 'Service deleted', 'success');
+          Service.load();
+          Dashboard.load();
+        } catch (error) {
+          console.error('Delete service error:', error);
+          Utils.showMessage('servicesTable', 'Failed to delete', 'error');
+        }
+      }
+    };
+
+    // ===== ORDER MODULE =====
+    const Order = {
+      load: async () => {
+        const container = document.getElementById('ordersTable');
+        container.innerHTML = '<div class="text-center py-8"><div class="loader"></div></div>';
+        
+        try {
+          const snapshot = await db.collection("orders").orderBy("createdAt", "desc").get();
+          document.getElementById('orderCount').textContent = `${snapshot.size} total orders`;
+          
+          if (snapshot.empty) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">No orders found</div>';
+            return;
+          }
+          
+          let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+          snapshot.forEach(doc => {
+            const o = doc.data();
+            const statusClass = { completed: 'status-completed', cancelled: 'status-cancelled' }[o.status] || 'status-pending';
+            html += `<tr class="hover:bg-white/5 transition">
+              <td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${o.customerName || '-'}</td>
+              <td class="font-medium">${o.serviceName || '-'}</td>
+              <td class="text-gray-400">${o.planName || '-'}</td>
+              <td class="font-semibold text-orange-400">${Utils.formatCurrency(o.amount)}</td>
+              <td>
+                <select onchange="Order.updateStatus('${doc.id}', this.value)" 
+                        class="order-status-select ${o.status || 'pending'}">
+                  <option value="pending" ${o.status==='pending'?'selected':''}>🟡 Pending</option>
+                  <option value="completed" ${o.status==='completed'?'selected':''}>✅ Completed</option>
+                  <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ Cancelled</option>
+                </select>
+              </td>
+              <td class="text-gray-500 text-sm">${Utils.formatDateTime(o.createdAt)}</td>
+              <td>
+                <button onclick="Order.delete('${doc.id}')" class="text-red-500 hover:text-red-400 transition">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        } catch (error) {
+          console.error('Orders load error:', error);
+          container.innerHTML = '<div class="text-center py-8 text-red-400">Failed to load orders</div>';
+        }
+      },
+      
+      updateStatus: async (orderId, status) => {
+        try {
+          await db.collection("orders").doc(orderId).update({ 
+            status: status, 
+            updatedAt: new Date() 
+          });
+          Utils.showMessage('orderCount', `✅ Order marked as ${status.toUpperCase()}`, 'success');
+          Order.load();
+          Dashboard.load();
+        } catch (error) {
+          console.error('Update status error:', error);
+          alert('Failed to update order status');
+          Order.load(); // Revert UI
+        }
+      },
+      
+      delete: async (orderId) => {
+        if (!confirm("Delete this order permanently?")) return;
+        try {
+          await db.collection("orders").doc(orderId).delete();
+          Utils.showMessage('orderCount', 'Order deleted', 'success');
+          Order.load();
+          Dashboard.load();
+        } catch (error) {
+          console.error('Delete order error:', error);
+          Utils.showMessage('orderCount', 'Failed to delete', 'error');
+        }
+      }
+    };
+
+    // ===== SETTINGS MODULE =====
+    const Settings = {
+      load: async () => {
+        try {
+          const doc = await db.collection("settings").doc("website").get();
+          if (doc.exists) {
+            const s = doc.data();
+            document.getElementById('websiteName').value = s.name || 'StanyTech Service';
+            document.getElementById('websiteLogo').value = s.logo || '';
+            document.getElementById('waNumber').value = s.whatsapp || '255787069580';
+            document.getElementById('supportEmail').value = s.email || '';
+            document.getElementById('defaultCurrency').value = s.currency || 'TZS';
+          }
+        } catch (error) {
+          console.error('Load settings error:', error);
+        }
+      },
+      
+      save: async () => {
+        const btn = document.getElementById('saveSettingsBtn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+        
+        try {
+          await db.collection("settings").doc("website").set({
+            name: document.getElementById('websiteName').value.trim(),
+            logo: document.getElementById('websiteLogo').value.trim(),
+            whatsapp: document.getElementById('waNumber').value.trim(),
+            email: document.getElementById('supportEmail').value.trim(),
+            currency: document.getElementById('defaultCurrency').value,
+            timezone: Config.timezone,
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          Utils.showMessage('settingsMsg', '✅ Settings saved successfully!', 'success');
+          Config.currency = document.getElementById('defaultCurrency').value;
+        } catch (error) {
+          console.error('Save settings error:', error);
+          Utils.showMessage('settingsMsg', `❌ Error: ${error.message}`, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
+    };
+
+    // ===== MODALS MODULE =====
+    const Modals = {
+      close: (name) => {
+        document.getElementById(`${name}Modal`)?.classList.remove('active');
+        document.getElementById(`${name}Form`)?.reset();
+        document.getElementById(`${name}Id`)?.value = '';
+        document.getElementById(`${name}Msg`)?.classList.add('hidden');
+      },
+      // Close modal when clicking outside
+      init: () => {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+          });
+        });
+      }
+    };
+
+    // ===== APP INITIALIZATION =====
+    const App = {
+      init: async () => {
+        // Setup event listeners
+        document.getElementById('adminLogoutBtn').addEventListener('click', Auth.logout);
+        document.getElementById('addCategoryBtn').addEventListener('click', () => Category.openModal('add'));
+        document.getElementById('addServiceBtn').addEventListener('click', () => Service.openModal('add'));
+        document.getElementById('saveSettingsBtn').addEventListener('click', Settings.save);
+        
+        Modals.init();
+        
+        // Load initial data
+        await Dashboard.load();
+      }
+    };
+
+    // ===== STARTUP =====
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check for existing session
+      if (!Auth.checkSession()) {
+        Utils.show('adminLoginModal');
+      }
     });
 
-    function closeServiceModal() { document.getElementById('serviceModal').style.display = 'none'; document.getElementById('serviceForm').reset(); document.getElementById('serviceId').value = ''; }
-    function closeCategoryModal() { document.getElementById('categoryModal').style.display = 'none'; document.getElementById('categoryForm').reset(); document.getElementById('categoryId').value = ''; }
-
-    document.getElementById('addServiceBtn').addEventListener('click', async () => {
-      const categories = await db.collection("categories").get();
-      let options = '';
-      categories.forEach(c => options += `<option value="${c.data().key}">${c.data().name}</option>`);
-      document.getElementById('serviceCategory').innerHTML = options;
-      document.getElementById('serviceModalTitle').innerText = "Add New Service";
-      document.getElementById('serviceForm').reset();
-      document.getElementById('serviceId').value = '';
-      document.getElementById('serviceModal').style.display = 'flex';
-    });
-
-    document.getElementById('addCategoryBtn').addEventListener('click', () => {
-      document.getElementById('categoryModalTitle').innerText = "Add New Category";
-      document.getElementById('categoryForm').reset();
-      document.getElementById('categoryId').value = '';
-      document.getElementById('categoryModal').style.display = 'flex';
-    });
-
-    async function saveService(e) {
-      e.preventDefault();
-      const id = document.getElementById('serviceId').value;
-      const data = {
-        name: document.getElementById('serviceName').value,
-        category: document.getElementById('serviceCategory').value,
-        description: document.getElementById('serviceDesc').value,
-        image: document.getElementById('serviceImage').value,
-        price: document.getElementById('servicePrice').value,
-        planName: document.getElementById('servicePlan').value,
-        needPanel: document.getElementById('serviceNeedPanel').value === "true"
-      };
-      if(id) await db.collection("services").doc(id).update(data);
-      else await db.collection("services").add(data);
-      closeServiceModal();
-      loadServices();
-      loadStats();
-    }
-
-    async function saveCategory(e) {
-      e.preventDefault();
-      const id = document.getElementById('categoryId').value;
-      const key = document.getElementById('categoryKey').value.toLowerCase();
-      const data = {
-        name: document.getElementById('categoryName').value,
-        key: key,
-        image: document.getElementById('categoryImage').value
-      };
-      if(id) await db.collection("categories").doc(id).update(data);
-      else await db.collection("categories").doc(key).set(data);
-      closeCategoryModal();
-      loadCategories();
-    }
-
-    async function seedDefaultData() {
-      const cats = await db.collection("categories").get();
-      if(cats.empty) {
-        const defaultCats = [
-          { key: "panels", name: "Panels", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png" },
-          { key: "bots", name: "Bots", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png" },
-          { key: "azam", name: "Azam TV", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg" },
-          { key: "documents", name: "Documents", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg" },
-          { key: "vpn", name: "VPN", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg" }
-        ];
-        for(const c of defaultCats) await db.collection("categories").doc(c.key).set(c);
-        loadCategories();
-      }
-      const services = await db.collection("services").get();
-      if(services.empty) {
-        const defaultServices = [
-          { name: "Unlimited Panel", category: "panels", description: "Full premium access", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "5000", planName: "Unlimited Access", needPanel: true },
-          { name: "2GB Panel", category: "panels", description: "2GB premium data", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "3000", planName: "2GB Data", needPanel: true },
-          { name: "Bug Bot", category: "bots", description: "Advanced WhatsApp bot", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "5000", planName: "Bug Bot", needPanel: false },
-          { name: "Azam TV 1 Month", category: "azam", description: "30 days unlimited", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "3000", planName: "1 Month", needPanel: false },
-          { name: "NIDA Soft Copy", category: "documents", description: "Digital NIDA document", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg", price: "10000", planName: "Soft Copy", needPanel: false },
-          { name: "Birthday Certificate", category: "documents", description: "RITA Certificate - TOTAL 35000 TZS", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/9b3ff475-89d9-424d-80a9-e94ed3f177d6.jpeg", price: "35000", planName: "Certificate Package", needPanel: false },
-          { name: "Halotel VPN 1 Month", category: "vpn", description: "Secure VPN", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "4500", planName: "1 Month", needPanel: false }
-        ];
-        for(const s of defaultServices) await db.collection("services").add(s);
-        loadServices();
-      }
-    }
+    // Expose functions to global scope for inline handlers
+    window.Router = Router;
+    window.Modals = Modals;
+    window.Category = Category;
+    window.Service = Service;
+    window.User = User;
+    window.Order = Order;
+    window.Auth = Auth;
   </script>
 </body>
 </html>
+
+
+
+              <script>
+                              rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Admin only write access
+    match /{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                   get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}
+
+
+              </script>
+                        </body>
+                        </html>
+                    
