@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   
   <title>StanyTech Admin | Premium Dashboard</title>
-  <meta name="description" content="Admin dashboard for StanyTech Service">
+  <meta name="description" content="Admin dashboard for StanyTech Service - Full control">
   <meta name="theme-color" content="#f97316">
   
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png">
@@ -17,7 +17,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet"/>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -54,6 +54,7 @@
     .content-section { display: none; animation: fadeIn 0.3s ease; }
     .content-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .text-gradient { background: linear-gradient(135deg, #f97316, #8b5cf6, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
 </head>
 <body>
@@ -84,10 +85,10 @@
         </div>
       </div>
       <nav class="p-4 mt-2 space-y-1">
-        <div class="nav-item" data-section="dashboard"><i class="fas fa-tachometer-alt w-5 mr-3"></i> Dashboard</div>
+        <div class="nav-item active" data-section="dashboard"><i class="fas fa-tachometer-alt w-5 mr-3"></i> Dashboard</div>
         <div class="nav-item" data-section="users"><i class="fas fa-users w-5 mr-3"></i> Users</div>
         <div class="nav-item" data-section="services"><i class="fas fa-box w-5 mr-3"></i> Services</div>
-        <div class="nav-item" data-section="categories-section"><i class="fas fa-folder w-5 mr-3"></i> Categories</div>
+        <div class="nav-item" data-section="categories"><i class="fas fa-folder w-5 mr-3"></i> Categories</div>
         <div class="nav-item" data-section="orders"><i class="fas fa-shopping-cart w-5 mr-3"></i> Orders</div>
         <div class="nav-item" data-section="settings"><i class="fas fa-cog w-5 mr-3"></i> Settings</div>
       </nav>
@@ -114,7 +115,7 @@
           <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Orders</p><p id="totalOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center"><i class="fas fa-shopping-cart text-2xl text-teal-500"></i></div></div></div>
           <div class="stat-card"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Pending Orders</p><p id="pendingOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center"><i class="fas fa-clock text-2xl text-yellow-500"></i></div></div></div>
         </div>
-        <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400">Loading orders...</div></div></div>
+        <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading orders...</div></div></div>
       </div>
 
       <!-- Users Section -->
@@ -138,7 +139,7 @@
   <div id="categoryModal" class="modal"><div class="glass-card p-6 max-w-md w-full"><div class="flex justify-between items-center mb-5"><h3 id="categoryModalTitle" class="text-xl font-bold text-white">Add Category</h3><button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="categoryForm"><input type="hidden" id="categoryId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Name</label><input type="text" id="categoryName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category Key (unique)</label><input type="text" id="categoryKey" required placeholder="panels, bots, azam, documents, vpn"></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Category Image URL</label><input type="text" id="categoryImage" placeholder="https://..."></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Category</button><button type="button" onclick="closeCategoryModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
 
   <!-- Service Modal -->
-  <div id="serviceModal" class="modal"><div class="glass-card p-6 max-w-lg w-full"><div class="flex justify-between items-center mb-5"><h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3><button onclick="closeServiceModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="serviceForm"><input type="hidden" id="serviceId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Service Name</label><input type="text" id="serviceName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category</label><select id="serviceCategory" required></select></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Description</label><textarea id="serviceDesc" rows="2"></textarea></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Image URL</label><input type="text" id="serviceImage" placeholder="https://..."></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Price (TZS)</label><input type="text" id="servicePrice" placeholder="5000" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Plan Name</label><input type="text" id="servicePlan" placeholder="Unlimited Access" required></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Requires Panel Credentials?</label><select id="serviceNeedPanel"><option value="false">No</option><option value="true">Yes</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button><button type="button" onclick="closeServiceModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
+  <div id="serviceModal" class="modal"><div class="glass-card p-6 max-w-lg w-full"><div class="flex justify-between items-center mb-5"><h3 id="serviceModalTitle" class="text-xl font-bold text-white">Add Service</h3><button onclick="closeServiceModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button></div><form id="serviceForm"><input type="hidden" id="serviceId"><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Service Name</label><input type="text" id="serviceName" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Category</label><select id="serviceCategory" required></select></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Description</label><textarea id="serviceDesc" rows="2"></textarea></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Image URL</label><input type="text" id="serviceImage" placeholder="https://..."></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Price (TZS)</label><input type="text" id="servicePrice" placeholder="5000" required></div><div class="mb-3"><label class="text-sm text-gray-400 mb-1 block">Plan Name</label><input type="text" id="servicePlan" placeholder="Unlimited Access" required></div><div class="mb-4"><label class="text-sm text-gray-400 mb-1 block">Requires Panel Credentials?</label><select id="serviceNeedPanel"><option value="false">No</option><option value="true">Yes (Email + Password)</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 gradient-btn text-white py-2.5 rounded-xl">Save Service</button><button type="button" onclick="closeServiceModal()" class="flex-1 border border-gray-600 text-gray-400 py-2.5 rounded-xl">Cancel</button></div></form></div></div>
 
   <script>
     const firebaseConfig = { apiKey: "AIzaSyBhF_jesV0dMhy3cEgehrWlT_mZOtKXySE", authDomain: "stanytechzone.firebaseapp.com", projectId: "stanytechzone", storageBucket: "stanytechzone.firebasestorage.app", messagingSenderId: "182249230489", appId: "1:182249230489:web:c87d89de113b6714c46808" };
@@ -162,6 +163,12 @@
       } catch(err) {
         await auth.createUserWithEmailAndPassword(email, password);
         await auth.currentUser.updateProfile({displayName: "Super Admin"});
+        await db.collection("settings").doc("website").set({
+          name: "StanyTech Service",
+          logo: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png",
+          whatsapp: "255787069580",
+          email: "support@stanytech.com"
+        });
       }
     });
 
@@ -186,7 +193,7 @@
 
     document.getElementById('adminLogoutBtn').addEventListener('click', () => auth.signOut());
 
-    // Navigation - Only show selected section
+    // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -194,11 +201,11 @@
         const section = item.dataset.section;
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.getElementById(`${section}Section`).classList.add('active');
-        const titles = { dashboard: 'Dashboard', users: 'Users', services: 'Services', 'categories-section': 'Categories', orders: 'Orders', settings: 'Settings' };
+        const titles = { dashboard: 'Dashboard', users: 'Users', services: 'Services', categories: 'Categories', orders: 'Orders', settings: 'Settings' };
         document.getElementById('pageTitle').innerText = titles[section] || 'Dashboard';
         if(section === 'users') loadUsers();
         else if(section === 'services') loadServices();
-        else if(section === 'categories-section') loadCategories();
+        else if(section === 'categories') loadCategories();
         else if(section === 'orders') loadOrders();
         else if(section === 'dashboard') loadStats();
       });
@@ -240,7 +247,7 @@
       document.getElementById('usersTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No users found</div>';
     }
 
-    window.deleteUser = async (userId) => { if(confirm("Delete this user?")) { await db.collection("users").doc(userId).delete(); loadUsers(); loadStats(); } };
+    window.deleteUser = async (userId) => { if(confirm("Delete this user? This cannot be undone.")) { await db.collection("users").doc(userId).delete(); loadUsers(); loadStats(); } };
 
     async function loadServices() {
       const services = await db.collection("services").get();
@@ -290,12 +297,12 @@
       document.getElementById('categoryModalTitle').innerText = "Edit Category";
       document.getElementById('categoryModal').style.display = 'flex';
     };
-    window.deleteCategory = async (id) => { if(confirm("Delete this category? Services in this category will remain but category will be removed.")) { await db.collection("categories").doc(id).delete(); loadCategories(); } };
+    window.deleteCategory = async (id) => { if(confirm("Delete this category?")) { await db.collection("categories").doc(id).delete(); loadCategories(); } };
 
     async function loadOrders() {
       const orders = await db.collection("orders").orderBy("createdAt", "desc").get();
       document.getElementById('orderCount').innerText = `${orders.size} total orders`;
-      let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<tr><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
       orders.forEach(doc => {
         const o = doc.data();
         let statusClass = o.status === 'completed' ? 'status-completed' : (o.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
@@ -311,13 +318,10 @@
     async function loadSettings() {
       const settings = await db.collection("settings").doc("website").get();
       if(settings.exists) {
-        document.getElementById('websiteName').value = settings.data().name || '';
+        document.getElementById('websiteName').value = settings.data().name || 'StanyTech Service';
         document.getElementById('websiteLogo').value = settings.data().logo || '';
         document.getElementById('waNumber').value = settings.data().whatsapp || '255787069580';
         document.getElementById('supportEmail').value = settings.data().email || '';
-      } else {
-        document.getElementById('websiteName').value = 'StanyTech Service';
-        document.getElementById('websiteLogo').value = 'https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png';
       }
     }
 
@@ -337,9 +341,9 @@
 
     document.getElementById('addServiceBtn').addEventListener('click', async () => {
       const categories = await db.collection("categories").get();
-      let options = '<option value="">Select Category</option>';
+      let options = '';
       categories.forEach(c => options += `<option value="${c.data().key}">${c.data().name}</option>`);
-      document.getElementById('serviceCategory').innerHTML = options;
+      document.getElementById('serviceCategory').innerHTML = options || '<option value="">No categories yet</option>';
       document.getElementById('serviceModalTitle').innerText = "Add New Service";
       document.getElementById('serviceForm').reset();
       document.getElementById('serviceId').value = '';
@@ -378,13 +382,14 @@
     document.getElementById('categoryForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('categoryId').value;
+      const key = document.getElementById('categoryKey').value.toLowerCase();
       const data = {
         name: document.getElementById('categoryName').value,
-        key: document.getElementById('categoryKey').value.toLowerCase(),
+        key: key,
         image: document.getElementById('categoryImage').value
       };
       if(id) await db.collection("categories").doc(id).update(data);
-      else await db.collection("categories").doc(data.key).set(data);
+      else await db.collection("categories").doc(key).set(data);
       closeCategoryModal();
       loadCategories();
     });
@@ -405,12 +410,22 @@
       const services = await db.collection("services").get();
       if(services.empty) {
         const defaultServices = [
-          { name: "Unlimited Panel", category: "panels", description: "Full premium access", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "5000", planName: "Unlimited Access", needPanel: true },
-          { name: "2GB Panel", category: "panels", description: "2GB premium data", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "3000", planName: "2GB Data", needPanel: true },
-          { name: "Bug Bot", category: "bots", description: "Advanced WhatsApp bot", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "5000", planName: "Bug Bot", needPanel: false },
+          { name: "Unlimited Panel", category: "panels", description: "Full premium access, no data limits", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "5000", planName: "Unlimited Access", needPanel: true },
+          { name: "2GB Panel", category: "panels", description: "2GB premium data package", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "3000", planName: "2GB Data", needPanel: true },
+          { name: "4GB Panel", category: "panels", description: "4GB high-speed data", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "4000", planName: "4GB Data", needPanel: true },
+          { name: "5GB Panel", category: "panels", description: "5GB ultimate value", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3426.png", price: "4500", planName: "5GB Data", needPanel: true },
+          { name: "Bug Bot", category: "bots", description: "Advanced WhatsApp bot with bug detection", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "5000", planName: "Bug Bot", needPanel: false },
+          { name: "Normal Bot", category: "bots", description: "Standard automation bot", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "4000", planName: "Normal Bot", needPanel: false },
+          { name: "Bot Development", category: "bots", description: "Custom bot tailored to your needs", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/C2585B79-C829-4452-9FBD-405B5AB8019B.png", price: "25000", planName: "Custom Development", needPanel: false },
+          { name: "Azam TV 1 Day", category: "azam", description: "24 hours all channels access", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "500", planName: "1 Day", needPanel: false },
+          { name: "Azam TV 1 Week", category: "azam", description: "7 days premium entertainment", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "2000", planName: "1 Week", needPanel: false },
           { name: "Azam TV 1 Month", category: "azam", description: "30 days unlimited", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "3000", planName: "1 Month", needPanel: false },
-          { name: "NIDA Soft Copy", category: "documents", description: "Digital NIDA document", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg", price: "10000", planName: "Soft Copy", needPanel: false },
-          { name: "Birthday Certificate", category: "documents", description: "RITA Certificate - TOTAL 35000 TZS", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/9b3ff475-89d9-424d-80a9-e94ed3f177d6.jpeg", price: "35000", planName: "Certificate Package", needPanel: false }
+          { name: "Azam TV 1 Year", category: "azam", description: "Best value yearly plan", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3417.jpeg", price: "5000", planName: "1 Year", needPanel: false },
+          { name: "NIDA Soft Copy", category: "documents", description: "Digital NIDA registration document", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3441.jpeg", price: "10000", planName: "Soft Copy", needPanel: false },
+          { name: "Birthday Certificate", category: "documents", description: "RITA Certificate - RITA 20000 + Service 15000 = TOTAL 35000 TZS", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/9b3ff475-89d9-424d-80a9-e94ed3f177d6.jpeg", price: "35000", planName: "Certificate Package", needPanel: false },
+          { name: "Halotel VPN 10 Days", category: "vpn", description: "Secure VPN for Halotel users", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "2500", planName: "10 Days", needPanel: false },
+          { name: "Halotel VPN 2 Weeks", category: "vpn", description: "Secure VPN for Halotel users", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "3500", planName: "2 Weeks", needPanel: false },
+          { name: "Halotel VPN 1 Month", category: "vpn", description: "Secure VPN for Halotel users", image: "https://raw.githubusercontent.com/stanytz378/stanyimagesservers/refs/heads/main/IMG_3440.jpeg", price: "4500", planName: "1 Month", needPanel: false }
         ];
         for(const s of defaultServices) await db.collection("services").add(s);
         loadServices();
