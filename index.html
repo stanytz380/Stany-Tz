@@ -25,7 +25,7 @@
     .gradient-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(249,115,22,0.4); }
     .stat-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 24px; transition: all 0.3s ease; cursor: pointer; }
     .stat-card:hover { transform: translateY(-5px); border-color: #f97316; background: rgba(249,115,22,0.1); }
-    .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+    .status-badge { padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
     .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
     .status-completed { background: rgba(16,185,129,0.2); color: #10b981; }
     .status-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; }
@@ -44,8 +44,12 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .nav-link { transition: all 0.2s ease; cursor: pointer; padding: 10px 20px; border-radius: 12px; }
     .nav-link:hover, .nav-link.active { background: rgba(249,115,22,0.15); color: #f97316; }
-    .btn-back { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; padding: 10px 20px; transition: all 0.2s; cursor: pointer; }
-    .btn-back:hover { background: rgba(249,115,22,0.2); border-color: #f97316; }
+    .btn-back { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; padding: 10px 20px; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-back:hover { background: rgba(249,115,22,0.2); border-color: #f97316; color: #f97316; }
+    .order-status-select { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; color: white; font-size: 0.75rem; cursor: pointer; }
+    .order-status-select.pending { border-color: #f59e0b; color: #f59e0b; }
+    .order-status-select.completed { border-color: #10b981; color: #10b981; }
+    .order-status-select.cancelled { border-color: #ef4444; color: #ef4444; }
   </style>
 </head>
 <body>
@@ -66,7 +70,7 @@
     </div>
   </div>
 
-  <!-- Admin Dashboard (Hidden until login) -->
+  <!-- Admin Dashboard -->
   <div id="adminDashboard" style="display:none">
     <!-- Top Navigation Bar -->
     <nav class="fixed top-0 left-0 right-0 z-40 glass-card" style="border-radius:0; border-bottom:1px solid rgba(255,255,255,0.08);">
@@ -91,7 +95,7 @@
 
     <div class="pt-20 pb-10 px-4 max-w-7xl mx-auto">
       
-      <!-- DASHBOARD PAGE -->
+      <!-- ========== DASHBOARD PAGE ========== -->
       <div id="dashboardPage" class="page active">
         <h1 class="text-2xl font-bold text-white mb-6">Dashboard Overview</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -100,36 +104,36 @@
           <div class="stat-card" onclick="showPage('orders')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Total Orders</p><p id="totalOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center"><i class="fas fa-shopping-cart text-2xl text-teal-500"></i></div></div></div>
           <div class="stat-card" onclick="showPage('orders')"><div class="flex items-center justify-between"><div><p class="text-gray-400 text-sm">Pending Orders</p><p id="pendingOrders" class="text-3xl font-bold text-white mt-1">0</p></div><div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center"><i class="fas fa-clock text-2xl text-yellow-500"></i></div></div></div>
         </div>
-        <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400">Loading orders...</div></div></div>
+        <div class="glass-card p-5"><h3 class="font-bold text-white mb-4"><i class="fas fa-history text-orange-500 mr-2"></i>Recent Orders</h3><div id="recentOrdersTable" class="overflow-x-auto"><div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading orders...</div></div></div>
       </div>
 
-      <!-- USERS PAGE -->
+      <!-- ========== USERS PAGE ========== -->
       <div id="usersPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Users</h1></div>
-        <div class="glass-card p-5"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-white"><i class="fas fa-users text-orange-500 mr-2"></i>Registered Users</h3><span id="userCount" class="text-sm text-gray-400"></span></div><div id="usersTable" class="overflow-x-auto"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Users</h1><span id="userCount" class="text-sm text-gray-400 ml-auto"></span></div>
+        <div class="glass-card p-5 overflow-x-auto"><div id="usersTable"></div></div>
       </div>
 
-      <!-- SERVICES PAGE -->
+      <!-- ========== SERVICES PAGE ========== -->
       <div id="servicesPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Services</h1><button id="addServiceBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Service</button></div>
-        <div class="glass-card p-5"><div id="servicesTable" class="overflow-x-auto"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Services</h1><button id="addServiceBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Service</button></div>
+        <div class="glass-card p-5 overflow-x-auto"><div id="servicesTable"></div></div>
       </div>
 
-      <!-- CATEGORIES PAGE -->
+      <!-- ========== CATEGORIES PAGE ========== -->
       <div id="categoriesPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Categories</h1><button id="addCategoryBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Category</button></div>
-        <div class="glass-card p-5"><div id="categoriesTable" class="overflow-x-auto"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Categories</h1><button id="addCategoryBtn" class="gradient-btn text-white px-5 py-2 rounded-full text-sm ml-auto"><i class="fas fa-plus mr-1"></i> Add Category</button></div>
+        <div class="glass-card p-5 overflow-x-auto"><div id="categoriesTable"></div></div>
       </div>
 
-      <!-- ORDERS PAGE -->
+      <!-- ========== ORDERS PAGE ========== -->
       <div id="ordersPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Orders</h1></div>
-        <div class="glass-card p-5"><div id="ordersTable" class="overflow-x-auto"></div></div>
+        <div class="flex items-center gap-4 mb-6 flex-wrap"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Manage Orders</h1><span id="orderCount" class="text-sm text-gray-400 ml-auto"></span></div>
+        <div class="glass-card p-5 overflow-x-auto"><div id="ordersTable"></div></div>
       </div>
 
-      <!-- SETTINGS PAGE -->
+      <!-- ========== SETTINGS PAGE ========== -->
       <div id="settingsPage" class="page">
-        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Website Settings</h1></div>
+        <div class="flex items-center gap-4 mb-6"><button onclick="showPage('dashboard')" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</button><h1 class="text-2xl font-bold text-white">Website Settings</h1></div>
         <div class="glass-card p-6 max-w-2xl"><div class="space-y-5"><div><label class="block text-sm text-gray-400 mb-1">Website Name</label><input type="text" id="websiteName" placeholder="StanyTech Service"></div><div><label class="block text-sm text-gray-400 mb-1">Logo URL</label><input type="text" id="websiteLogo" placeholder="https://..."></div><div><label class="block text-sm text-gray-400 mb-1">WhatsApp Number</label><input type="tel" id="waNumber" placeholder="255787069580"></div><div><label class="block text-sm text-gray-400 mb-1">Support Email</label><input type="email" id="supportEmail" placeholder="support@stanytech.com"></div><button id="saveSettingsBtn" class="gradient-btn text-white px-6 py-2 rounded-full"><i class="fas fa-save mr-2"></i> Save Settings</button></div></div>
       </div>
     </div>
@@ -173,13 +177,12 @@
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
       document.getElementById(`${pageName}Page`).classList.add('active');
-      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-      event?.target?.classList?.add('active');
       if(pageName === 'users') loadUsers();
       else if(pageName === 'services') loadServices();
       else if(pageName === 'categories') loadCategories();
       else if(pageName === 'orders') loadOrders();
       else if(pageName === 'dashboard') loadStats();
+      else if(pageName === 'settings') loadSettings();
     }
 
     async function loadAllData() { await loadStats(); await loadUsers(); await loadServices(); await loadCategories(); await loadOrders(); await loadSettings(); }
@@ -194,7 +197,7 @@
       document.getElementById('totalOrders').innerText = orders.size;
       document.getElementById('pendingOrders').innerText = pending.size;
       
-      let recentHtml = '<table><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+      let recentHtml = '<tr><thead><tr><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>';
       const recentOrders = [];
       orders.forEach(doc => recentOrders.push({ id: doc.id, ...doc.data() }));
       recentOrders.sort((a,b) => (b.createdAt?.toDate?.() || new Date(b.createdAt)) - (a.createdAt?.toDate?.() || new Date(a.createdAt)));
@@ -214,7 +217,7 @@
         const u = doc.data();
         html += `<tr><td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${u.name || 'N/A'}</td><td>${u.email || doc.id.substring(0,20)}...</td><td>${u.phone || '-'}</td><td>${u.createdAt?.toDate?.().toLocaleDateString() || '-'}</td><td><button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
       });
-      html += '</tbody><tr>';
+      html += '</tbody></table>';
       document.getElementById('usersTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No users found</div>';
     }
 
@@ -222,12 +225,12 @@
 
     async function loadServices() {
       const services = await db.collection("services").get();
-      let html = '<table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<tr><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price (TZS)</th><th>Plan</th><th>Actions</th></tr></thead><tbody>';
       services.forEach(doc => {
         const s = doc.data();
-        html += `<tr><td><img src="${s.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td>${s.name}</td><td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${s.category}</span></td><td>${s.price || '0'} TZS</td><td>${s.planName || '-'}</td><td><button onclick="editService('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteService('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
+        html += `<tr><td class="p-2"><img src="${s.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td class="font-medium">${s.name}</td><td><span class="text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-400">${s.category}</span></td><td class="font-semibold text-orange-400">${s.price || '0'}</td><td>${s.planName || '-'}</td><td><button onclick="editService('${doc.id}')" class="text-blue-500 mr-3 hover:text-blue-400"><i class="fas fa-edit"></i></button><button onclick="deleteService('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;
       });
-      html += '</tbody></table>';
+      html += '</tbody><table>';
       document.getElementById('servicesTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No services. Click Add Service to create one.</div>';
     }
 
@@ -249,12 +252,12 @@
 
     async function loadCategories() {
       const categories = await db.collection("categories").get();
-      let html = '</table><thead><tr><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>Image</th><th>Category Name</th><th>Key</th><th>Actions</th></tr></thead><tbody>';
       categories.forEach(doc => {
         const c = doc.data();
-        html += `<tr><td><img src="${c.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td><i class="fas fa-folder text-orange-500 mr-2"></i>${c.name}</td><td><code class="text-xs bg-gray-800 px-2 py-1 rounded">${c.key}</code></td><td><button onclick="editCategory('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteCategory('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
+        html += `<tr><td class="p-2"><img src="${c.image || 'https://placehold.co/40'}" class="w-10 h-10 rounded-lg object-cover"></td><td><i class="fas fa-folder text-orange-500 mr-2"></i>${c.name}</td><td><code class="text-xs bg-gray-800 px-2 py-1 rounded">${c.key}</code></td><td><button onclick="editCategory('${doc.id}')" class="text-blue-500 mr-3"><i class="fas fa-edit"></i></button><button onclick="deleteCategory('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
       });
-      html += '</tbody></tr>';
+      html += '</tbody></table>';
       document.getElementById('categoriesTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No categories. Click Add Category to create one.</div>';
     }
 
@@ -273,16 +276,36 @@
     async function loadOrders() {
       const orders = await db.collection("orders").orderBy("createdAt", "desc").get();
       document.getElementById('orderCount').innerText = `${orders.size} total orders`;
-      let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<table><thead><tr><th>Customer</th><th>Service</th><th>Plan</th><th>Amount (TZS)</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
       orders.forEach(doc => {
         const o = doc.data();
-        html += `<tr><td><i class="fas fa-user text-orange-500 mr-2"></i>${o.customerName || '-'}</td><td>${o.serviceName || '-'}</td><td>${o.planName || '-'}</td><td class="font-semibold text-orange-400">${o.amount || '-'}</td><td><select onchange="updateOrderStatus('${doc.id}', this.value)" class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-sm"><option value="pending" ${o.status==='pending'?'selected':''}> Pending</option><option value="completed" ${o.status==='completed'?'selected':''}> Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}> Cancelled</option></select></td><td>${o.createdAt?.toDate?.().toLocaleString() || new Date(o.createdAt).toLocaleString()}</td><td><button onclick="deleteOrder('${doc.id}')" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`;
+        let statusClass = o.status === 'completed' ? 'status-completed' : (o.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
+        html += `<tr class="hover:bg-white/5 transition">
+          <td><i class="fas fa-user-circle text-orange-500 mr-2"></i>${o.customerName || '-'}</td>
+          <td class="font-medium">${o.serviceName || '-'}</td>
+          <td class="text-gray-400">${o.planName || '-'}</td>
+          <td class="font-semibold text-orange-400">${o.amount || '-'}</td>
+          <td>
+            <select onchange="updateOrderStatus('${doc.id}', this.value)" class="order-status-select ${o.status || 'pending'}" style="background:rgba(0,0,0,0.5); border-radius:20px; padding:6px 12px;">
+              <option value="pending" ${o.status==='pending'?'selected':''} style="color:#f59e0b;">🟡 Pending</option>
+              <option value="completed" ${o.status==='completed'?'selected':''} style="color:#10b981;">✅ Completed</option>
+              <option value="cancelled" ${o.status==='cancelled'?'selected':''} style="color:#ef4444;">❌ Cancelled</option>
+            </select>
+          </td>
+          <td class="text-gray-500 text-sm">${o.createdAt?.toDate?.().toLocaleString() || new Date(o.createdAt).toLocaleString()}</td>
+          <td><button onclick="deleteOrder('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button></td>
+        </tr>`;
       });
       html += '</tbody></table>';
       document.getElementById('ordersTable').innerHTML = html || '<div class="text-center py-8 text-gray-400">No orders found</div>';
     }
 
-    window.updateOrderStatus = async (orderId, status) => { await db.collection("orders").doc(orderId).update({ status: status, updatedAt: new Date() }); loadStats(); loadOrders(); alert(`Order marked as ${status}`); };
+    window.updateOrderStatus = async (orderId, status) => { 
+      await db.collection("orders").doc(orderId).update({ status: status, updatedAt: new Date() }); 
+      loadStats(); 
+      loadOrders(); 
+      alert(`✅ Order marked as ${status.toUpperCase()}!`);
+    };
     window.deleteOrder = async (orderId) => { if(confirm("Delete this order?")) { await db.collection("orders").doc(orderId).delete(); loadStats(); loadOrders(); } };
 
     async function loadSettings() {
@@ -303,7 +326,7 @@
         email: document.getElementById('supportEmail').value,
         updatedAt: new Date()
       });
-      alert("Settings saved!");
+      alert("Settings saved successfully!");
     });
 
     function closeServiceModal() { document.getElementById('serviceModal').style.display = 'none'; document.getElementById('serviceForm').reset(); document.getElementById('serviceId').value = ''; }
